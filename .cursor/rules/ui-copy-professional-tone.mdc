@@ -1,0 +1,24 @@
+---
+description: Keep UI copy formal and product-grade
+alwaysApply: true
+---
+
+# UI Copy Professional Tone
+
+- User-facing copy must be concise, neutral, and production-ready.
+- Do not use demo/prototype wording in UI text.
+- Remove feature-internal labels unless they provide clear user value.
+
+## Disallowed patterns (examples)
+
+- "润色你的草稿"
+- "精简版"
+- "短一些"
+- "保留语气"
+- Any wording that reads like an internal demo tag or generation label.
+
+## Required style
+
+- Prefer direct action labels and plain language.
+- Keep labels short and unambiguous.
+- If unsure, choose the more formal and less "AI showcase" wording.

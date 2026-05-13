@@ -1,0 +1,28 @@
+---
+description: Avoid fallback and retry branching; fix root causes
+alwaysApply: true
+---
+
+# No Fallback, No Retry Branching
+
+- Do not add fallback paths, silent degradation, or automatic retry flows as default implementation strategy.
+- Do not mask failures with "best effort" branches that keep the flow running.
+- When a failure appears, prioritize root-cause analysis and direct fixes.
+
+## Engineering intent
+
+- Keep control flow simple and predictable.
+- Preserve a clear mental model for developers.
+- Reduce branch explosion and hidden behavior.
+
+## Preferred behavior
+
+- Fail fast with explicit errors.
+- Surface actionable error context for debugging.
+- Fix the underlying issue instead of adding fallback logic.
+
+## Disallowed patterns (unless explicitly requested)
+
+- Multi-layer fallback chains.
+- Generic catch-and-continue behavior.
+- Automatic retries added to hide instability.

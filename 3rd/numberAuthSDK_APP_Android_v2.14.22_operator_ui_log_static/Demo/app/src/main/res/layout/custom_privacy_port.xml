@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="240dp"
+                android:text="取消"
+                android:gravity="center"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="40dp"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/authsdk_privacy_btn"
+                android:textColor="@color/privacy_alert_btn_color"
+                android:textSize="14sp" />
+
+</RelativeLayout>

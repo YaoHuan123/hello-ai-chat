@@ -1,0 +1,30 @@
+---
+description: Allow fallback/retry only with explicit requirement and strict guardrails
+alwaysApply: true
+---
+
+# Guarded Resilience Only When Required
+
+- Fallback or retry logic is allowed only when explicitly requested by product/business requirement.
+- Any resilience branch must be intentional, bounded, and observable.
+
+## Required conditions before adding fallback/retry
+
+- State the explicit requirement in the PR/task context.
+- Define clear trigger conditions.
+- Define clear stop/exit conditions.
+- Define max attempts/time budget (for retry).
+- Define logging/metrics for each trigger.
+
+## Implementation constraints
+
+- No silent fallback.
+- No unbounded retries.
+- No nested fallback chains.
+- Keep the primary path readable and dominant.
+
+## Review checklist
+
+- Why is resilience required here?
+- Is root cause still being fixed in parallel?
+- Can developers predict behavior from one pass of reading?

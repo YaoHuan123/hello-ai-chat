@@ -1,0 +1,3 @@
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,*Annotation*,EnclosingMethod
+-keep class android.app.ActivityThread {*;}
+-keep class android.os.SystemProperties {*;}

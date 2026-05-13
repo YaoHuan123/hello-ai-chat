@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.aliqin.mytel">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    
+
+<!-- 可选权限 --><uses-permission android:name="android.permission.READ_PHONE_STATE"/><application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name="com.aliqin.mytel.MyApplication" android:networkSecurityConfig="@xml/network_security_config" android:supportsRtl="true" android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <activity android:name="com.aliqin.mytel.ModeSelectActivity" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:name="com.aliqin.mytel.DisplayActivity" android:screenOrientation="sensorPortrait"/>
+
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale" android:exported="false" android:name="com.aliqin.mytel.login.OneKeyLoginActivity" android:screenOrientation="sensorPortrait"/>
+        <activity android:configChanges="orientation|keyboardHidden|screenSize|uiMode|fontScale" android:exported="false" android:name="com.aliqin.mytel.auth.CustomWebViewActivity" android:screenOrientation="sensorPortrait">
+            <intent-filter>
+                <action android:name="com.aliqin.mytel.protocolWeb"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:name="com.aliqin.mytel.login.OneKeyLoginDelayActivity" android:screenOrientation="sensorPortrait"/>
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:name="com.aliqin.mytel.auth.NumberAuthActivity" android:screenOrientation="sensorPortrait"/>
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:name="com.aliqin.mytel.auth.PersonActivity" android:screenOrientation="sensorPortrait"/>
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:name="com.aliqin.mytel.MessageActivity" android:screenOrientation="sensorPortrait"/>
+
+
+        <!--重点关注！！！！！！！-->
+        <!--如果不需要使用窗口模式，不要使用authsdk_activity_dialog主题，会出现异常动画-->
+        <!--如果需要使用authsdk_activity_dialog主题，则screenOrientation一定不能指定明确的方向，
+        比如portrait、sensorPortrait，在8.0的系统上不允许窗口模式指定orientation，会发生crash，需要指定为behind，
+        然后在授权页的前一个页面指定具体的orientation-->
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:launchMode="singleTop" android:name="com.mobile.auth.gatewayauth.LoginAuthActivity" android:screenOrientation="behind" android:theme="@style/authsdk_activity_dialog"/>
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:launchMode="singleTop" android:name="com.mobile.auth.gatewayauth.PrivacyDialogActivity" android:screenOrientation="behind" android:theme="@style/authsdk_activity_dialog"/>
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:exported="false" android:launchMode="singleTop" android:name="com.mobile.auth.gatewayauth.activity.AuthWebVeiwActivity" android:screenOrientation="behind"/>
+
+    </application></manifest>
