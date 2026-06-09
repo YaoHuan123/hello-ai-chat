@@ -1,5 +1,6 @@
 import { deleteJson, getJson, patchJson, postJson } from "./api";
 import { isApiMock } from "./mock";
+import { getAuthToken } from "./storage";
 
 export type ChatRole = "visitor" | "agent";
 export type OneWayMessage = {
@@ -40,6 +41,9 @@ export type MolCatalogItem = {
   recommended: boolean;
   /** 热度，供排序与热门 */
   popularityScore: number;
+  /** 当前用户是否为该 MOL 在 MOL 世界的上传者 */
+  uploaderIsMe?: boolean;
+  uploaderUserId?: string;
 };
 
 /** 在「我的 Mol」中：来自商城已应用，或用户自建。 */
@@ -70,7 +74,33 @@ export type UpdateMyMolInput = {
   name?: string;
   summary?: string;
   primaryCategory?: string;
+  infoItems?: MolInfoItem[];
 };
+
+function authT(): string {
+  const t = getAuthToken().trim();
+  if (!t) throw new Error("未登录");
+  return t;
+}
+
+function fileRecordToCatalogItem(rec: Record<string, unknown>, owned = true): MolCatalogItem {
+  return {
+    id: String(rec.id),
+    name: String(rec.name),
+    summary: String(rec.summary),
+    price: Number(rec.price ?? 0),
+    owned,
+    primaryCategory: String(rec.primaryCategory),
+    taskTags: (rec.taskTags as string[]) ?? [],
+    toneTags: (rec.toneTags as string[]) ?? [],
+    relationshipTags: (rec.relationshipTags as string[]) ?? [],
+    abilityTags: (rec.abilityTags as string[]) ?? [],
+    recommended: Boolean(rec.recommended),
+    popularityScore: Number(rec.popularityScore ?? 0),
+    uploaderIsMe: rec.uploaderIsMe as boolean | undefined,
+    uploaderUserId: rec.uploaderUserId as string | undefined,
+  };
+}
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 const nowTime = () => {
@@ -234,15 +264,29 @@ function defaultProInfoList(): MolInfoItem[] {
 }
 
 function mergeMyMolsListMock(): MolInMyCollection[] {
-  const fromStore: MolInMyCollection[] = molCatalogMock
-    .filter((m) => m.owned)
-    .map((m) => ({ ...m, source: "store" as const }));
   const fromUser: MolInMyCollection[] = userMolsList.map((m) => ({
     ...m,
     owned: true,
     source: "created" as const,
+    uploaderIsMe: m.uploaderIsMe ?? true,
   }));
-  return [...fromUser, ...fromStore].sort(
+  const fromStore: MolInMyCollection[] = molCatalogMock
+    .filter((m) => m.owned)
+    .map((m) => ({
+      ...m,
+      source: "store" as const,
+      uploaderIsMe: m.uploaderIsMe ?? false,
+    }));
+  const byId = new Map<string, MolInMyCollection>();
+  for (const u of fromUser) {
+    byId.set(u.id, u);
+  }
+  for (const s of fromStore) {
+    if (!byId.has(s.id)) {
+      byId.set(s.id, s);
+    }
+  }
+  return [...byId.values()].sort(
     (a, b) => (b.popularityScore ?? 0) - (a.popularityScore ?? 0) || a.name.localeCompare(b.name, "zh-Hans"),
   );
 }
@@ -310,7 +354,7 @@ export async function getMolCatalog(): Promise<MolCatalogItem[]> {
     await wait(160);
     return molCatalogMock;
   }
-  return getJson<MolCatalogItem[]>("/api/mol-world/catalog");
+  return getJson<MolCatalogItem[]>("/api/mol-world", authT());
 }
 
 export async function purchaseMol(molId: string): Promise<MolCatalogItem[]> {
@@ -319,7 +363,7 @@ export async function purchaseMol(molId: string): Promise<MolCatalogItem[]> {
     molCatalogMock = molCatalogMock.map((m) => (m.id === molId ? { ...m, owned: true } : m));
     return molCatalogMock;
   }
-  return postJson<MolCatalogItem[]>("/api/mol-world/purchase", { molId });
+  return postJson<MolCatalogItem[]>("/api/mol-mine/import", { molWorldId: molId }, authT());
 }
 
 export async function getMyMols(): Promise<MolInMyCollection[]> {
@@ -327,7 +371,7 @@ export async function getMyMols(): Promise<MolInMyCollection[]> {
     await wait(140);
     return mergeMyMolsListMock();
   }
-  return getJson<MolInMyCollection[]>("/api/mol-mine");
+  return getJson<MolInMyCollection[]>("/api/mol-mine", authT());
 }
 
 function normalizeInfoDrafts(rows: CreateMyMolInput["initialInfo"]): MolInfoItem[] {
@@ -354,16 +398,17 @@ export async function getMolInfoItems(molId: string): Promise<MolInfoItem[]> {
     }
     return [];
   }
-  return getJson<MolInfoItem[]>(`/api/mol-mine/${encodeURIComponent(molId)}/info-items`);
+  const { info } = await getMyMolDetailForEdit(molId);
+  return info;
 }
 
-export async function putMolInfoItems(molId: string, items: MolInfoItem[]): Promise<void> {
+export async function putMolInfoItems(_molId: string, _items: MolInfoItem[]): Promise<void> {
   if (isApiMock()) {
     await wait(150);
-    molInfoById[molId] = items.map((x) => ({ ...x }));
+    molInfoById[_molId] = _items.map((x) => ({ ...x }));
     return;
   }
-  await postJson<unknown>(`/api/mol-mine/${encodeURIComponent(molId)}/info-items`, { items });
+  throw new Error("请使用保存：信息项已合并到 MOL 世界文件更新接口。");
 }
 
 export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolInMyCollection; info: MolInfoItem[] }> {
@@ -377,7 +422,7 @@ export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolI
     const info = await getMolInfoItems(molId);
     return { item, info };
   }
-  return getJson<{ item: MolInMyCollection; info: MolInfoItem[] }>(`/api/mol-mine/${encodeURIComponent(molId)}/detail`);
+  return getJson<{ item: MolInMyCollection; info: MolInfoItem[] }>(`/api/mol-mine/${encodeURIComponent(molId)}/detail`, authT());
 }
 
 export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogItem> {
@@ -402,18 +447,29 @@ export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogIt
       abilityTags: [],
       recommended: false,
       popularityScore: 0,
+      uploaderIsMe: true,
     };
     userMolsList = [...userMolsList, newItem];
+    molCatalogMock = [...molCatalogMock, { ...newItem, owned: true, uploaderIsMe: true }];
     const initial = normalizeInfoDrafts(input.initialInfo);
     molInfoById = { ...molInfoById, [newItem.id]: initial };
     return { ...newItem };
   }
-  return postJson<MolCatalogItem>("/api/mol-mine", {
-    name,
-    summary,
-    primaryCategory,
-    initialInfo: input.initialInfo,
-  });
+  const t = authT();
+  const initialInfo = input.initialInfo?.map((row) => ({
+    id: row.id,
+    title: row.title.trim(),
+    body: row.body.trim(),
+    source: row.source ?? "custom",
+    softRemoved: row.softRemoved,
+  }));
+  const created = await postJson<Record<string, unknown>>(
+    "/api/mol-world",
+    { name, summary, primaryCategory, initialInfo },
+    t,
+  );
+  await postJson<unknown>("/api/mol-mine/import", { molWorldId: String(created.id) }, t);
+  return fileRecordToCatalogItem(created, true);
 }
 
 export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promise<void> {
@@ -435,6 +491,9 @@ export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promi
             }
           : m,
       );
+      if (p.infoItems) {
+        molInfoById[molId] = p.infoItems.map((x) => ({ ...x }));
+      }
       return;
     }
     const c = molCatalogMock.find((m) => m.id === molId && m.owned);
@@ -448,18 +507,24 @@ export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promi
           primaryCategory: p.primaryCategory !== undefined && p.primaryCategory !== "" ? p.primaryCategory! : m.primaryCategory,
         };
       });
+      if (p.infoItems) {
+        molInfoById[molId] = p.infoItems.map((x) => ({ ...x }));
+      }
       return;
     }
     throw new Error("该 Mol 不存在或不可编辑。");
   }
-  await patchJson<unknown>(`/api/mol-mine/${encodeURIComponent(molId)}`, patch);
+  await patchJson<unknown>(`/api/mol-world/${encodeURIComponent(molId)}`, p, authT());
 }
 
-export async function removeMyMol(molId: string): Promise<void> {
+export async function removeMyMol(molId: string, options?: { deleteFromWorld?: boolean }): Promise<void> {
   if (isApiMock()) {
     await wait(200);
     if (userMolsList.some((m) => m.id === molId)) {
       userMolsList = userMolsList.filter((m) => m.id !== molId);
+      if (options?.deleteFromWorld) {
+        molCatalogMock = molCatalogMock.filter((m) => m.id !== molId);
+      }
       if (molId in molInfoById) {
         const next = { ...molInfoById };
         delete next[molId];
@@ -478,5 +543,9 @@ export async function removeMyMol(molId: string): Promise<void> {
     }
     throw new Error("该 Mol 不存在或已移除。");
   }
-  await deleteJson<unknown>(`/api/mol-mine/${encodeURIComponent(molId)}`);
+  if (options?.deleteFromWorld) {
+    await deleteJson<unknown>(`/api/mol-world/${encodeURIComponent(molId)}`, authT());
+  } else {
+    await deleteJson<unknown>(`/api/mol-mine/${encodeURIComponent(molId)}`, authT());
+  }
 }

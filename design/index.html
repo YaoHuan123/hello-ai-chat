@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>聊天界面设计稿索引</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #eef0f5; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #14171a; }
+      .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 60px; }
+      h1 { font-size: 22px; margin: 0 0 6px; }
+      .lead { color: #6b7380; margin: 0 0 24px; font-size: 14px; line-height: 1.6; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+      .card { background: #fff; border-radius: 16px; padding: 18px 18px 14px; box-shadow: 0 6px 22px rgba(20,23,26,0.06); border: 1px solid rgba(20,23,26,0.06); display: flex; flex-direction: column; gap: 8px; }
+      .card h2 { margin: 0; font-size: 16px; }
+      .card p { margin: 0; color: #6b7380; font-size: 13px; line-height: 1.55; }
+      .pros, .cons { font-size: 12px; line-height: 1.6; padding: 6px 10px; border-radius: 8px; }
+      .pros { background: rgba(47,158,111,0.10); color: #1f6f4a; }
+      .cons { background: rgba(214, 70, 70, 0.08); color: #984040; }
+      .btn { align-self: flex-start; margin-top: 4px; text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #4f6df5; color: #fff; font-size: 13px; font-weight: 700; }
+      .checklist { background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      .checklist h3 { margin: 0 0 8px; font-size: 14px; }
+      .checklist ul { margin: 0; padding-left: 18px; color: #14171a; font-size: 13px; line-height: 1.8; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>聊天界面设计稿（4 个方案）</h1>
+      <p class="lead">每个原型都覆盖以下要素，用不同的布局组织方式呈现，便于你横向对比挑选或混搭。点击 "查看" 单独打开手机视图。</p>
+
+      <div class="checklist">
+        <h3>必备元素清单</h3>
+        <ul>
+          <li>当前 Mol 名称展示 + 切换入口</li>
+          <li>一键触发 Mol 推荐按钮</li>
+          <li>单向 / 普通 聊天模式切换</li>
+          <li>对方头像 + 名称 + 在线状态</li>
+          <li>消息时间戳</li>
+          <li>Mol 推荐内容的展示方式</li>
+          <li>标准输入框 + 发送按钮</li>
+        </ul>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>方案 A · 顶栏 Mol + 工具条推荐</h2>
+          <p>顶栏放对方信息和模式开关；下方一条独立的 Mol 工具条，左侧是当前 Mol 切换胶囊，右侧是醒目的 "Mol 推荐" 按钮。推荐结果以浮层卡片出现在输入框上方。</p>
+          <div class="pros"><b>适合：</b>把 Mol 当作"持续显示的工具"，强调当前用的 Mol。</div>
+          <div class="cons"><b>取舍：</b>顶部占两行，纵向空间略少。</div>
+          <a class="btn" href="./chat-A-topbar-mol.html" target="_blank">查看 A</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 B · 输入框上方工具条 + 内联建议</h2>
+          <p>顶栏只放对方信息；Mol 选择、模式切换、Mol 推荐全部聚合在输入框正上方一行。推荐结果以"草稿气泡"形式出现在我方一侧，点击直接发送。</p>
+          <div class="pros"><b>适合：</b>把所有控件靠近拇指；推荐结果上下文连贯。</div>
+          <div class="cons"><b>取舍：</b>底部工具条略重，需注意视觉层级。</div>
+          <a class="btn" href="./chat-B-composer-toolbar.html" target="_blank">查看 B</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 C · 占位原位展开 + 建议框内管理 Mol</h2>
+          <p>顶栏不展示当前 Mol。推荐入口为「我方下一条」虚线占位，点击后在同位置展开 Mol 建议卡片；卡片内提供「修改 Mol」入口（示意中可再打开底部选择列表）。模式切换为顶栏右上角胶囊。同页含三种状态示意。</p>
+          <div class="pros"><b>适合：</b>推荐与占位同位；Mol 相关操作集中在建议流程内，顶栏更简洁。</div>
+          <div class="cons"><b>取舍：</b>展开卡片会拉长列表，需预留滚动空间。</div>
+          <a class="btn" href="./chat-C-inline-placeholder.html" target="_blank">查看 C</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 D · 输入区图标化 + 底部抽屉</h2>
+          <p>对方名旁挂一颗"当前 Mol"小胶囊，单向/普通做成 Segmented Control。Mol 推荐做成输入框左侧的 ✨ 图标按钮，推荐结果以底部抽屉式出现。附赠单向模式对比稿。</p>
+          <div class="pros"><b>适合：</b>整体最克制，把更多空间留给消息内容。</div>
+          <div class="cons"><b>取舍：</b>图标对新用户认知成本略高，需要 tooltip。</div>
+          <a class="btn" href="./chat-D-bottom-sheet.html" target="_blank">查看 D</a>
+        </div>
+      </div>
+
+      <div class="checklist" style="margin-top: 32px;">
+        <h3>朋友圈 UI 风格（3 套 · 对齐现版 5 页面）</h3>
+        <p style="margin: 0 0 10px; font-size: 13px; color: #6b7380; line-height: 1.6;">
+          覆盖朋友圈 Tab、我的动态、添加、热点、探索对话；每套方案内并排 5 个手机屏预览。
+        </p>
+        <a class="btn" href="./moments-ui-index.html" style="display: inline-block; background: #d49a3a;">打开朋友圈 UI 索引</a>
+      </div>
+
+      <div class="checklist" style="margin-top: 20px;">
+        <h3>朋友圈 Tab 展示方案（5 个 · 早期）</h3>
+        <p style="margin: 0 0 10px; font-size: 13px; color: #6b7380; line-height: 1.6;">
+          针对「联系人列表 + 探索预览」认知不清的问题，提供 A–E 五种布局方向，含 PM 对比表与推荐说明。
+        </p>
+        <a class="btn" href="./moments-index.html" style="display: inline-block;">打开早期方案索引</a>
+      </div>
+    </div>
+  </body>
+</html>

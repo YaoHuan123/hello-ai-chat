@@ -12,7 +12,7 @@
 | 质量 | ESLint 9 + `typescript-eslint` + `eslint-plugin-react-hooks` |
 | 路由 | **未使用** `react-router`；在 `src/App.tsx` 内用 `useState<RouteName>` 在多个全屏页之间切换 |
 | HTTP 客户端 | 浏览器 **原生 `fetch`**，封装在 `src/services/api.ts` |
-| 默认后端地址 | `export const API_BASE = "http://localhost:3000"`（与传记后端 `PORT` 默认一致，见下节） |
+| 默认后端地址 | `export const API_BASE = "http://localhost:4000"`（与传记后端 `PORT` 默认一致，见下节） |
 | 鉴权 | 在需登录的接口中通过 `Authorization: Bearer <token>` 传递，token 由登录流程写入并读取（见 `src/services/storage.ts`） |
 
 **约定**：新功能优先在 `api.ts` 中按现有 `getJson` / `postJson` 风格增函数；页面组件不直接写散落的多套 `API_BASE` 常亮。
@@ -26,7 +26,7 @@
 | 模块格式 | `"type": "commonjs"` |
 | HTTP 框架 | **Express 5** |
 | 主要依赖 | `cors`、`jsonwebtoken`、`bcryptjs`、`zod`、`dotenv`，数据目录见 `src/config.ts` 等 |
-| 端口 | 默认 **`3000`**，可通过环境变量 `PORT` 覆盖（`src/config.ts`：`Number(process.env.PORT ?? 3000)`） |
+| 端口 | 默认 **`4000`**，可通过环境变量 `PORT` 覆盖（`src/config.ts`：`Number(process.env.PORT ?? 4000)`） |
 | 入口 | `src/index.ts`：挂载 `/api/auth`、`/api/materials`、/api/texts` 等，无内置前端静态托管（前端由 Vite 自管） |
 
 ## 3. AI 接口在传记中的用法（对齐重点）

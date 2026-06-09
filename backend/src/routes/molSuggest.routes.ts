@@ -1,0 +1,124 @@
+import { Router, type Response } from "express";
+import { z } from "zod";
+import { authMiddleware } from "../middleware/auth";
+import { logWarn } from "../logger";
+import type { AiReplyService, SuggestLastMessage } from "../services/aiReply.service";
+import type { ContactsService } from "../services/contacts.service";
+import type { UserMolsService } from "../services/userMols.service";
+
+const bodySchema = z.object({
+  peerUserId: z.string().min(1),
+  lastMessages: z
+    .array(
+      z.object({
+        from: z.enum(["me", "peer"]),
+        text: z.string().min(1).max(2000),
+        ts: z.number(),
+      }),
+    )
+    .max(20)
+    .optional(),
+});
+
+function buildPersonaBlock(userMols: UserMolsService, ownerUserId: string): string {
+  const owned = userMols.listByOwnerWithMeta(ownerUserId);
+  const lines: string[] = [];
+  for (const { record } of owned) {
+    const items = record.infoItems.filter((it) => !it.softRemoved);
+    for (const it of items) {
+      const title = it.title.trim();
+      const body = it.body.trim();
+      if (!title || !body) continue;
+      lines.push(`[${record.name}] ${title}: ${body}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+function mapError(res: Response, error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const code = error.message;
+  logWarn("mol_suggest.error", { code });
+  if (code === "NOT_FRIENDS") {
+    res.status(403).json({ code, message: "双方不是联系人，无法生成建议" });
+    return true;
+  }
+  if (code === "AI_NOT_CONFIGURED") {
+    res.status(503).json({ code, message: "AI 服务未配置" });
+    return true;
+  }
+  if (code === "NO_USER_MOLS") {
+    res.status(409).json({ code, message: "尚未添加 Mol，无法生成建议" });
+    return true;
+  }
+  if (code === "INVALID_PARAMS") {
+    res.status(400).json({ code, message: "请求参数无效" });
+    return true;
+  }
+  if (code === "AI_PROVIDER_ERROR") {
+    res.status(502).json({ code, message: "AI 服务暂不可用" });
+    return true;
+  }
+  if (code === "AI_PARSE_ERROR") {
+    res.status(502).json({ code, message: "生成结果格式异常" });
+    return true;
+  }
+  if (code === "AI_PROMPT_EMPTY") {
+    res.status(500).json({ code, message: "提示词文件为空或无效，请检查数据目录下 prompts 内模板" });
+    return true;
+  }
+  if (code === "AI_TIMEOUT") {
+    res.status(504).json({ code, message: "AI 请求超时" });
+    return true;
+  }
+  return false;
+}
+
+export const createMolSuggestRouter = (
+  aiReply: AiReplyService,
+  contacts: ContactsService,
+  userMols: UserMolsService,
+): Router => {
+  const router = Router();
+
+  router.post("/suggest", authMiddleware, async (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    const parsed = bodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
+      return;
+    }
+    const { peerUserId, lastMessages } = parsed.data;
+
+    if (!contacts.areMutualContacts(user.userId, peerUserId)) {
+      res.status(403).json({ code: "NOT_FRIENDS", message: "双方不是联系人，无法生成建议" });
+      return;
+    }
+    if (!aiReply.isConfigured()) {
+      res.status(503).json({ code: "AI_NOT_CONFIGURED", message: "AI 服务未配置" });
+      return;
+    }
+
+    const personaBlock = buildPersonaBlock(userMols, user.userId);
+    if (!personaBlock.trim()) {
+      res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加 Mol，无法生成建议" });
+      return;
+    }
+
+    const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
+
+    try {
+      const suggestions = await aiReply.suggestReplies({ personaBlock, lastMessages: lm });
+      res.status(200).json({ suggestions });
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "生成失败" });
+    }
+  });
+
+  return router;
+};

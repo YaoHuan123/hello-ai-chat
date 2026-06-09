@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>朋友圈 UI 风格方案索引（2026）</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #eef0f5; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #14171a; }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px 60px; }
+      h1 { font-size: 22px; margin: 0 0 6px; }
+      .lead { color: #6b7380; margin: 0 0 20px; font-size: 14px; line-height: 1.65; }
+      .pages { background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      .pages h3 { margin: 0 0 8px; font-size: 14px; }
+      .pages ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.85; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+      .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 6px 22px rgba(20,23,26,0.06); border: 1px solid rgba(20,23,26,0.06); display: flex; flex-direction: column; gap: 10px; }
+      .card h2 { margin: 0; font-size: 17px; }
+      .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+      .tag-a { background: rgba(212,154,58,0.15); color: #9a6b1e; }
+      .tag-b { background: rgba(79,109,245,0.12); color: #3a4db8; }
+      .tag-c { background: rgba(47,158,111,0.12); color: #1f6f4a; }
+      .card p { margin: 0; color: #6b7380; font-size: 13px; line-height: 1.55; }
+      .traits { font-size: 12px; line-height: 1.65; padding: 8px 10px; border-radius: 10px; background: #f7f8fb; color: #3a3a3c; }
+      .btn { align-self: flex-start; text-decoration: none; padding: 9px 16px; border-radius: 999px; color: #fff; font-size: 13px; font-weight: 700; }
+      .btn-a { background: #d49a3a; }
+      .btn-b { background: #4f6df5; }
+      .btn-c { background: #2f9e6f; }
+      .legacy { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(20,23,26,0.08); font-size: 13px; color: #6b7380; }
+      .legacy a { color: #d49a3a; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 14px; overflow: hidden; margin-top: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(20,23,26,0.06); }
+      th { background: #f7f8fb; }
+      tr:last-child td { border-bottom: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>朋友圈相关页面 · 3 套 UI 风格</h1>
+      <p class="lead">
+        对齐当前产品实现：<b>朋友圈 Tab</b>（三入口 + 按天探索记录）、<b>我的动态</b>、<b>添加</b>、<b>热点</b>、<b>探索对话</b>。
+        每套风格在同一 HTML 内并排展示 5 个手机屏，便于横向对比整体气质后再定稿。
+      </p>
+
+      <div class="pages">
+        <h3>每套方案包含的 5 个页面</h3>
+        <ul>
+          <li><b>朋友圈 Tab</b> — 探索好友 / 我的日常 / 热点；探索记录按「今天、昨天…」分组，卡片只显示问题</li>
+          <li><b>我的动态</b> — 列表 + 右上角「添加」；问答类只展示问题</li>
+          <li><b>添加</b> — 顶栏「返回 · 添加 · 发布」+ 单输入框</li>
+          <li><b>热点</b> — 热门话题列表，可回答 / 已收录</li>
+          <li><b>探索对话</b> — 单向分身聊天 + 底部输入</li>
+        </ul>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>风格 A · 暖色简约 <span class="tag tag-a">接近现版</span></h2>
+          <p>金色主色、圆角卡片、三宫格入口。与当前 App 气质最接近，改动成本最低。</p>
+          <div class="traits">主色 #d49a3a · 白卡片 · 轻阴影 · 探索记录卡片可点击</div>
+          <a class="btn btn-a" href="./moments-ui-style-A-warm.html" target="_blank">查看风格 A</a>
+        </div>
+        <div class="card">
+          <h2>风格 B · 清爽扁平</h2>
+          <p>蓝灰主色、弱阴影、列表化历史。信息密度略高，偏工具型、偏「记录本」感。</p>
+          <div class="traits">主色 #4f6df5 · 细分割线 · 入口改为横条 · 历史用紧凑行</div>
+          <a class="btn btn-b" href="./moments-ui-style-B-flat.html" target="_blank">查看风格 B</a>
+        </div>
+        <div class="card">
+          <h2>风格 C · 分层卡片</h2>
+          <p>彩色入口胶囊、日期标签、卡片浮层感更强。视觉层次清晰，适合强调「三个能力入口」。</p>
+          <div class="traits">多色入口 · 日期 pill · 大圆角 · 探索记录留白更多</div>
+          <a class="btn btn-c" href="./moments-ui-style-C-layered.html" target="_blank">查看风格 C</a>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>A 暖色简约</th>
+            <th>B 清爽扁平</th>
+            <th>C 分层卡片</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>与现版接近度</td><td>高</td><td>中</td><td>中低</td></tr>
+          <tr><td>开发改动量</td><td>小</td><td>中</td><td>中</td></tr>
+          <tr><td>入口辨识度</td><td>中</td><td>中</td><td>高</td></tr>
+          <tr><td>历史列表可读性</td><td>高</td><td>高</td><td>中</td></tr>
+          <tr><td>品牌温暖感</td><td>高</td><td>低</td><td>中</td></tr>
+        </tbody>
+      </table>
+
+      <p class="legacy">
+        早期「仅朋友圈 Tab 布局」方案（A–E 联系人列表方向）仍保留在
+        <a href="./moments-index.html">moments-index.html</a>，与本索引相互独立。
+      </p>
+    </div>
+  </body>
+</html>

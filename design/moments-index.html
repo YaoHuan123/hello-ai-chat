@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>朋友圈 Tab 展示方案索引</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #eef0f5; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #14171a; }
+      .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 60px; }
+      h1 { font-size: 22px; margin: 0 0 6px; }
+      .lead { color: #6b7380; margin: 0 0 8px; font-size: 14px; line-height: 1.65; }
+      .pain { background: #fff8ed; border: 1px solid rgba(212,154,58,0.25); border-radius: 14px; padding: 14px 18px; margin: 20px 0 24px; font-size: 13px; line-height: 1.7; color: #6b4f1a; }
+      .pain b { color: #3d2e0f; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 16px; }
+      .card { background: #fff; border-radius: 16px; padding: 18px 18px 14px; box-shadow: 0 6px 22px rgba(20,23,26,0.06); border: 1px solid rgba(20,23,26,0.06); display: flex; flex-direction: column; gap: 8px; }
+      .card h2 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+      .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(212,154,58,0.15); color: #9a6b1e; }
+      .badge--rec { background: rgba(47,158,111,0.12); color: #1f6f4a; }
+      .card p { margin: 0; color: #6b7380; font-size: 13px; line-height: 1.55; }
+      .pros, .cons, .fit { font-size: 12px; line-height: 1.6; padding: 6px 10px; border-radius: 8px; }
+      .pros { background: rgba(47,158,111,0.10); color: #1f6f4a; }
+      .cons { background: rgba(214, 70, 70, 0.08); color: #984040; }
+      .fit { background: rgba(79,109,245,0.08); color: #3a4db8; }
+      .btn { align-self: flex-start; margin-top: 4px; text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #d49a3a; color: #fff; font-size: 13px; font-weight: 700; }
+      .checklist { background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      .checklist h3 { margin: 0 0 8px; font-size: 14px; }
+      .checklist ul { margin: 0; padding-left: 18px; color: #14171a; font-size: 13px; line-height: 1.8; }
+      table.compare { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 14px; overflow: hidden; margin-top: 28px; border: 1px solid rgba(20,23,26,0.06); }
+      table.compare th, table.compare td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(20,23,26,0.06); }
+      table.compare th { background: #f7f8fb; font-weight: 700; }
+      table.compare tr:last-child td { border-bottom: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>朋友圈 Tab · 5 种展示方案</h1>
+      <p class="lead">
+        产品本质：<b>选一位好友 → 单向探索 TA 的日常分身</b>（非双向聊天，也非完整朋友圈时间轴）。
+        当前「联系人列表 + 上次探索预览」容易让用户误以为是消息列表或通讯录，认知成本偏高。
+        以下方案围绕<b>降低误解、提高探索动机、保留单向属性</b>展开，可直接打开 HTML 在手机框内预览。
+        <br /><br />
+        <b>→ 现版五页完整 UI 请见 <a href="./moments-ui-index.html">moments-ui-index.html</a>（2026 更新）</b>
+      </p>
+
+      <div class="pain">
+        <b>现状问题（PM 视角）</b><br />
+        ① 列表样式与「联系人」Tab 过于相似，用户不知道这里能干什么；<br />
+        ② 「进入单向探索」文案偏功能化，缺少「TA 最近发了什么」的吸引力；<br />
+        ③ 探索聊天记录作为副标题，对新用户无意义；<br />
+        ④ 没有体现「分身 / AI 了解 TA」的产品差异点。
+      </div>
+
+      <div class="checklist">
+        <h3>方案需覆盖的核心要素</h3>
+        <ul>
+          <li>好友是谁（头像 / 备注）</li>
+          <li>TA 的日常有没有内容（动态摘要 / 空状态）</li>
+          <li>如何进入探索（CTA 明确：和分身聊聊 / 继续探索）</li>
+          <li>单向属性提示（仅你可见，对方不会收到）</li>
+          <li>与「消息」「联系人」Tab 的视觉区分</li>
+        </ul>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>方案 A <span class="badge">优化现状</span></h2>
+          <p>保留联系人列表结构，但每行展示<b>好友最新一条动态摘要</b> + 更新时间；副文案改为「和 TA 的分身聊聊」。探索记录仅作为「继续」标签出现。</p>
+          <div class="fit"><b>适合：</b>改动最小，快速上线；列表可扫、信息密度适中。</div>
+          <div class="cons"><b>取舍：</b>仍偏「列表」，社交感弱于时间线。</div>
+          <a class="btn" href="./moments-A-contact-snippet.html" target="_blank">查看 A</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 B <span class="badge">聚合时间线</span></h2>
+          <p>按时间混排好友动态卡片（类微信朋友圈），每条底部有「问分身」入口。点好友头像区进入该人的探索会话。</p>
+          <div class="fit"><b>适合：</b>浏览感强，适合好友动态多、用户爱刷的场景。</div>
+          <div class="cons"><b>取舍：</b>需服务端/同步支持混排 feed；探索入口分散在卡片内。</div>
+          <a class="btn" href="./moments-B-timeline-feed.html" target="_blank">查看 B</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 C <span class="badge">头像宫格</span></h2>
+          <p>首屏大标题 + 单向说明，下方 3 列头像宫格；有动态的好友右上角绿点。点击头像直接进入探索聊天。</p>
+          <div class="fit"><b>适合：</b>联系人少、强调「选人」而非「刷内容」；视觉轻快。</div>
+          <div class="cons"><b>取舍：</b>看不到动态预览，动机依赖用户已有关系。</div>
+          <a class="btn" href="./moments-C-avatar-grid.html" target="_blank">查看 C</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 D <span class="badge badge--rec">大卡探索</span></h2>
+          <p>每位好友一张大卡：头像、2 条动态摘录、橙色「和分身聊聊」主按钮；空状态单独展示引导去聊天认识对方。</p>
+          <div class="fit"><b>适合：</b>突出产品与微信的差异（分身 + 日常资料）；转化探索意图最强。</div>
+          <div class="cons"><b>取舍：</b>纵向较长，好友多时滚动多。</div>
+          <a class="btn" href="./moments-D-rich-cards.html" target="_blank">查看 D</a>
+        </div>
+
+        <div class="card">
+          <h2>方案 E <span class="badge">最近 + 全部</span></h2>
+          <p>上半区「最近在探索」横滑卡片（带上次对话一句）；下半区折叠式「全部好友」。兼顾回访与发现。</p>
+          <div class="fit"><b>适合：</b>有探索历史的重度用户；减少重复从长列表里找人。</div>
+          <div class="cons"><b>取舍：</b>结构两层，新用户上半区可能为空。</div>
+          <a class="btn" href="./moments-E-recent-first.html" target="_blank">查看 E</a>
+        </div>
+      </div>
+
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>A 列表摘要</th>
+            <th>B 时间线</th>
+            <th>C 宫格</th>
+            <th>D 大卡</th>
+            <th>E 最近优先</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>开发成本</td><td>低</td><td>高</td><td>低</td><td>中</td><td>中</td></tr>
+          <tr><td>认知清晰度</td><td>中</td><td>高</td><td>中</td><td>高</td><td>高</td></tr>
+          <tr><td>探索转化</td><td>中</td><td>中</td><td>低</td><td>高</td><td>高（回访）</td></tr>
+          <tr><td>与消息 Tab 区分</td><td>弱</td><td>强</td><td>中</td><td>强</td><td>中</td></tr>
+          <tr><td>好友很多时</td><td>好</td><td>好</td><td>一般</td><td>滚动长</td><td>好</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

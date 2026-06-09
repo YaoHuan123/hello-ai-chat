@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { POPULAR_TASK_SHORTCUTS, PRIMARY_SCENES, SEARCH_SUGGESTION_CHIPS } from "../data/molWorldTaxonomy";
 import { getSearchFallbackSuggestions, searchAndRankMols } from "../lib/molWorldSearch";
-import { getMolCatalog, purchaseMol, type MolCatalogItem } from "../services/stageApi";
+import { createMyMol, getMolCatalog, purchaseMol, type MolCatalogItem } from "../services/stageApi";
+
+const SCENE_OPTIONS = PRIMARY_SCENES.filter((s) => s !== "全部") as [string, ...string[]];
 
 const TONE_CHIPS = ["专业", "温和", "直接", "活泼", "有边界感"] as const;
 const REL_CHIPS = ["同事", "领导", "客户", "朋友", "家人", "暧昧对象"] as const;
@@ -21,7 +23,7 @@ function MolCard({
     <div className="aichat-card aichat-page-card aichat-mol-tile">
       <div className="aichat-inline-row aichat-inline-row-between aichat-mol-tile__head">
         <h2 className="aichat-panel-title">{m.name}</h2>
-        {m.owned ? <span className="aichat-tag-ok">已拥有</span> : <span className="aichat-tag-muted">未解锁</span>}
+        {m.owned ? <span className="aichat-tag-ok">已加入</span> : <span className="aichat-tag-muted">未加入</span>}
       </div>
       <p className="aichat-mol-catline">{m.primaryCategory}</p>
       <p className="aichat-card-hint">{m.summary}</p>
@@ -34,14 +36,14 @@ function MolCard({
       </div>
       {!m.owned && (
         <div className="aichat-inline-row aichat-inline-row-between">
-          <span className="aichat-price">¥{m.price}</span>
+          <span className="aichat-price">{m.price > 0 ? `¥${m.price}` : "免费"}</span>
           <button
             type="button"
             className="aichat-btn-primary aichat-btn-fit"
             onClick={() => onBuy(m.id)}
             disabled={buying}
           >
-            立即解锁
+            加入我的 Mol
           </button>
         </div>
       )}
@@ -54,6 +56,15 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState("");
   const [err, setErr] = useState("");
+
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [upName, setUpName] = useState("");
+  const [upSummary, setUpSummary] = useState("");
+  const [upScene, setUpScene] = useState<string>(SCENE_OPTIONS[0] ?? "职场沟通");
+  const [upInfoTitle, setUpInfoTitle] = useState("");
+  const [upInfoBody, setUpInfoBody] = useState("");
+  const [upBusy, setUpBusy] = useState(false);
+  const [upErr, setUpErr] = useState("");
 
   const [search, setSearch] = useState("");
   const [scene, setScene] = useState<(typeof PRIMARY_SCENES)[number]>("全部");
@@ -140,6 +151,61 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
     }
   }
 
+  function openUploadModal() {
+    setUpErr("");
+    setUploadOpen(true);
+  }
+
+  async function submitUpload() {
+    const n = upName.trim();
+    const s = upSummary.trim();
+    const c = upScene.trim();
+    if (!n || !s || !c) {
+      setUpErr("请填写名称、简介与场景。");
+      return;
+    }
+    if ((upInfoTitle.trim() && !upInfoBody.trim()) || (!upInfoTitle.trim() && upInfoBody.trim())) {
+      setUpErr("信息条目的标题与描述需同时填写，或留空。");
+      return;
+    }
+    setUpBusy(true);
+    setUpErr("");
+    try {
+      const initialInfo =
+        upInfoTitle.trim() && upInfoBody.trim()
+          ? [{ source: "custom" as const, title: upInfoTitle.trim(), body: upInfoBody.trim() }]
+          : undefined;
+      await createMyMol({ name: n, summary: s, primaryCategory: c, initialInfo });
+      const next = await getMolCatalog();
+      setItems(next);
+      setUploadOpen(false);
+      setUpName("");
+      setUpSummary("");
+      setUpScene(SCENE_OPTIONS[0] ?? "职场沟通");
+      setUpInfoTitle("");
+      setUpInfoBody("");
+    } catch (e: unknown) {
+      setUpErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setUpBusy(false);
+    }
+  }
+
+  const topRight = (
+    <div className="aichat-molworld-top-actions">
+      <button type="button" className="aichat-btn-ghost" disabled={upBusy} onClick={openUploadModal}>
+        上传
+      </button>
+      {onMyMols ? (
+        <button className="aichat-btn-ghost" type="button" onClick={onMyMols} disabled={upBusy}>
+          我的
+        </button>
+      ) : (
+        <div className="aichat-topbar-spacer" aria-hidden />
+      )}
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="aichat-shell">
@@ -149,15 +215,9 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
           </button>
           <div className="aichat-stage-head">
             <h1>Mol 世界</h1>
-            <p>选择并解锁能力</p>
+            <p>浏览场景并加入列表</p>
           </div>
-          {onMyMols ? (
-            <button className="aichat-btn-ghost" type="button" onClick={onMyMols}>
-              我的
-            </button>
-          ) : (
-            <div className="aichat-topbar-spacer" aria-hidden />
-          )}
+          {topRight}
         </header>
         <div className="aichat-main aichat-page-main">
           <div className="aichat-card">正在加载 Mol...</div>
@@ -174,15 +234,9 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
         </button>
         <div className="aichat-stage-head">
           <h1>Mol 世界</h1>
-          <p>选择并解锁能力</p>
+          <p>浏览场景并加入列表</p>
         </div>
-        {onMyMols ? (
-          <button className="aichat-btn-ghost" type="button" onClick={onMyMols}>
-            我的
-          </button>
-        ) : (
-          <div className="aichat-topbar-spacer" aria-hidden />
-        )}
+        {topRight}
       </header>
 
       <div className="aichat-main aichat-page-main aichat-molworld-main">
@@ -219,7 +273,7 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
                   <p className="aichat-mol-shelf-sub">{m.primaryCategory}</p>
                   {!m.owned && (
                     <button type="button" className="aichat-mol-shelf-cta" onClick={() => onBuy(m.id)} disabled={!!buyingId}>
-                      ¥{m.price}
+                      {m.price > 0 ? `¥${m.price}` : "加入"}
                     </button>
                   )}
                 </div>
@@ -342,6 +396,86 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
           </div>
         </section>
       </div>
+
+      {uploadOpen && (
+        <div className="aichat-modal" role="dialog" aria-modal onClick={() => !upBusy && setUploadOpen(false)}>
+          <div className="aichat-modal-box aichat-modal-box--molworld-upload" onClick={(e) => e.stopPropagation()}>
+            <h2 className="aichat-modal-t">上传 Mol</h2>
+            {upErr ? <p className="aichat-form-msg err">{upErr}</p> : null}
+            <label className="aichat-molworld-upload-lab" htmlFor="aichat-mw-up-name">
+              名称
+            </label>
+            <input
+              id="aichat-mw-up-name"
+              className="aichat-input"
+              value={upName}
+              onChange={(e) => setUpName(e.target.value)}
+              maxLength={80}
+              disabled={upBusy}
+            />
+            <label className="aichat-molworld-upload-lab" htmlFor="aichat-mw-up-sum">
+              简介
+            </label>
+            <textarea
+              id="aichat-mw-up-sum"
+              className="aichat-textarea"
+              rows={3}
+              value={upSummary}
+              onChange={(e) => setUpSummary(e.target.value)}
+              maxLength={500}
+              disabled={upBusy}
+            />
+            <label className="aichat-molworld-upload-lab" htmlFor="aichat-mw-up-scene">
+              场景
+            </label>
+            <select
+              id="aichat-mw-up-scene"
+              className="aichat-input"
+              value={upScene}
+              onChange={(e) => setUpScene(e.target.value)}
+              disabled={upBusy}
+            >
+              {SCENE_OPTIONS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <p className="aichat-molworld-upload-hint">可选：一条内置信息条目</p>
+            <label className="aichat-molworld-upload-lab" htmlFor="aichat-mw-up-it">
+              信息标题
+            </label>
+            <input
+              id="aichat-mw-up-it"
+              className="aichat-input"
+              value={upInfoTitle}
+              onChange={(e) => setUpInfoTitle(e.target.value)}
+              maxLength={100}
+              disabled={upBusy}
+            />
+            <label className="aichat-molworld-upload-lab" htmlFor="aichat-mw-up-ib">
+              信息描述
+            </label>
+            <textarea
+              id="aichat-mw-up-ib"
+              className="aichat-textarea"
+              rows={2}
+              value={upInfoBody}
+              onChange={(e) => setUpInfoBody(e.target.value)}
+              maxLength={800}
+              disabled={upBusy}
+            />
+            <div className="aichat-molworld-upload-actions">
+              <button type="button" className="aichat-btn-ghost" disabled={upBusy} onClick={() => setUploadOpen(false)}>
+                取消
+              </button>
+              <button type="button" className="aichat-btn-primary" disabled={upBusy} onClick={() => void submitUpload()}>
+                {upBusy ? "提交中…" : "发布"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

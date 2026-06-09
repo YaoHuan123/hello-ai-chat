@@ -25,7 +25,7 @@ function MolItemCard({
           <h2 className="aichat-panel-title">{m.name}</h2>
           <div className="aichat-mymols-badges" aria-label="来源与状态">
             {m.source === "store" ? (
-              <span className="aichat-mymols-badge aichat-mymols-badge--store">来自商城</span>
+              <span className="aichat-mymols-badge aichat-mymols-badge--store">来自 Mol 世界</span>
             ) : (
               <span className="aichat-mymols-badge aichat-mymols-badge--own">自己创建</span>
             )}
@@ -83,15 +83,16 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
   }
 
   async function handleDelete(m: MolInMyCollection) {
-    const msg =
-      m.source === "created"
-        ? `确定要删除「${m.name}」吗？自建 Mol 删除后无法恢复。`
-        : `从「我的 Mol」中移除「${m.name}」？\n你仍可在 Mol 世界再次应用或购买该模板。`;
-    if (!window.confirm(msg)) return;
+    const isUploader = m.uploaderIsMe === true || (m.uploaderIsMe !== false && m.source === "created");
+    if (!window.confirm(`确定从「我的」移除「${m.name}」？`)) return;
+    let deleteFromWorld: boolean | undefined;
+    if (isUploader) {
+      deleteFromWorld = window.confirm("该条目为你发布。是否从 Mol 世界同时删除（他人将无法再加入）？");
+    }
     setSaving(true);
     setErr("");
     try {
-      await removeMyMol(m.id);
+      await removeMyMol(m.id, isUploader ? { deleteFromWorld: Boolean(deleteFromWorld) } : undefined);
       await refresh();
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
@@ -139,7 +140,7 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
         {err && <p className="aichat-form-msg err">{err}</p>}
 
         <div className="aichat-mymols-toolbar">
-          <p className="aichat-mymols-hint">来源：自己创建，或从 Mol 世界应用。新建与详情参考「Mol 信息集合」信息架构。</p>
+          <p className="aichat-mymols-hint">来源：自己创建，或从 Mol 世界加入。新建与详情在「Mol 信息管理」中维护。</p>
           <button type="button" className="aichat-btn-primary aichat-mymols-btn-new" onClick={openNew} disabled={saving}>
             新建 Mol
           </button>
@@ -148,7 +149,7 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
         {items.length === 0 ? (
           <div className="aichat-card aichat-page-card aichat-mymols-empty">
             <p className="aichat-mymols-empty__t">这里还没有 Mol</p>
-            <p className="aichat-mymols-empty__d">可新建，或前往 Mol 世界从商城应用模板。创建后在详情页中维护信息集合列表。</p>
+            <p className="aichat-mymols-empty__d">可新建，或前往 Mol 世界浏览并加入。创建后在详情页维护信息条目。</p>
             <div className="aichat-mymols-empty__row">
               <button type="button" className="aichat-btn-primary aichat-mymols-empty__cta" onClick={openNew} disabled={saving}>
                 创建 Mol

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>方案 B · 聚合时间线</title>
+    <style>
+      :root {
+        --bg: #f2f3f7; --surface: #fff; --text: #14171a; --muted: #6b7380;
+        --border: rgba(20,23,26,0.08); --accent: #d49a3a; --accent-soft: rgba(212,154,58,0.14);
+        --shadow: 0 6px 22px rgba(20,23,26,0.08);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #e9ebf1; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--text); }
+      body { display: flex; align-items: center; justify-content: center; padding: 24px; gap: 28px; flex-wrap: wrap; }
+      .phone { width: 390px; height: 844px; background: var(--bg); border-radius: 40px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; flex-direction: column; }
+      .note { max-width: 300px; font-size: 13px; line-height: 1.65; color: #6b7380; }
+      .note h2 { font-size: 15px; color: #14171a; margin: 0 0 8px; }
+      .note a { color: #d49a3a; }
+      header.top { background: var(--surface); padding: 52px 18px 12px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+      header.top h1 { margin: 0; font-size: 22px; }
+      .filter { font-size: 12px; font-weight: 700; color: var(--accent); padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); border: none; }
+      .scroll { flex: 1; overflow-y: auto; }
+      .feed-card { background: var(--surface); padding: 16px 16px 14px; border-bottom: 8px solid var(--bg); }
+      .head { display: flex; align-items: center; gap: 10px; }
+      .av { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #f0b35c, #e88b3a); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+      .av.b { background: linear-gradient(135deg, #6e88ff, #9ab0ff); }
+      .who { flex: 1; }
+      .who .n { font-size: 15px; font-weight: 700; }
+      .who .t { font-size: 12px; color: var(--muted); margin-top: 2px; }
+      .body { margin-top: 12px; font-size: 15px; line-height: 1.55; }
+      .qa-q { font-size: 14px; font-weight: 600; color: #3a3a3c; margin-bottom: 6px; }
+      .actions { margin-top: 12px; display: flex; gap: 8px; }
+      .btn-ghost { flex: 1; padding: 10px; border-radius: 12px; border: 0.5px solid var(--border); background: #fafafa; font-size: 13px; font-weight: 600; color: var(--muted); }
+      .btn-main { flex: 1; padding: 10px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; }
+      .tabbar { display: flex; border-top: 0.5px solid var(--border); background: var(--surface); padding: 10px 0 24px; }
+      .tab { flex: 1; text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); }
+      .tab.on { color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <header class="top">
+        <h1>朋友圈</h1>
+        <button class="filter">全部好友 ▾</button>
+      </header>
+      <div class="scroll">
+        <article class="feed-card">
+          <div class="head">
+            <div class="av">小</div>
+            <div class="who"><div class="n">小雨</div><div class="t">昨天 21:06</div></div>
+          </div>
+          <div class="body">周末去了城西那家咖啡馆，拿铁比想象中好喝。窗边位置刚好能看到街灯，坐了一下午。</div>
+          <div class="actions">
+            <button class="btn-ghost">查看 TA 的主页</button>
+            <button class="btn-main">💬 问分身</button>
+          </div>
+        </article>
+        <article class="feed-card">
+          <div class="head">
+            <div class="av b">阿</div>
+            <div class="who"><div class="n">阿Ken</div><div class="t">3月12日 09:20</div></div>
+          </div>
+          <div class="qa-q">最近单曲循环的歌？</div>
+          <div class="body">还是那首老歌，夜里听特别安静。开车的时候也会放。</div>
+          <div class="actions">
+            <button class="btn-ghost">查看 TA 的主页</button>
+            <button class="btn-main">💬 问分身</button>
+          </div>
+        </article>
+        <article class="feed-card">
+          <div class="head">
+            <div class="av" style="background:linear-gradient(135deg,#2dc69b,#7fe7c4)">L</div>
+            <div class="who"><div class="n">Lisa</div><div class="t">3月10日 18:44</div></div>
+          </div>
+          <div class="body">今天加班到九点，但项目终于上线了。奖励自己一碗拉面。</div>
+          <div class="actions">
+            <button class="btn-ghost">查看 TA 的主页</button>
+            <button class="btn-main">💬 问分身</button>
+          </div>
+        </article>
+      </div>
+      <nav class="tabbar">
+        <div class="tab">消息</div>
+        <div class="tab on">朋友圈</div>
+        <div class="tab">AI</div>
+        <div class="tab">联系人</div>
+        <div class="tab">我的</div>
+      </nav>
+    </div>
+    <aside class="note">
+      <h2>方案 B · 聚合时间线</h2>
+      <p>把好友动态混排成 Feed，用户先<b>刷内容</b>，感兴趣再点「问分身」。最接近传统朋友圈心智，但需后端聚合多好友 moment。</p>
+      <p><b>注意：</b>「查看 TA 的主页」可进入该好友的动态列表 + 探索入口。</p>
+      <p><a href="./moments-index.html">← 返回索引</a></p>
+    </aside>
+  </body>
+</html>

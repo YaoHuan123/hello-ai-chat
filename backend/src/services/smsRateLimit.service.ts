@@ -22,7 +22,7 @@ export class SmsRateLimitService {
     const dailyPhone = this.db
       .prepare("SELECT COUNT(*) AS count FROM sms_send_log WHERE phone = ? AND ts >= ?")
       .get(phone, now - ONE_DAY_MS) as { count: number };
-    if (dailyPhone.count >= 5) {
+    if (dailyPhone.count >= 50) {
       throw new Error("SMS_RATE_LIMITED");
     }
 

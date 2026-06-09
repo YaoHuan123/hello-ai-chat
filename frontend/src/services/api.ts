@@ -1,13 +1,42 @@
 import type { AuthResult } from "../types/auth";
+import type { ContactItem } from "../types/contact";
 import { getAuthToken } from "./storage";
 import { isApiMock } from "./mock";
 
 /** 生产环境可在 `.env` 中改 `VITE_API_BASE` */
-export const API_BASE = (import.meta.env.VITE_API_BASE ?? "http://localhost:3000").replace(/\/$/, "");
+export const API_BASE = (import.meta.env.VITE_API_BASE ?? "http://localhost:4000").replace(/\/$/, "");
 
 export type AuthSmsScene = "login" | "delete_account";
 
-type ApiErrorShape = { message?: string; code?: string };
+type ApiErrorShape = {
+  message?: string;
+  code?: string;
+  detail?: string | Array<{ msg?: string }>;
+};
+
+function readApiErrorMessage(data: ApiErrorShape, status: number): string {
+  const msg = typeof data.message === "string" ? data.message.trim() : "";
+  if (msg) return msg;
+
+  const detail = data.detail;
+  if (typeof detail === "string" && detail.trim()) {
+    if (status === 404) {
+      return "接口不存在，请确认 backend 已启动（npm run dev）且包含朋友圈模块";
+    }
+    return detail.trim();
+  }
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0]?.msg?.trim();
+    if (first) return first;
+  }
+
+  const code = typeof data.code === "string" ? data.code.trim() : "";
+  if (code === "NOT_FOUND" || status === 404) {
+    return "接口不存在，请确认 backend 已启动（npm run dev）且包含朋友圈模块";
+  }
+  if (code) return `${code}（HTTP ${status}）`;
+  return `请求失败（HTTP ${status}）`;
+}
 
 function rethrowFetchError(e: unknown, context: string): never {
   const msg = e instanceof Error ? e.message : String(e);
@@ -30,9 +59,7 @@ export async function getJson<T>(path: string, token?: string): Promise<T> {
   }
   const data = (await res.json().catch(() => ({}))) as ApiErrorShape & T;
   if (!res.ok) {
-    const msg = typeof data.message === "string" && data.message.trim() ? data.message.trim() : "";
-    const code = typeof data.code === "string" && data.code.trim() ? data.code.trim() : "";
-    throw new Error(msg || (code ? `${code}（HTTP ${res.status}）` : `请求失败（HTTP ${res.status}）`));
+    throw new Error(readApiErrorMessage(data, res.status));
   }
   return data;
 }
@@ -52,9 +79,27 @@ export async function postJson<T>(path: string, body: unknown, token?: string): 
   }
   const data = (await res.json().catch(() => ({}))) as ApiErrorShape & T;
   if (!res.ok) {
-    const msg = typeof data.message === "string" && data.message.trim() ? data.message.trim() : "";
-    const code = typeof data.code === "string" && data.code.trim() ? data.code.trim() : "";
-    throw new Error(msg || (code ? `${code}（HTTP ${res.status}）` : `请求失败（HTTP ${res.status}）`));
+    throw new Error(readApiErrorMessage(data, res.status));
+  }
+  return data;
+}
+
+export async function putJson<T>(path: string, body: unknown, token?: string): Promise<T> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    rethrowFetchError(e, "请求失败");
+  }
+  const data = (await res.json().catch(() => ({}))) as ApiErrorShape & T;
+  if (!res.ok) {
+    throw new Error(readApiErrorMessage(data, res.status));
   }
   return data;
 }
@@ -70,9 +115,7 @@ export async function patchJson<T>(path: string, body: unknown, token?: string):
   }
   const data = (await res.json().catch(() => ({}))) as ApiErrorShape & T;
   if (!res.ok) {
-    const msg = typeof data.message === "string" && data.message.trim() ? data.message.trim() : "";
-    const code = typeof data.code === "string" && data.code.trim() ? data.code.trim() : "";
-    throw new Error(msg || (code ? `${code}（HTTP ${res.status}）` : `请求失败（HTTP ${res.status}）`));
+    throw new Error(readApiErrorMessage(data, res.status));
   }
   return data;
 }
@@ -95,9 +138,7 @@ export async function deleteJson<T>(path: string, token?: string, body?: unknown
   }
   const data = (await res.json().catch(() => ({}))) as ApiErrorShape & T;
   if (!res.ok) {
-    const msg = typeof data.message === "string" && data.message.trim() ? data.message.trim() : "";
-    const code = typeof data.code === "string" && data.code.trim() ? data.code.trim() : "";
-    throw new Error(msg || (code ? `${code}（HTTP ${res.status}）` : `请求失败（HTTP ${res.status}）`));
+    throw new Error(readApiErrorMessage(data, res.status));
   }
   return data;
 }
@@ -136,4 +177,21 @@ export async function deleteAccountApi(code: string, token?: string): Promise<{ 
     throw new Error("未登录");
   }
   return deleteJson<{ ok: true }>("/api/auth/me", t, { code });
+}
+
+export async function listContactsApi(token?: string): Promise<{ items: ContactItem[] }> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return getJson<{ items: ContactItem[] }>("/api/contacts", t);
+}
+
+export async function removeContactApi(contactUserId: string, token?: string): Promise<{ ok: true }> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  const id = encodeURIComponent(contactUserId);
+  return deleteJson<{ ok: true }>(`/api/contacts/${id}`, t);
 }

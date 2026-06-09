@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>主壳 · 4 Tab + 消息双模式设计稿</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  :root {
+    /* —— 普通模式（蓝紫冷色） —— */
+    --c-normal: #5B5BD6;
+    --c-normal-deep: #4A4AC0;
+    --c-normal-soft: #EEEEFB;
+    --c-normal-bg: #F4F4F7;
+    --c-normal-tint: #ECECF7;
+
+    /* —— 单向模式（橙暖色） —— */
+    --c-oneway: #FF7A52;
+    --c-oneway-deep: #E25F38;
+    --c-oneway-soft: #FFE4DA;
+    --c-oneway-bg: #FFF6EE;
+    --c-oneway-tint: #FFEFE0;
+
+    /* —— Mol —— */
+    --c-mol-a: #6D6BE2;
+    --c-mol-b: #A6A0F0;
+    --c-mol-c: #FFB489;
+
+    /* —— 中性 —— */
+    --c-card: #FFFFFF;
+    --c-divider: #ECECF1;
+    --c-text: #1D1D1F;
+    --c-text-2: #6E6E73;
+    --c-text-3: #9CA0A6;
+
+    --c-success: #1d6f3f;
+    --c-danger: #d33;
+
+    --r-card: 16px;
+    --r-pill: 999px;
+    --shadow-sm: 0 1px 2px rgba(28,28,30,.04), 0 2px 6px rgba(28,28,30,.05);
+    --shadow-md: 0 6px 14px rgba(28,28,30,.06), 0 12px 32px rgba(28,28,30,.08);
+    --shadow-fab: 0 8px 20px rgba(28,28,30,.18), 0 2px 6px rgba(28,28,30,.12);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: #F0F0F3;
+    color: var(--c-text);
+    padding: 40px 16px 80px;
+  }
+
+  /* ============ 顶部说明 ============ */
+  .head { max-width: 1500px; margin: 0 auto 32px; text-align: center; }
+  .head h1 { font-size: 28px; font-weight: 700; letter-spacing: -.5px; }
+  .head .sub { font-size: 14px; color: var(--c-text-2); max-width: 880px; margin: 12px auto 0; line-height: 1.65; }
+  .head .struct {
+    display: inline-flex; gap: 10px; align-items: center; margin-top: 16px;
+    padding: 8px 16px; background: var(--c-text); color: #fff; border-radius: var(--r-pill);
+    font-size: 12px; letter-spacing: .5px;
+  }
+  .head .struct b { color: #6CE6C8; font-weight: 700; }
+  .head .legend {
+    display: inline-flex; gap: 18px; margin-top: 14px; font-size: 12px; color: var(--c-text-2);
+  }
+  .head .legend .dot {
+    width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 6px; vertical-align: middle;
+  }
+  code { background: rgba(91,91,214,.08); padding: 1px 6px; border-radius: 4px; font-size: .92em; color: var(--c-normal-deep); }
+
+  /* ============ 并排栅格 ============ */
+  .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 28px; max-width: 1500px; margin: 0 auto; justify-items: center;
+  }
+  @media (max-width: 1180px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 760px)  { .grid { grid-template-columns: 1fr; } }
+
+  .col-meta { margin-top: 18px; max-width: 320px; text-align: center; }
+  .col-meta .badge {
+    display: inline-block; padding: 3px 10px; border-radius: var(--r-pill);
+    font-size: 11px; color: #fff; letter-spacing: .5px; margin-bottom: 8px;
+    background: var(--c-text);
+  }
+  .col-meta .badge.normal { background: var(--c-normal); }
+  .col-meta .badge.oneway { background: var(--c-oneway); }
+  .col-meta .badge.gray { background: var(--c-text-2); }
+  .col-meta h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .col-meta p { font-size: 13px; color: var(--c-text-2); line-height: 1.55; }
+
+  /* ============ 手机外壳 ============ */
+  .phone {
+    width: 340px; height: 720px;
+    border-radius: 46px; position: relative; overflow: hidden;
+    box-shadow:
+      0 0 0 8px #1C1C1E, 0 0 0 9px #2C2C2E,
+      0 30px 60px -12px rgba(0,0,0,.28),
+      0 18px 30px -12px rgba(0,0,0,.18);
+  }
+  .phone .notch {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 26px; background: #1C1C1E;
+    border-radius: 0 0 16px 16px; z-index: 30;
+  }
+  .phone .status {
+    position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 25;
+    display: flex; justify-content: space-between; padding: 16px 24px 0;
+    font-size: 12px; font-weight: 600; color: var(--c-text);
+  }
+  .phone .home-pill {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 4px; border-radius: 4px; z-index: 25;
+    background: var(--c-text); opacity: .8;
+  }
+  .phone .body {
+    position: absolute; inset: 0; padding-top: 44px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  /* 模式底色 */
+  .phone.normal .body { background: var(--c-normal-bg); }
+  .phone.oneway .body { background: var(--c-oneway-bg); }
+  .phone.neutral .body { background: var(--c-normal-bg); }
+
+  .body-scroll { flex: 1; overflow-y: auto; padding-bottom: 88px; /* tabbar 留位 */ }
+
+  /* ============ 图标基础 ============ */
+  svg.ic { stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .ic-tile {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--c-normal-soft); color: var(--c-normal); flex-shrink: 0;
+  }
+  .ic-tile.amber { background: var(--c-oneway-soft); color: var(--c-oneway-deep); }
+  .ic-tile.mol { background: linear-gradient(135deg, var(--c-mol-a), var(--c-mol-c)); color: #fff; }
+  .ic-tile.muted { background: #ECECF1; color: var(--c-text-2); }
+  .ic-tile.danger { background: #FCE8E8; color: var(--c-danger); }
+  .ic-tile.lg { width: 44px; height: 44px; border-radius: 14px; }
+
+  /* ============ Page header（每页顶部） ============ */
+  .page-h {
+    padding: 12px 20px 4px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-h h2 { font-size: 24px; font-weight: 700; letter-spacing: -.4px; }
+  .page-h .right { display: flex; gap: 6px; align-items: center; }
+  .page-h .icon-btn {
+    width: 32px; height: 32px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-text-2); background: transparent;
+  }
+  .page-h .icon-btn:hover { background: rgba(0,0,0,.05); }
+
+  /* ============ 模式条（消息 tab 头下方） ============ */
+  .mode-strip {
+    margin: 4px 16px 8px; padding: 8px 12px; border-radius: 12px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600;
+  }
+  .mode-strip .badge {
+    padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 11px;
+  }
+  .mode-strip .desc { color: var(--c-text-2); font-weight: 500; }
+  .mode-strip .meta { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--c-text-2); }
+  .normal .mode-strip { background: var(--c-normal-soft); }
+  .normal .mode-strip .badge { background: var(--c-normal); color: #fff; }
+  .normal .mode-strip .desc { color: var(--c-normal-deep); }
+  .oneway .mode-strip { background: var(--c-oneway-soft); }
+  .oneway .mode-strip .badge { background: var(--c-oneway); color: #fff; }
+  .oneway .mode-strip .desc { color: var(--c-oneway-deep); }
+
+  /* ============ 消息列表 ============ */
+  .msg-list { padding: 0 8px; }
+  .msg-item {
+    margin: 4px 8px; padding: 12px 12px;
+    background: var(--c-card); border-radius: 14px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--c-divider);
+  }
+  .normal .msg-item { border-color: var(--c-divider); }
+  .oneway .msg-item { border-color: #F5DCC8; }
+
+  .msg-item .av {
+    width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0;
+    background: linear-gradient(135deg, #B0C4FF, #6B7BD8); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+  }
+  .msg-item .av.av2 { background: linear-gradient(135deg, #FFD3BD, #FF9472); }
+  .msg-item .av.av3 { background: linear-gradient(135deg, #C7E8D6, #6FB58C); }
+  .msg-item .av.av4 { background: linear-gradient(135deg, #DDD7F3, #9F95DD); }
+  .msg-item .av.av5 { background: linear-gradient(135deg, #FBE3A3, #E0A93B); }
+  .msg-item .av.anon { background: linear-gradient(135deg, #D6D6DC, #909097); }
+
+  .msg-item .av .ow-tag {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 16px; height: 16px; background: var(--c-oneway); color: #fff;
+    border-radius: 999px; border: 2px solid #fff;
+    font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  }
+  .msg-item .av-wrap { position: relative; }
+
+  .msg-item .body { flex: 1; min-width: 0; }
+  .msg-item .body .top {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+  }
+  .msg-item .body .name { font-size: 14px; font-weight: 700; }
+  .msg-item .body .time { font-size: 11px; color: var(--c-text-3); flex-shrink: 0; }
+  .msg-item .body .preview {
+    font-size: 12px; color: var(--c-text-2); margin-top: 3px; line-height: 1.4;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .msg-item .body .preview .label {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 999px; margin-right: 4px; vertical-align: 1px;
+  }
+  .normal .preview .label.mol { background: var(--c-normal-soft); color: var(--c-normal-deep); }
+  .oneway .preview .label.topic { background: var(--c-oneway-soft); color: var(--c-oneway-deep); }
+  .oneway .preview .label.dur { background: #FFF1E6; color: var(--c-text-2); }
+
+  .msg-item .unread {
+    width: 18px; height: 18px; border-radius: 999px;
+    background: var(--c-oneway); color: #fff; font-size: 10px;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;
+  }
+  .normal .msg-item .unread { background: var(--c-normal); }
+  .msg-item.muted .body .name { color: var(--c-text-2); font-weight: 600; }
+
+  /* ============ FAB（核心：模式切换） ============ */
+  .fab {
+    position: absolute; right: 18px; bottom: 96px; z-index: 22;
+    width: 56px; height: 56px; border-radius: 999px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; box-shadow: var(--shadow-fab);
+    cursor: pointer; transition: transform .15s;
+  }
+  .fab:hover { transform: scale(1.04); }
+  .fab .ic-wrap { font-size: 0; line-height: 0; }
+  .fab .label {
+    position: absolute; right: 64px; top: 50%; transform: translateY(-50%);
+    background: #1d1d1f; color: #fff; padding: 5px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+    box-shadow: 0 4px 8px rgba(0,0,0,.15);
+  }
+  .fab .label::after {
+    content: ""; position: absolute; right: -4px; top: 50%; transform: translateY(-50%) rotate(45deg);
+    width: 8px; height: 8px; background: #1d1d1f;
+  }
+  /* 普通模式 → FAB 是橙色（"切到单向"召唤色） */
+  .normal .fab { background: linear-gradient(135deg, var(--c-oneway), var(--c-oneway-deep)); }
+  /* 单向模式 → FAB 是蓝紫（"切到普通"召唤色） */
+  .oneway .fab { background: linear-gradient(135deg, var(--c-normal), var(--c-normal-deep)); }
+  /* 对话窗中位置抬高 */
+  .fab.in-chat { bottom: 78px; right: 14px; width: 48px; height: 48px; }
+
+  /* ============ Tab Bar ============ */
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 76px; padding-bottom: 20px;
+    display: flex; align-items: flex-end;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 35%);
+    border-top: .5px solid var(--c-divider);
+    z-index: 20;
+  }
+  .oneway .tabbar { background: linear-gradient(180deg, rgba(255,246,238,0) 0%, #fff 35%); }
+  .tab-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: #9CA0A6; padding: 0 4px;
+  }
+  .tab-item span { font-size: 10px; font-weight: 500; }
+  .normal .tab-item.active { color: var(--c-normal); }
+  .normal .tab-item.active span { font-weight: 700; color: var(--c-normal-deep); }
+  .oneway .tab-item.active { color: var(--c-oneway); }
+  .oneway .tab-item.active span { font-weight: 700; color: var(--c-oneway-deep); }
+  .neutral .tab-item.active { color: var(--c-normal); }
+  .neutral .tab-item.active span { font-weight: 700; color: var(--c-normal-deep); }
+  .tab-item.active svg.ic { stroke-width: 2.1; }
+  .tab-item .badge-dot { position: relative; display: inline-block; }
+  .tab-item .badge-dot::after {
+    content: ""; position: absolute; top: -2px; right: -3px;
+    width: 7px; height: 7px; background: var(--c-oneway); border-radius: 999px;
+    border: 1.5px solid #fff;
+  }
+
+  /* =================== Phone 3：对话窗口 =================== */
+  .chat-h {
+    padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+    background: #fff; border-bottom: 1px solid var(--c-divider);
+  }
+  .chat-h .back { color: var(--c-text-2); width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center; }
+  .chat-h .av {
+    width: 32px; height: 32px; border-radius: 999px;
+    background: linear-gradient(135deg, #B0C4FF, #6B7BD8); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .chat-h .who { flex: 1; min-width: 0; }
+  .chat-h .who .name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .chat-h .who .name .mode-chip {
+    font-size: 10px; padding: 1px 7px; border-radius: 999px; font-weight: 700;
+    background: var(--c-normal-soft); color: var(--c-normal-deep);
+  }
+  .chat-h .who .status { font-size: 11px; color: var(--c-text-3); margin-top: 1px; }
+  .chat-h .icon-btn {
+    width: 30px; height: 30px; border-radius: 999px; color: var(--c-text-2);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .chat-scroll {
+    flex: 1; overflow-y: auto; padding: 12px 14px 8px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .msg-bubble { max-width: 78%; padding: 8px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .msg-bubble.them { background: #fff; color: var(--c-text); border: 1px solid var(--c-divider); border-bottom-left-radius: 6px; align-self: flex-start; }
+  .msg-bubble.me { background: var(--c-normal); color: #fff; border-bottom-right-radius: 6px; align-self: flex-end; }
+  .msg-bubble.draft {
+    background: #fff; color: var(--c-text); border: 1px dashed var(--c-normal);
+    border-bottom-right-radius: 6px; align-self: flex-end;
+  }
+  .msg-time { font-size: 10px; color: var(--c-text-3); text-align: center; margin: 6px 0; }
+
+  .mol-tip {
+    margin: 4px 0 0; background: linear-gradient(135deg, #fff, var(--c-normal-soft));
+    border: 1px solid #DEDEFA; border-radius: 14px; padding: 10px 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .mol-tip .head-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .mol-tip .head-row .av {
+    width: 20px; height: 20px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--c-mol-a), var(--c-mol-c)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;
+  }
+  .mol-tip .head-row .label { font-size: 11px; font-weight: 700; color: var(--c-normal-deep); }
+  .mol-tip .chips { display: flex; flex-direction: column; gap: 5px; }
+  .mol-tip .chip {
+    padding: 7px 10px; border-radius: 10px; font-size: 12px;
+    background: #fff; border: 1px solid #DEDEFA;
+  }
+  .mol-tip .chip.primary { background: var(--c-normal); color: #fff; border-color: var(--c-normal); }
+
+  .chat-input {
+    padding: 8px 12px 10px; background: #fff; border-top: 1px solid var(--c-divider);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .chat-input input {
+    flex: 1; height: 36px; padding: 0 14px; border-radius: var(--r-pill);
+    background: var(--c-normal-bg); border: 1px solid var(--c-divider);
+    font-size: 13px; outline: none;
+  }
+  .chat-input .send {
+    width: 36px; height: 36px; border-radius: 999px; background: var(--c-normal); color: #fff;
+    border: none; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* =================== Phone 4：AI =================== */
+  .ai-card {
+    margin: 8px 16px; background: var(--c-card); border-radius: var(--r-card);
+    border: 1px solid var(--c-divider); box-shadow: var(--shadow-sm);
+    padding: 14px 16px;
+  }
+  .ai-card.mol-card {
+    background: linear-gradient(135deg, #fff, var(--c-normal-soft));
+    border-color: #DEDEFA;
+  }
+  .ai-card.ow-card {
+    background: linear-gradient(135deg, #fff, var(--c-oneway-soft));
+    border-color: #F5DCC8;
+  }
+  .ai-card .head-row { display: flex; align-items: center; gap: 12px; }
+  .ai-card .head-row .meta { flex: 1; }
+  .ai-card .head-row .meta .t { font-size: 15px; font-weight: 700; }
+  .ai-card .head-row .meta .d { font-size: 12px; color: var(--c-text-2); margin-top: 2px; }
+  .ai-card .stats {
+    display: flex; gap: 14px; margin: 12px 0 8px;
+    padding: 10px 12px; background: rgba(255,255,255,.7); border-radius: 10px;
+  }
+  .ai-card .stats > div { flex: 1; }
+  .ai-card .stats b { font-size: 16px; font-weight: 800; }
+  .ai-card .stats span { font-size: 11px; color: var(--c-text-3); display: block; margin-top: 1px; }
+  .ai-card .sub-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+  .ai-card .sub-row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 4px;
+    border-bottom: 1px dashed var(--c-divider); font-size: 13px;
+  }
+  .ai-card .sub-row:last-child { border-bottom: none; }
+  .ai-card .sub-row .icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: var(--c-text-2); }
+  .ai-card .sub-row .name { flex: 1; }
+  .ai-card .sub-row .meta-r { font-size: 11px; color: var(--c-text-3); }
+
+  /* =================== Phone 5：联系人 =================== */
+  .contact-section { padding: 4px 22px 4px; font-size: 11px; font-weight: 700; color: var(--c-text-3); letter-spacing: .04em; }
+  .contact-card { margin: 0 8px 4px; padding: 0 8px; }
+  .contact-row {
+    padding: 10px 12px; display: flex; align-items: center; gap: 12px;
+    background: var(--c-card); border-radius: 12px; margin-bottom: 4px;
+    border: 1px solid var(--c-divider);
+  }
+  .contact-row .av {
+    width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0;
+    background: linear-gradient(135deg, #B0C4FF, #6B7BD8); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .contact-row .av.av2 { background: linear-gradient(135deg, #FFD3BD, #FF9472); }
+  .contact-row .av.av3 { background: linear-gradient(135deg, #C7E8D6, #6FB58C); }
+  .contact-row .av.av4 { background: linear-gradient(135deg, #DDD7F3, #9F95DD); }
+  .contact-row .av.av5 { background: linear-gradient(135deg, #FBE3A3, #E0A93B); }
+  .contact-row .info { flex: 1; min-width: 0; }
+  .contact-row .info .name { font-size: 14px; font-weight: 600; }
+  .contact-row .info .meta { font-size: 11px; color: var(--c-text-3); margin-top: 1px; }
+  .contact-row .tags { display: flex; gap: 4px; flex-shrink: 0; }
+  .contact-row .tag {
+    font-size: 10px; padding: 2px 7px; border-radius: 999px;
+    background: var(--c-oneway-soft); color: var(--c-oneway-deep); font-weight: 600;
+  }
+  .contact-row .tag.work { background: var(--c-normal-soft); color: var(--c-normal-deep); }
+
+  .index-strip {
+    position: absolute; right: 4px; top: 240px;
+    display: flex; flex-direction: column; gap: 6px; padding: 4px;
+    font-size: 9px; color: var(--c-text-3); font-weight: 700;
+  }
+
+  /* =================== Phone 6：我的 =================== */
+  .me-hero {
+    margin: 8px 16px; padding: 16px;
+    background: var(--c-card); border-radius: var(--r-card);
+    border: 1px solid var(--c-divider); box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .me-hero .av-lg {
+    width: 56px; height: 56px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--c-mol-a), var(--c-mol-c)); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800;
+  }
+  .me-hero .info .name { font-size: 16px; font-weight: 700; }
+  .me-hero .info .phone-l { font-size: 13px; color: var(--c-text-2); margin-top: 2px; }
+  .me-hero .info .joined { font-size: 11px; color: var(--c-text-3); margin-top: 4px; }
+
+  .my-mol-card {
+    margin: 8px 16px; padding: 16px; border-radius: var(--r-card);
+    background: linear-gradient(135deg, var(--c-mol-a) 0%, #7568D8 55%, var(--c-mol-c) 130%);
+    color: #fff; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+  }
+  .my-mol-card::after {
+    content: ""; position: absolute; right: -30px; top: -30px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #FFD3BD 0%, transparent 60%);
+    opacity: .35;
+  }
+  .my-mol-card .label { font-size: 11px; opacity: .85; }
+  .my-mol-card h3 { font-size: 22px; font-weight: 700; margin-top: 6px; letter-spacing: -.3px; }
+  .my-mol-card p { font-size: 12px; opacity: .85; margin-top: 4px; line-height: 1.5; }
+  .my-mol-card .row {
+    margin-top: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .my-mol-card .btn {
+    background: rgba(255,255,255,.18); color: #fff; padding: 7px 12px;
+    border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,.3);
+  }
+  .my-mol-card .btn.solid { background: #fff; color: var(--c-normal-deep); border-color: #fff; }
+  .my-mol-card .btn .ic {
+    margin-left: 4px; vertical-align: -2px;
+  }
+
+  .me-card {
+    margin: 6px 16px; background: var(--c-card); border-radius: var(--r-card);
+    border: 1px solid var(--c-divider); overflow: hidden; box-shadow: var(--shadow-sm);
+  }
+  .me-row {
+    display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+    border-bottom: 1px solid var(--c-divider);
+  }
+  .me-row:last-child { border-bottom: none; }
+  .me-row .body { flex: 1; }
+  .me-row .body .t { font-size: 14px; font-weight: 600; }
+  .me-row .body .d { font-size: 11px; color: var(--c-text-3); margin-top: 1px; }
+  .me-row .meta { font-size: 11px; color: var(--c-text-3); }
+  .me-row .chev { color: var(--c-text-3); }
+  .me-row.danger .body .t { color: var(--c-danger); }
+
+  .section-h {
+    padding: 14px 22px 6px;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .section-h h4 {
+    font-size: 11px; font-weight: 700; color: var(--c-text-3);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>主壳 · 4 Tab · 消息双模式</h1>
+  <p class="sub">
+    Tab：<b>消息 / AI / 联系人 / 我的</b>。「消息」内含浮动按钮一键切换 <b>普通</b> 与 <b>单向</b>：色调随之变化、对话列表也整体替换；这个浮动按钮在每一个具体对话窗口内也存在，按下后会换到对方在另一个模式下的对话历史。
+    「AI」收纳一切 AI 数据管理（辅助助手 Mol 数据 + 单向 AI 分身数据）。「我的」放我的 Mol（含跳转 Mol 世界）。
+  </p>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--c-normal);"></span>普通模式（蓝紫冷色）</span>
+    <span><span class="dot" style="background:var(--c-oneway);"></span>单向模式（橙暖色）</span>
+    <span><span class="dot" style="background:#1d1d1f;"></span>FAB 颜色 = 切换目标色</span>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ============================================================ -->
+  <!-- Phone 1：消息 - 普通模式 -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone normal">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body">
+        <div class="page-h">
+          <h2>消息</h2>
+          <div class="right">
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+
+        <div class="mode-strip">
+          <span class="badge">普通</span>
+          <span class="desc">和真人的对话</span>
+          <span class="meta">3 未读</span>
+        </div>
+
+        <div class="body-scroll">
+          <div class="msg-list">
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av">陆</div></div>
+              <div class="body">
+                <div class="top"><span class="name">陆云</span><span class="time">21:08</span></div>
+                <div class="preview"><span class="label mol">Mol 协助</span>下周末再约？</div>
+              </div>
+              <div class="unread">2</div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av av2">林</div></div>
+              <div class="body">
+                <div class="top"><span class="name">林夕</span><span class="time">19:45</span></div>
+                <div class="preview">图发过来啦，你看看</div>
+              </div>
+              <div class="unread">1</div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av av3">苏</div></div>
+              <div class="body">
+                <div class="top"><span class="name">小苏</span><span class="time">17:22</span></div>
+                <div class="preview">[图片]</div>
+              </div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av av4">岑</div></div>
+              <div class="body">
+                <div class="top"><span class="name">阿岑</span><span class="time">14:11</span></div>
+                <div class="preview">好的 等你消息</div>
+              </div>
+            </div>
+
+            <div class="msg-item muted">
+              <div class="av-wrap"><div class="av av5">周</div></div>
+              <div class="body">
+                <div class="top"><span class="name">周毅 · 工作</span><span class="time">昨天</span></div>
+                <div class="preview">明天会议改到下午 3 点</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAB：切到单向 -->
+        <button class="fab" aria-label="切到单向模式">
+          <span class="label">切到单向</span>
+          <svg class="ic" width="22" height="22" viewBox="0 0 24 24" stroke="white">
+            <path d="M4 7h13l-3-3M20 17H7l3 3"/>
+          </svg>
+        </button>
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab-item active">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+            <span>消息</span>
+          </div>
+          <div class="tab-item">
+            <span class="badge-dot">
+              <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M5 12c2 4 5 6 7 6s5-2 7-6"/></svg>
+            </span>
+            <span>AI</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/><circle cx="17" cy="8" r="3"/><path d="M14 14c2 0 4 1.5 5 4"/></svg>
+            <span>联系人</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge normal">消息 · 普通模式</span>
+      <h3>普通对话列表</h3>
+      <p>蓝紫冷色调，列表是和真人的对话。FAB 醒目橙色「切到单向」—— 按下整页色调切换、对话列表也整体换成访客对话。</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Phone 2：消息 - 单向模式 -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone oneway">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body">
+        <div class="page-h">
+          <h2>消息</h2>
+          <div class="right">
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+
+        <div class="mode-strip">
+          <span class="badge">单向</span>
+          <span class="desc">访客与我的单向体</span>
+          <span class="meta">今天 3 位访客</span>
+        </div>
+
+        <div class="body-scroll">
+          <div class="msg-list">
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av">陆</div><div class="ow-tag">S</div></div>
+              <div class="body">
+                <div class="top"><span class="name">陆云 来访</span><span class="time">14:32</span></div>
+                <div class="preview">
+                  <span class="label topic">话题</span>周末计划
+                  <span class="label dur">4 分钟</span>
+                </div>
+              </div>
+              <div class="unread">2</div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av av2">林</div><div class="ow-tag">S</div></div>
+              <div class="body">
+                <div class="top"><span class="name">林夕 来访</span><span class="time">11:02</span></div>
+                <div class="preview">
+                  <span class="label topic">话题</span>上次约的事
+                  <span class="label dur">1 分钟</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av anon">未</div><div class="ow-tag">S</div></div>
+              <div class="body">
+                <div class="top"><span class="name">未实名访客</span><span class="time">昨天 23:10</span></div>
+                <div class="preview">
+                  <span class="label topic">话题</span>你喜欢什么
+                  <span class="label dur">2 分钟</span>
+                </div>
+              </div>
+              <div class="unread">1</div>
+            </div>
+
+            <div class="msg-item">
+              <div class="av-wrap"><div class="av">陆</div><div class="ow-tag">S</div></div>
+              <div class="body">
+                <div class="top"><span class="name">陆云 来访</span><span class="time">昨天 14:22</span></div>
+                <div class="preview">
+                  <span class="label topic">话题</span>工作压力
+                  <span class="label dur">6 分钟</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg-item muted">
+              <div class="av-wrap"><div class="av av4">岑</div><div class="ow-tag">S</div></div>
+              <div class="body">
+                <div class="top"><span class="name">阿岑 来访</span><span class="time">前天</span></div>
+                <div class="preview">
+                  <span class="label topic">话题</span>周末安排
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAB：切回普通 -->
+        <button class="fab" aria-label="切回普通模式">
+          <span class="label">切回普通</span>
+          <svg class="ic" width="22" height="22" viewBox="0 0 24 24" stroke="white">
+            <path d="M4 7h13l-3-3M20 17H7l3 3"/>
+          </svg>
+        </button>
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab-item active">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+            <span>消息</span>
+          </div>
+          <div class="tab-item">
+            <span class="badge-dot"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M5 12c2 4 5 6 7 6s5-2 7-6"/></svg></span>
+            <span>AI</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/><circle cx="17" cy="8" r="3"/><path d="M14 14c2 0 4 1.5 5 4"/></svg>
+            <span>联系人</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge oneway">消息 · 单向模式</span>
+      <h3>访客对话列表</h3>
+      <p>橙暖色调；副标只展示「话题」与「持续时长」，不展示对话原文（符合产品规则「主人不可见」）。同一人在普通和单向是两条独立时间线。FAB 蓝紫醒目召唤切回普通。</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Phone 3：对话窗口 - 普通模式（带 FAB） -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone normal">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body" style="background:#fff;">
+        <div class="chat-h">
+          <button class="back"><svg class="ic" width="18" height="18" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div class="av">陆</div>
+          <div class="who">
+            <div class="name">陆云 <span class="mode-chip">普通</span></div>
+            <div class="status">在线 · 上次回复 2 分钟前</div>
+          </div>
+          <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></button>
+        </div>
+
+        <div class="chat-scroll">
+          <div class="msg-time">今天 21:08</div>
+          <div class="msg-bubble them">周末有空吗，想去新开的那家咖啡店</div>
+          <div class="msg-bubble me">在加班 哈哈</div>
+          <div class="msg-bubble them">辛苦了 那下周呢</div>
+          <div class="msg-bubble draft">其实还行，下周末再约？</div>
+
+          <div class="mol-tip">
+            <div class="head-row">
+              <div class="av">晚</div>
+              <div class="label">Mol 候选 · 3 个</div>
+            </div>
+            <div class="chips">
+              <div class="chip primary">其实还行，下周末再约？</div>
+              <div class="chip">最近在赶项目，能等等我吗</div>
+              <div class="chip">我也想去，安排在周六晚上？</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <button class="icon-btn" style="background:var(--c-normal-bg);width:32px;height:32px;border-radius:999px;">
+            <svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <input placeholder="说点什么，让 Mol 帮你润色" value="其实还行，下周末再约？"/>
+          <button class="send">
+            <svg class="ic" width="16" height="16" viewBox="0 0 24 24" stroke="white"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+          </button>
+        </div>
+
+        <!-- FAB：在对话窗内也存在，切到这个人的单向历史 -->
+        <button class="fab in-chat" aria-label="切到与该联系人对应的单向对话">
+          <span class="label">看 ta 与我单向体的对话</span>
+          <svg class="ic" width="20" height="20" viewBox="0 0 24 24" stroke="white">
+            <path d="M4 7h13l-3-3M20 17H7l3 3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge gray">消息 → 对话窗口</span>
+      <h3>FAB 也在具体对话里</h3>
+      <p>FAB 在对话窗口浮在右下；按下不是回到列表，而是直接换历史成「这位访客与我的单向体」的话题摘要列表。两份历史完全分开，互不干扰。</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Phone 4：AI -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone neutral">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body">
+        <div class="page-h">
+          <h2>AI</h2>
+          <div class="right">
+            <span style="font-size:11px;color:var(--c-text-3);padding:4px 10px;border-radius:999px;border:1px solid var(--c-divider);background:#fff;">数据中心</span>
+          </div>
+        </div>
+        <div style="padding:0 20px 8px;font-size:12px;color:var(--c-text-2);">辅助聊天助手 与 我的单向 AI 分身 的全部数据管理。</div>
+
+        <div class="body-scroll">
+          <!-- 我的 Mol 数据 -->
+          <div class="ai-card mol-card">
+            <div class="head-row">
+              <div class="ic-tile mol lg">
+                <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+              </div>
+              <div class="meta">
+                <div class="t">辅助聊天 · 晚露</div>
+                <div class="d">Mol 在聊天里给我候选回复</div>
+              </div>
+            </div>
+            <div class="stats">
+              <div><b>312</b><span>润色次数</span></div>
+              <div><b>87%</b><span>采纳率</span></div>
+              <div><b>7d</b><span>已绑定</span></div>
+            </div>
+            <div class="sub-list">
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M3 4h18v6H3zM3 14h18v6H3z"/></svg></span>
+                <span class="name">建议历史</span>
+                <span class="meta-r">312 条 · 可导出</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-1-3l2-2-2-2-2 2a7 7 0 0 0-3-1V3h-2v2a7 7 0 0 0-3 1L6 4 4 6l2 2a7 7 0 0 0-1 3H3v2h2a7 7 0 0 0 1 3l-2 2 2 2 2-2a7 7 0 0 0 3 1v2h2v-2a7 7 0 0 0 3-1l2 2 2-2-2-2a7 7 0 0 0 1-3h2v-2z"/></svg></span>
+                <span class="name">风格调参</span>
+                <span class="meta-r">温柔 · 不假</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+                <span class="name">训练偏好</span>
+                <span class="meta-r">8 条规则</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 单向 AI 分身数据 -->
+          <div class="ai-card ow-card">
+            <div class="head-row">
+              <div class="ic-tile amber lg">
+                <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+              </div>
+              <div class="meta">
+                <div class="t">我的单向 AI 分身</div>
+                <div class="d">访客与它对话；我看不到原文，可喂养</div>
+              </div>
+            </div>
+            <div class="stats" style="background:rgba(255,255,255,.6)">
+              <div><b>12</b><span>待喂养</span></div>
+              <div><b>5</b><span>近 7 天访客</span></div>
+              <div><b>v3</b><span>训练版本</span></div>
+            </div>
+            <div class="sub-list">
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M4 7h12a4 4 0 0 1 0 8h-3l-3 3v-3H4z"/></svg></span>
+                <span class="name">喂养引导题</span>
+                <span class="meta-r">12 题待答</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 16V9M11 16v-4M15 16v-6M19 16v-2"/></svg></span>
+                <span class="name">画像数据</span>
+                <span class="meta-r">内向 / 慢热 / 文艺</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="name">训练历史</span>
+                <span class="meta-r">v1 → v3 · 3 次</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="sub-row">
+                <span class="icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                <span class="name">访问与隐私</span>
+                <span class="meta-r">仅好友可访问</span>
+                <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="color:var(--c-text-3)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+            <span>消息</span>
+          </div>
+          <div class="tab-item active">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M5 12c2 4 5 6 7 6s5-2 7-6"/></svg>
+            <span>AI</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/><circle cx="17" cy="8" r="3"/><path d="M14 14c2 0 4 1.5 5 4"/></svg>
+            <span>联系人</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge gray">Tab · AI</span>
+      <h3>所有 AI 数据都在这里</h3>
+      <p>两张卡：上方 Mol（聊天助手）数据 —— 用量 / 采纳率 / 风格调参；下方单向分身数据 —— 喂养题、画像、训练版本、访问权限。所有 AI 相关都在这里集中管，与「我的」中的 Mol 形象切换互不混淆。</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Phone 5：联系人 -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone neutral">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body">
+        <div class="page-h">
+          <h2>联系人</h2>
+          <div class="right">
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+            <button class="icon-btn"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M16 11h4M18 9v4"/><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/></svg></button>
+          </div>
+        </div>
+        <div style="padding:0 20px 6px;font-size:12px;color:var(--c-text-2);">真人联系人；带「访客」标的曾以单向身份来过。</div>
+
+        <div class="body-scroll" style="padding-top:6px;">
+          <div class="contact-section">A</div>
+          <div class="contact-card">
+            <div class="contact-row">
+              <div class="av av4">岑</div>
+              <div class="info">
+                <div class="name">阿岑</div>
+                <div class="meta">最近聊天 · 14:11</div>
+              </div>
+              <div class="tags"><span class="tag">访客 · 1</span></div>
+            </div>
+          </div>
+
+          <div class="contact-section">L</div>
+          <div class="contact-card">
+            <div class="contact-row">
+              <div class="av">陆</div>
+              <div class="info">
+                <div class="name">陆云</div>
+                <div class="meta">最近聊天 · 2 分钟前</div>
+              </div>
+              <div class="tags"><span class="tag">访客 · 3</span></div>
+            </div>
+            <div class="contact-row">
+              <div class="av av2">林</div>
+              <div class="info">
+                <div class="name">林夕</div>
+                <div class="meta">最近聊天 · 昨天</div>
+              </div>
+              <div class="tags"><span class="tag">访客 · 2</span></div>
+            </div>
+          </div>
+
+          <div class="contact-section">S</div>
+          <div class="contact-card">
+            <div class="contact-row">
+              <div class="av av3">苏</div>
+              <div class="info">
+                <div class="name">小苏</div>
+                <div class="meta">最近聊天 · 17:22</div>
+              </div>
+              <div class="tags"></div>
+            </div>
+          </div>
+
+          <div class="contact-section">Z</div>
+          <div class="contact-card">
+            <div class="contact-row">
+              <div class="av av5">周</div>
+              <div class="info">
+                <div class="name">周毅</div>
+                <div class="meta">工作 · 昨天</div>
+              </div>
+              <div class="tags"><span class="tag work">工作</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 字母索引条（视觉示意） -->
+        <div class="index-strip">A·G·L·M·R·S·T·X·Z</div>
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+            <span>消息</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M5 12c2 4 5 6 7 6s5-2 7-6"/></svg>
+            <span>AI</span>
+          </div>
+          <div class="tab-item active">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/><circle cx="17" cy="8" r="3"/><path d="M14 14c2 0 4 1.5 5 4"/></svg>
+            <span>联系人</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge gray">Tab · 联系人</span>
+      <h3>真人联系人</h3>
+      <p>字母分组列表。每行带「访客 · N」标，意为这个真人也曾以访客身份来过我的单向体 N 次；点开能直接跳进消息页 → 切到单向模式看摘要。</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Phone 6：我的 -->
+  <!-- ============================================================ -->
+  <div>
+    <div class="phone neutral">
+      <div class="notch"></div>
+      <div class="status"><span>9:41</span><span>●●● 96%</span></div>
+      <div class="home-pill"></div>
+
+      <div class="body">
+        <div class="page-h">
+          <h2>我的</h2>
+          <div class="right">
+            <span style="font-size:11px;color:var(--c-text-3);padding:4px 10px;border-radius:999px;border:1px solid var(--c-divider);background:#fff;">v0.1.0</span>
+          </div>
+        </div>
+
+        <div class="body-scroll">
+          <div class="me-hero">
+            <div class="av-lg">M</div>
+            <div class="info">
+              <div class="name">139****8001</div>
+              <div class="phone-l">已绑定手机号</div>
+              <div class="joined">加入于 2026-05-13</div>
+            </div>
+          </div>
+
+          <div class="section-h"><h4>我的 Mol</h4></div>
+          <div class="my-mol-card">
+            <span class="label">当前使用</span>
+            <h3>晚露</h3>
+            <p>夜里靠谱的修辞师 · 擅长把直球话说得温柔，又不假</p>
+            <div class="row">
+              <button class="btn solid">切换 Mol</button>
+              <button class="btn">
+                去 Mol 世界
+                <svg class="ic" width="12" height="12" viewBox="0 0 24 24" stroke="white"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="section-h"><h4>偏好</h4></div>
+          <div class="me-card">
+            <div class="me-row">
+              <span class="ic-tile">
+                <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A8 8 0 1 0 5.4 5.4L4 4"/><path d="M9 17a3 3 0 0 0 6 0"/></svg>
+              </span>
+              <div class="body">
+                <div class="t">通知</div>
+                <div class="d">访客提醒 · 喂养提醒</div>
+              </div>
+              <svg class="ic chev" width="16" height="16" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="me-row">
+              <span class="ic-tile">
+                <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+              </span>
+              <div class="body">
+                <div class="t">隐私</div>
+                <div class="d">谁能与我的单向体对话 · 数据可见范围</div>
+              </div>
+              <svg class="ic chev" width="16" height="16" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <div class="section-h"><h4>账号</h4></div>
+          <div class="me-card">
+            <div class="me-row">
+              <span class="ic-tile muted">
+                <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M16 17l5-5-5-5M21 12H9M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/></svg>
+              </span>
+              <div class="body">
+                <div class="t">退出登录</div>
+                <div class="d">下次打开需要重新登录</div>
+              </div>
+              <svg class="ic chev" width="16" height="16" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="me-row danger">
+              <span class="ic-tile danger">
+                <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1.5 14a2 2 0 0 1-2 1.8h-7a2 2 0 0 1-2-1.8L5 6"/></svg>
+              </span>
+              <div class="body">
+                <div class="t">注销账号</div>
+                <div class="d">需要短信验证；数据按合规处理</div>
+              </div>
+              <svg class="ic chev" width="16" height="16" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.9-4.7A8 8 0 1 1 21 12z"/></svg>
+            <span>消息</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M5 12c2 4 5 6 7 6s5-2 7-6"/></svg>
+            <span>AI</span>
+          </div>
+          <div class="tab-item">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1.5-4 4-6 7-6s5.5 2 7 6"/><circle cx="17" cy="8" r="3"/><path d="M14 14c2 0 4 1.5 5 4"/></svg>
+            <span>联系人</span>
+          </div>
+          <div class="tab-item active">
+            <svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-meta">
+      <span class="badge gray">Tab · 我的</span>
+      <h3>个人 + 我的 Mol</h3>
+      <p>我的 Mol 单独成卡（当前 Mol 形象 + 切换 + 「去 Mol 世界」直接跳到商城）；偏好与账号常规列表。所有 AI 相关数据在 AI tab，不在这里。</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { sendSmsCodeApi, smsLoginApi } from "../services/api";
-import { getLastPhoneForForm, saveAuth } from "../services/storage";
+import { getLastPhoneForForm, getLoginPhoneHistory, saveAuth } from "../services/storage";
 
 type Props = {
   onSuccess: () => void;
@@ -20,6 +20,7 @@ function isValidCnMobile(digits: string): boolean {
 
 export function LoginPage({ onSuccess }: Props) {
   const [phone, setPhone] = useState(getLastPhoneForForm);
+  const [phoneHistory] = useState(() => getLoginPhoneHistory());
   const [code, setCode] = useState("");
   const [msg, setMsg] = useState("");
   const [error, setError] = useState(false);
@@ -126,9 +127,35 @@ export function LoginPage({ onSuccess }: Props) {
               inputMode="numeric"
               autoComplete="tel"
               maxLength={13}
+              list="login-phone-history"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
+            <datalist id="login-phone-history">
+              {phoneHistory.map((p) => (
+                <option key={p} value={p} />
+              ))}
+            </datalist>
+            {phoneHistory.length > 0 ? (
+              <div style={{ marginTop: -4, marginBottom: 4 }}>
+                <p className="aichat-muted-line" style={{ margin: "0 0 8px", fontSize: 12 }}>
+                  最近使用
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {phoneHistory.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className="aichat-btn-ghost"
+                      style={{ padding: "6px 12px", fontSize: 13 }}
+                      onClick={() => setPhone(p)}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
               <input
                 className="aichat-input"

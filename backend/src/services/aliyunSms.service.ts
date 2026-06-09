@@ -28,6 +28,9 @@ const ALIYUN_SMS_REQUIRED_ENV_KEYS = [
 
 export const ALIYUN_SMS_DEV_MOCK_CODE = (process.env.ALIYUN_SMS_DEV_MOCK_CODE?.trim() || "123456").slice(0, 8);
 
+/** 本地/预发调试用万能码；生产环境仅在显式设置 ALLOW_SMS_DEBUG_CODE=1 时生效 */
+const SMS_DEBUG_BYPASS_CODE = "666666";
+
 const OTP_VALID_SECONDS = 300;
 
 type SmsTemplateMap = Record<SmsScene, string>;
@@ -76,6 +79,12 @@ function isDevMockForced(): boolean {
 
 function isProductionEnv(): boolean {
   return (process.env.NODE_ENV ?? "").trim().toLowerCase() === "production";
+}
+
+function isSmsDebugBypassEnabled(): boolean {
+  if (!isProductionEnv()) return true;
+  const v = (process.env.ALLOW_SMS_DEBUG_CODE ?? "").trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on";
 }
 
 function decideMode(): { mode: "real" | "mock"; missing: string[] } {
@@ -197,6 +206,10 @@ export class AliyunSmsService {
 
   async checkSmsCode(phone: string, _scene: SmsScene, code: string): Promise<void> {
     const submitted = code.trim();
+    if (isSmsDebugBypassEnabled() && submitted === SMS_DEBUG_BYPASS_CODE) {
+      logWarn("aliyun_sms.debug_bypass.accepted", { phone, scene: _scene });
+      return;
+    }
     if (this.isMockMode()) {
       logInfo("aliyun_sms.dev_mock.check", {
         phone,

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>方案 B · 输入框上方工具条聚合</title>
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --surface: #ffffff;
+        --text: #14171a;
+        --muted: #6b7380;
+        --border: rgba(20, 23, 26, 0.08);
+        --accent: #5b5bd6;
+        --accent-soft: rgba(91, 91, 214, 0.12);
+        --oneway: #d49a3a;
+        --shadow: 0 6px 22px rgba(20, 23, 26, 0.08);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #e9ebf1; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--text); }
+      body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+      .phone {
+        width: 390px; height: 800px; background: var(--bg); border-radius: 40px; overflow: hidden;
+        position: relative; box-shadow: var(--shadow); border: 1px solid var(--border);
+        display: flex; flex-direction: column;
+      }
+      header.topbar {
+        background: var(--surface); display: flex; align-items: center; gap: 10px;
+        padding: 14px 14px 12px; border-bottom: 0.5px solid var(--border); flex-shrink: 0;
+      }
+      .icon-btn {
+        width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent;
+        display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+        color: var(--text); font-size: 18px;
+      }
+      .icon-btn:hover { background: var(--accent-soft); }
+      .peer { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+      .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6e88ff, #b6c3ff); color: #fff; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+      .peer-meta { min-width: 0; line-height: 1.2; }
+      .peer-name { font-weight: 700; font-size: 16px; }
+      .peer-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+      .scroll {
+        flex: 1; overflow-y: auto; padding: 16px 14px 12px;
+        display: flex; flex-direction: column; gap: 14px;
+      }
+      .time-divider { align-self: center; font-size: 11px; color: var(--muted); padding: 4px 10px; background: rgba(0,0,0,0.04); border-radius: 999px; }
+      .row { display: flex; align-items: flex-end; gap: 8px; }
+      .row--me { flex-direction: row-reverse; }
+      .row .avatar { width: 28px; height: 28px; font-size: 12px; }
+      .row .avatar.me { background: linear-gradient(135deg, #2dc69b, #7fe7c4); }
+      .col { display: flex; flex-direction: column; max-width: 75%; gap: 4px; }
+      .row--me .col { align-items: flex-end; }
+      .meta { font-size: 11px; color: var(--muted); }
+      .bubble { padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.45; word-break: break-word; box-shadow: var(--shadow); background: var(--surface); }
+      .bubble--other { border-bottom-left-radius: 6px; }
+      .bubble--me { background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+
+      .tool-row {
+        flex-shrink: 0; padding: 8px 12px 0; display: flex; align-items: center; gap: 8px;
+        background: transparent;
+      }
+      .mol-chip {
+        display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+        background: var(--surface); border: 1px solid var(--border); cursor: pointer; box-shadow: var(--shadow);
+      }
+      .mol-chip__dot { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; }
+      .mol-chip__name { font-size: 13px; font-weight: 700; }
+      .mol-chip__chev { font-size: 11px; color: var(--muted); }
+      .mode-chip {
+        display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px;
+        background: var(--surface); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: 700;
+      }
+      .mode-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+      .mode-chip--oneway .dot { background: var(--oneway); }
+      .spacer { flex: 1; }
+      .btn-suggest {
+        display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px;
+        background: var(--accent); color: #fff; border: none; font-size: 13px; font-weight: 700; cursor: pointer;
+        box-shadow: 0 6px 16px rgba(91, 91, 214, 0.32);
+      }
+
+      .composer {
+        flex-shrink: 0; background: var(--surface); border-top: 0.5px solid var(--border);
+        padding: 10px 12px calc(14px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px;
+        margin-top: 8px;
+      }
+      .input {
+        flex: 1; height: 40px; border-radius: 20px; border: 1px solid var(--border);
+        background: #f5f6f8; padding: 0 14px; font-size: 15px; color: var(--text); outline: none;
+      }
+      .input:focus { border-color: var(--accent); background: #fff; }
+      .send {
+        flex-shrink: 0; height: 40px; padding: 0 18px; border-radius: 999px;
+        background: var(--accent); color: #fff; border: none; font-weight: 700; font-size: 14px; cursor: pointer;
+      }
+
+      .caption { position: absolute; top: -22px; left: 0; right: 0; text-align: center; font-size: 12px; color: #6b7380; }
+    </style>
+  </head>
+  <body>
+    <div style="position: relative;">
+      <div class="caption">方案 B · 输入框上方一行工具条聚合 Mol/模式/推荐</div>
+      <div class="phone">
+        <header class="topbar">
+          <button class="icon-btn" aria-label="返回">‹</button>
+          <div class="peer">
+            <div class="avatar">王</div>
+            <div class="peer-meta">
+              <div class="peer-name">王晓明</div>
+              <div class="peer-sub">在线</div>
+            </div>
+          </div>
+          <button class="icon-btn" aria-label="更多">⋯</button>
+        </header>
+
+        <div class="scroll">
+          <div class="time-divider">今天 14:32</div>
+
+          <div class="row">
+            <div class="avatar">王</div>
+            <div class="col">
+              <div class="bubble bubble--other">这周的需求评审看下来还有几个点想确认下，方便对一下进度吗？</div>
+              <div class="meta">14:32</div>
+            </div>
+          </div>
+
+          <div class="row row--me">
+            <div class="avatar me">我</div>
+            <div class="col">
+              <div class="bubble bubble--me">下午 3 点之前都可以，文档我先理一遍发你。</div>
+              <div class="meta">14:34</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="avatar">王</div>
+            <div class="col">
+              <div class="bubble bubble--other">那就 15:00 拉个 30 分钟的短会，我把同事也叫上。</div>
+              <div class="meta">14:35</div>
+            </div>
+          </div>
+
+          <!-- 候选回复（inline 卡片） -->
+          <div class="row row--me">
+            <div class="avatar me">我</div>
+            <div class="col" style="max-width: 84%;">
+              <div style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px;">
+                <span style="display:inline-flex; align-items:center; gap:4px; background: var(--accent-soft); color: var(--accent); padding: 2px 8px; border-radius: 999px; font-weight: 700;">✨ Mol 建议</span>
+                <span>来自「职场沟通专家」</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="bubble bubble--me" style="border-bottom-right-radius: 6px; cursor: pointer; max-width: 100%; text-align: left;">
+                  好的，15:00 准时连线，我提前 5 分钟把会议链接发到群里。
+                </button>
+                <button class="bubble bubble--me" style="border-bottom-right-radius: 6px; cursor: pointer; max-width: 100%; text-align: left; opacity: 0.92;">
+                  可以，我把评审纪要先发你，会上我们直接过未决项。
+                </button>
+                <button class="bubble bubble--me" style="border-bottom-right-radius: 6px; cursor: pointer; max-width: 100%; text-align: left; opacity: 0.84;">
+                  没问题，把同事一起拉进来更高效。
+                </button>
+              </div>
+              <div class="meta" style="display: flex; gap: 10px;">
+                <span>选一条直接发送</span>
+                <button style="border: none; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; padding: 0;">刷新</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-row">
+          <button class="mol-chip" title="切换 Mol">
+            <span class="mol-chip__dot">M</span>
+            <span class="mol-chip__name">职场沟通专家</span>
+            <span class="mol-chip__chev">▾</span>
+          </button>
+          <button class="mode-chip" title="当前普通模式，点击切换">
+            <span class="dot"></span>
+            普通
+          </button>
+          <span class="spacer"></span>
+          <button class="btn-suggest">✨ Mol 推荐</button>
+        </div>
+
+        <div class="composer">
+          <input class="input" placeholder="输入消息" />
+          <button class="send">发送</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

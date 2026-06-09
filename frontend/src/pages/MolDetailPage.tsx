@@ -3,7 +3,6 @@ import { PRIMARY_SCENES } from "../data/molWorldTaxonomy";
 import {
   createMyMol,
   getMyMolDetailForEdit,
-  putMolInfoItems,
   updateMyMol,
   type MolInMyCollection,
   type MolInfoItem,
@@ -22,7 +21,7 @@ function newLocalInfoId() {
 
 function infoTagLabel(item: MolInfoItem): string {
   if (item.source === "store") {
-    return item.softRemoved ? "商城模板（已删除）" : "商城模板";
+    return item.softRemoved ? "模板（已移除）" : "模板";
   }
   return "自定义";
 }
@@ -94,6 +93,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
   const [infoItems, setInfoItems] = useState<MolInfoItem[]>([]);
   const [infoForm, setInfoForm] = useState<InfoFormMode>(null);
   const [infoFormKey, setInfoFormKey] = useState(0);
+  const [readOnly, setReadOnly] = useState(false);
 
   const load = useCallback(() => {
     if (isNew) {
@@ -102,6 +102,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
       setCategory(SCENE_OPTIONS[0] ?? "职场沟通");
       setSource("created");
       setInfoItems([]);
+      setReadOnly(false);
       setLoading(false);
       return;
     }
@@ -114,6 +115,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
         setCategory(item.primaryCategory);
         setSource(item.source);
         setInfoItems(info.map((x) => ({ ...x })));
+        setReadOnly(item.uploaderIsMe === false);
       })
       .catch((e: unknown) => {
         setLoadErr(e instanceof Error ? e.message : String(e));
@@ -145,6 +147,9 @@ export function MolDetailPage({ molId, onBack }: Props) {
       setSaveErr("请填写名称、简介与场景。");
       return;
     }
+    if (readOnly) {
+      return;
+    }
     setSaveErr("");
     setSaving(true);
     try {
@@ -163,8 +168,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
         onBack();
         return;
       }
-      await updateMyMol(molId, { name: n, summary: s, primaryCategory: c });
-      await putMolInfoItems(molId, infoItems);
+      await updateMyMol(molId, { name: n, summary: s, primaryCategory: c, infoItems });
       onBack();
     } catch (e: unknown) {
       setSaveErr(e instanceof Error ? e.message : String(e));
@@ -203,14 +207,18 @@ export function MolDetailPage({ molId, onBack }: Props) {
           ←
         </button>
         <div className="aichat-moldt-navbar-title">Mol 信息管理</div>
-        <button type="button" className="aichat-moldt-save" onClick={saveAll} disabled={saving}>
-          {saving ? "保存中…" : "保存"}
-        </button>
+        {!readOnly && (
+          <button type="button" className="aichat-moldt-save" onClick={saveAll} disabled={saving}>
+            {saving ? "保存中…" : "保存"}
+          </button>
+        )}
+        {readOnly && <div className="aichat-moldt-save" aria-hidden style={{ width: 44 }} />}
       </header>
 
       {saveErr && <p className="aichat-moldt-banner-err aichat-form-msg err">{saveErr}</p>}
 
       <div className="aichat-moldt-body">
+        {readOnly && <p className="aichat-moldt-banner-ro">仅上传者可编辑名称、场景、简介与信息条目。</p>}
         <section className="aichat-moldt-molhead" aria-label="Mol 概览">
           <div className="aichat-moldt-avatar" aria-hidden>
             {name.trim() ? <span className="aichat-moldt-avatar__txt">{name.trim().slice(0, 1)}</span> : <span className="aichat-moldt-avatar__txt">Mol</span>}
@@ -223,13 +231,27 @@ export function MolDetailPage({ molId, onBack }: Props) {
               maxLength={80}
               placeholder="职业形象或 Mol 名称"
               aria-label="名称"
+              readOnly={readOnly}
+              disabled={readOnly}
             />
-            <p className="aichat-moldt-name-hint">{source === "store" ? "来自 Mol 世界 · 可编辑本页内容" : "自己创建 · 可编辑本页内容"}</p>
+            <p className="aichat-moldt-name-hint">
+              {readOnly
+                ? "来自 Mol 世界 · 只读"
+                : source === "store"
+                  ? "来自 Mol 世界 · 可编辑本页内容"
+                  : "自己创建 · 可编辑本页内容"}
+            </p>
             <div className="aichat-moldt-scenewrap">
               <label className="aichat-moldt-hid" htmlFor="aichat-mol-detail-scene">
                 场景
               </label>
-              <select id="aichat-mol-detail-scene" className="aichat-moldt-scene" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <select
+                id="aichat-mol-detail-scene"
+                className="aichat-moldt-scene"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                disabled={readOnly}
+              >
                 {SCENE_OPTIONS.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -248,6 +270,8 @@ export function MolDetailPage({ molId, onBack }: Props) {
               rows={2}
               maxLength={500}
               placeholder="用一两句话概括用途与风格"
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </div>
         </section>
@@ -261,14 +285,18 @@ export function MolDetailPage({ molId, onBack }: Props) {
               setInfoFormKey((k) => k + 1);
               setInfoForm({ kind: "add" });
             }}
-            disabled={saving}
+            disabled={saving || readOnly}
           >
             + 添加信息
           </button>
         </div>
 
         <ul className="aichat-moldt-infolist" role="list">
-          {infoItems.length === 0 && <li className="aichat-moldt-infolist__empty">还没有信息。可点击「+ 添加信息」添加自定义条目。</li>}
+          {infoItems.length === 0 && (
+            <li className="aichat-moldt-infolist__empty">
+              {readOnly ? "暂无信息条目。" : "还没有信息。可点击「+ 添加信息」添加自定义条目。"}
+            </li>
+          )}
           {infoItems.map((it) => {
             const isSoft = it.softRemoved && it.source === "store";
             const isStore = it.source === "store";
@@ -295,10 +323,10 @@ export function MolDetailPage({ molId, onBack }: Props) {
                     <button
                       type="button"
                       className="aichat-moldt-iconbtn aichat-moldt-iconbtn--rest"
-                      aria-label="恢复此条商城信息"
+                      aria-label="恢复此条模板信息"
                       title="恢复"
                       onClick={() => restoreStore(it.id)}
-                      disabled={saving}
+                      disabled={saving || readOnly}
                     >
                       ↩
                     </button>
@@ -311,7 +339,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
                         setInfoFormKey((k) => k + 1);
                         setInfoForm({ kind: "edit", id: it.id });
                       }}
-                      disabled={saving}
+                      disabled={saving || readOnly}
                     >
                       ✏
                     </button>
@@ -322,11 +350,11 @@ export function MolDetailPage({ molId, onBack }: Props) {
                       className="aichat-moldt-iconbtn aichat-moldt-iconbtn--dl"
                       aria-label="软删除（可恢复）"
                       onClick={() => {
-                        if (window.confirm("将此项从列表中标记为删除？商城模板可随后恢复。")) {
+                        if (window.confirm("将此项标记为已移除？模板条目可随后恢复。")) {
                           softDeleteStore(it.id);
                         }
                       }}
-                      disabled={saving}
+                      disabled={saving || readOnly}
                     >
                       ✂
                     </button>
@@ -341,7 +369,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
                           hardDeleteCustom(it.id);
                         }
                       }}
-                      disabled={saving}
+                      disabled={saving || readOnly}
                     >
                       ✂
                     </button>
