@@ -19,35 +19,67 @@ function MolCard({
   buying: boolean;
   onBuy: (id: string) => void;
 }) {
+  const tags = [...(m.taskTags ?? []).slice(0, 3), ...(m.toneTags ?? []).slice(0, 1)].slice(0, 4);
+
   return (
-    <div className="aichat-card aichat-page-card aichat-mol-tile">
-      <div className="aichat-inline-row aichat-inline-row-between aichat-mol-tile__head">
-        <h2 className="aichat-panel-title">{m.name}</h2>
-        {m.owned ? <span className="aichat-tag-ok">已加入</span> : <span className="aichat-tag-muted">未加入</span>}
+    <article className="mol-world-a-card">
+      <div className="mol-world-a-card__head">
+        <h3 className="mol-world-a-card__name">{m.name}</h3>
+        {m.owned ? <span className="mol-world-a-card__owned">已加入</span> : null}
       </div>
-      <p className="aichat-mol-catline">{m.primaryCategory}</p>
-      <p className="aichat-card-hint">{m.summary}</p>
-      <div className="aichat-tag-wrap">
-        {(m.taskTags ?? []).slice(0, 4).map((t) => (
-          <span key={t} className="aichat-tag-s">
-            {t}
-          </span>
-        ))}
-      </div>
-      {!m.owned && (
-        <div className="aichat-inline-row aichat-inline-row-between">
-          <span className="aichat-price">{m.price > 0 ? `¥${m.price}` : "免费"}</span>
-          <button
-            type="button"
-            className="aichat-btn-primary aichat-btn-fit"
-            onClick={() => onBuy(m.id)}
-            disabled={buying}
-          >
+      <p className="mol-world-a-card__cat">{m.primaryCategory}</p>
+      <p className="mol-world-a-card__hint">{m.summary}</p>
+      {tags.length > 0 ? (
+        <div className="mol-world-a-card__tags">
+          {tags.map((t) => (
+            <span key={t} className="mol-world-a-card__tag">
+              {t}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {!m.owned ? (
+        <div className="mol-world-a-card__foot">
+          <span className="mol-world-a-card__price">{m.price > 0 ? `¥${m.price}` : "免费"}</span>
+          <button type="button" className="mol-world-a-card__join" onClick={() => onBuy(m.id)} disabled={buying}>
             加入我的 Mol
           </button>
         </div>
-      )}
-    </div>
+      ) : null}
+    </article>
+  );
+}
+
+function MolWorldTopBar({
+  onBack,
+  onUpload,
+  onMyMols,
+  uploadDisabled,
+}: {
+  onBack: () => void;
+  onUpload: () => void;
+  onMyMols?: () => void;
+  uploadDisabled: boolean;
+}) {
+  return (
+    <header className="aichat-topbar aichat-topbar-flex mol-world-a-topbar">
+      <button className="mol-world-a-topbar__back" type="button" onClick={onBack}>
+        返回
+      </button>
+      <h1 className="mol-world-a-topbar__title">Mol 世界</h1>
+      <div className="aichat-molworld-top-actions">
+        <button type="button" className="mol-world-a-topbar__link" disabled={uploadDisabled} onClick={onUpload}>
+          上传
+        </button>
+        {onMyMols ? (
+          <button type="button" className="mol-world-a-topbar__link" onClick={onMyMols} disabled={uploadDisabled}>
+            我的
+          </button>
+        ) : (
+          <span className="aichat-topbar-spacer" aria-hidden />
+        )}
+      </div>
+    </header>
   );
 }
 
@@ -191,88 +223,64 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
     }
   }
 
-  const topRight = (
-    <div className="aichat-molworld-top-actions">
-      <button type="button" className="aichat-btn-ghost" disabled={upBusy} onClick={openUploadModal}>
-        上传
-      </button>
-      {onMyMols ? (
-        <button className="aichat-btn-ghost" type="button" onClick={onMyMols} disabled={upBusy}>
-          我的
-        </button>
-      ) : (
-        <div className="aichat-topbar-spacer" aria-hidden />
-      )}
-    </div>
-  );
-
   if (loading) {
     return (
-      <div className="aichat-shell">
-        <header className="aichat-topbar aichat-topbar-flex">
-          <button className="aichat-btn-ghost" type="button" onClick={onBack}>
-            返回
-          </button>
-          <div className="aichat-stage-head">
-            <h1>Mol 世界</h1>
-            <p>浏览场景并加入列表</p>
-          </div>
-          {topRight}
-        </header>
-        <div className="aichat-main aichat-page-main">
-          <div className="aichat-card">正在加载 Mol...</div>
+      <div className="aichat-shell aichat-molworld aichat-molworld-a">
+        <MolWorldTopBar onBack={onBack} onUpload={openUploadModal} onMyMols={onMyMols} uploadDisabled={upBusy} />
+        <div className="aichat-main aichat-page-main aichat-molworld-main">
+          <div className="mol-world-a-loading">正在加载 Mol…</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="aichat-shell aichat-molworld">
-      <header className="aichat-topbar aichat-topbar-flex">
-        <button className="aichat-btn-ghost" type="button" onClick={onBack}>
-          返回
-        </button>
-        <div className="aichat-stage-head">
-          <h1>Mol 世界</h1>
-          <p>浏览场景并加入列表</p>
-        </div>
-        {topRight}
-      </header>
+    <div className="aichat-shell aichat-molworld aichat-molworld-a">
+      <MolWorldTopBar onBack={onBack} onUpload={openUploadModal} onMyMols={onMyMols} uploadDisabled={upBusy} />
 
       <div className="aichat-main aichat-page-main aichat-molworld-main">
-        {err && <p className="aichat-form-msg err">{err}</p>}
+        {err ? <p className="aichat-form-msg err">{err}</p> : null}
 
-        <div className="aichat-molworld-search">
-          <input
-            className="aichat-input aichat-molworld-search-input"
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜场景、关系或任务"
-            enterKeyHint="search"
-            aria-label="搜索 Mol"
-          />
-          {search.trim() && (
-            <div className="aichat-suggest-row" role="list">
-              {SEARCH_SUGGESTION_CHIPS.filter((c) => c.toLowerCase().includes(search.toLowerCase())).slice(0, 4).map((c) => (
+        <input
+          className="mol-world-a-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="搜场景、关系或任务"
+          enterKeyHint="search"
+          aria-label="搜索 Mol"
+        />
+        {search.trim() ? (
+          <div className="aichat-suggest-row" role="list">
+            {SEARCH_SUGGESTION_CHIPS.filter((c) => c.toLowerCase().includes(search.toLowerCase()))
+              .slice(0, 4)
+              .map((c) => (
                 <button key={c} type="button" className="aichat-suggest-chip" onClick={() => setSearch(c)}>
                   {c}
                 </button>
               ))}
-            </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
-        {recommended.length > 0 && (
-          <section className="aichat-molworld-section" aria-label="为你推荐">
-            <h2 className="aichat-molworld-h2">为你推荐</h2>
-            <div className="aichat-mol-shelf" role="list">
+        {recommended.length > 0 ? (
+          <section className="mol-world-a-section" aria-label="为你推荐">
+            <h2 className="mol-world-a-section__title">为你推荐</h2>
+            <div className="mol-world-a-shelf" role="list">
               {recommended.map((m) => (
-                <div key={m.id} className="aichat-mol-shelf-item" role="listitem">
-                  <p className="aichat-mol-shelf-name">{m.name}</p>
-                  <p className="aichat-mol-shelf-sub">{m.primaryCategory}</p>
-                  {!m.owned && (
-                    <button type="button" className="aichat-mol-shelf-cta" onClick={() => onBuy(m.id)} disabled={!!buyingId}>
+                <div key={m.id} className="mol-world-a-shelf-item" role="listitem">
+                  <strong className="mol-world-a-shelf-item__name">{m.name}</strong>
+                  <span className="mol-world-a-shelf-item__cat">{m.primaryCategory}</span>
+                  {m.owned ? (
+                    <button type="button" className="mol-world-a-shelf-item__cta mol-world-a-shelf-item__cta--owned" disabled>
+                      已加入
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="mol-world-a-shelf-item__cta"
+                      onClick={() => onBuy(m.id)}
+                      disabled={!!buyingId}
+                    >
                       {m.price > 0 ? `¥${m.price}` : "加入"}
                     </button>
                   )}
@@ -280,124 +288,117 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
               ))}
             </div>
           </section>
-        )}
+        ) : null}
 
-        <section className="aichat-molworld-section" aria-label="筛选">
-          <h2 className="aichat-molworld-h2">筛选</h2>
-          <div className="aichat-card aichat-molworld-filter-card">
-            <p className="aichat-molworld-lev1">场景</p>
-            <div className="aichat-mol-chips aichat-mol-chips--compact aichat-mol-chips--hscroll" role="tablist">
-              {PRIMARY_SCENES.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  role="tab"
-                  className={scene === s ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
-                  onClick={() => {
-                    setScene(s);
-                  }}
-                  aria-selected={scene === s}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-
-            <div className="aichat-molworld-summary-line" role="status">
-              <span className="aichat-molworld-summary-text">
-                {scene === "全部" ? "场景：全部" : `场景：${scene}`} · 更多：{subFilterSummary}
-              </span>
-              {hasSubFilters && (
-                <button type="button" className="aichat-molworld-summary-clear" onClick={clearSubFilters}>
-                  清除子筛
-                </button>
-              )}
-            </div>
-
-            <details className="aichat-molworld-details">
-              <summary className="aichat-molworld-details-summary">更多筛选</summary>
-              <div className="aichat-molworld-advanced">
-                <p className="aichat-molworld-sublab">热门任务</p>
-                <div className="aichat-mol-chips aichat-mol-chips--compact">
-                  {POPULAR_TASK_SHORTCUTS.map(({ label, taskTag: tag }) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      className={taskTag === tag ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
-                      onClick={() => setTaskTag((prev) => (prev === tag ? null : tag))}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <p className="aichat-molworld-sublab">语气</p>
-                <div className="aichat-mol-chips aichat-mol-chips--compact">
-                  {TONE_CHIPS.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      className={toneFilter === t ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
-                      onClick={() => setToneFilter((prev) => (prev === t ? null : t))}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-                <p className="aichat-molworld-sublab">关系</p>
-                <div className="aichat-mol-chips aichat-mol-chips--compact">
-                  {REL_CHIPS.map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      className={relFilter === r ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
-                      onClick={() => setRelFilter((prev) => (prev === r ? null : r))}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </details>
+        <div className="aichat-molworld-filter-card mol-world-a-filter" aria-label="筛选">
+          <p className="aichat-molworld-lev1">场景</p>
+          <div className="aichat-mol-chips aichat-mol-chips--compact mol-world-a-chips" role="tablist">
+            {PRIMARY_SCENES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                role="tab"
+                className={scene === s ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
+                onClick={() => setScene(s)}
+                aria-selected={scene === s}
+              >
+                {s}
+              </button>
+            ))}
           </div>
-        </section>
 
-        <section className="aichat-molworld-section" aria-label="结果列表">
-          <h2 className="aichat-molworld-h2">当前结果 {filteredList.length > 0 ? `· ${filteredList.length}` : ""}</h2>
-          {emptySearch && (
-            <div className="aichat-card aichat-mol-empty">
-              <p className="aichat-mol-empty__t">没有匹配的 Mol</p>
-              <p className="aichat-mol-empty__d">可尝试调整场景或换关键词</p>
-              <div className="aichat-suggest-row">
-                {fallbackSugs.map((c) => (
-                  <button key={c} type="button" className="aichat-suggest-chip" onClick={() => setSearch(c)}>
-                    {c}
+          <div className="aichat-molworld-summary-line mol-world-a-summary" role="status">
+            <span className="aichat-molworld-summary-text">
+              {scene === "全部" ? "场景：全部" : `场景：${scene}`} · 更多：{subFilterSummary}
+            </span>
+            {hasSubFilters ? (
+              <button type="button" className="aichat-molworld-summary-clear" onClick={clearSubFilters}>
+                清除子筛
+              </button>
+            ) : null}
+          </div>
+
+          <details className="aichat-molworld-details">
+            <summary className="aichat-molworld-details-summary">更多筛选</summary>
+            <div className="aichat-molworld-advanced">
+              <p className="aichat-molworld-sublab">热门任务</p>
+              <div className="aichat-mol-chips aichat-mol-chips--compact">
+                {POPULAR_TASK_SHORTCUTS.map(({ label, taskTag: tag }) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={taskTag === tag ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
+                    onClick={() => setTaskTag((prev) => (prev === tag ? null : tag))}
+                  >
+                    {label}
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                className="aichat-btn-ghost aichat-mol-empty__reset"
-                onClick={() => {
-                  setSearch("");
-                  setScene("全部");
-                  setTaskTag(null);
-                  setToneFilter(null);
-                  setRelFilter(null);
-                }}
-              >
-                清空筛选
-              </button>
+              <p className="aichat-molworld-sublab">语气</p>
+              <div className="aichat-mol-chips aichat-mol-chips--compact">
+                {TONE_CHIPS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    className={toneFilter === t ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
+                    onClick={() => setToneFilter((prev) => (prev === t ? null : t))}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <p className="aichat-molworld-sublab">关系</p>
+              <div className="aichat-mol-chips aichat-mol-chips--compact">
+                {REL_CHIPS.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    className={relFilter === r ? "aichat-mol-chip aichat-mol-chip--on" : "aichat-mol-chip"}
+                    onClick={() => setRelFilter((prev) => (prev === r ? null : r))}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
             </div>
-          )}
-          <div className="aichat-page-stack">
-            {filteredList.map((m) => (
-              <MolCard key={m.id} m={m} buying={!!buyingId} onBuy={onBuy} />
-            ))}
+          </details>
+        </div>
+
+        {emptySearch ? (
+          <div className="mol-world-a-empty">
+            <p className="mol-world-a-empty__t">没有匹配的 Mol</p>
+            <p className="mol-world-a-empty__d">可尝试调整场景或换关键词</p>
+            <div className="aichat-suggest-row">
+              {fallbackSugs.map((c) => (
+                <button key={c} type="button" className="aichat-suggest-chip" onClick={() => setSearch(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="aichat-btn-ghost mol-world-a-empty__reset"
+              onClick={() => {
+                setSearch("");
+                setScene("全部");
+                setTaskTag(null);
+                setToneFilter(null);
+                setRelFilter(null);
+              }}
+            >
+              清空筛选
+            </button>
           </div>
-        </section>
+        ) : null}
+
+        <div className="mol-world-a-list" aria-label="Mol 列表">
+          {filteredList.map((m) => (
+            <MolCard key={m.id} m={m} buying={!!buyingId} onBuy={onBuy} />
+          ))}
+        </div>
       </div>
 
-      {uploadOpen && (
+      {uploadOpen ? (
         <div className="aichat-modal" role="dialog" aria-modal onClick={() => !upBusy && setUploadOpen(false)}>
           <div className="aichat-modal-box aichat-modal-box--molworld-upload" onClick={(e) => e.stopPropagation()}>
             <h2 className="aichat-modal-t">上传 Mol</h2>
@@ -475,7 +476,7 @@ export function MolWorldPage({ onBack, onMyMols }: Props) {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

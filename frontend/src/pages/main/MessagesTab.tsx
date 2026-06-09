@@ -158,13 +158,10 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
 
   return (
     <div className="msg-tab-inner">
-      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar">
-        <div>
-          <h1>消息</h1>
-          <p>与联系人对话</p>
-        </div>
-        <button type="button" className="aichat-btn-ghost guardian-msg-entry" onClick={onOpenGuardianHall}>
-          AI群聊
+      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar aichat-topbar--plain">
+        <h1>消息</h1>
+        <button type="button" className="aichat-btn-pill guardian-msg-entry" onClick={onOpenGuardianHall}>
+          AI联系人
         </button>
       </header>
 
@@ -189,11 +186,7 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
           </ul>
         ) : convRows.length === 0 ? (
           <div className="msg-conv-empty">
-            <span className="msg-conv-empty__icon" aria-hidden>
-              💬
-            </span>
             <p className="msg-conv-empty__title">暂无会话</p>
-            <p className="msg-conv-empty__hint">同意好友申请后可在此对话，或创建 AI 守护群聊</p>
           </div>
         ) : (
           <ul className="msg-conv-list" aria-label="会话列表">

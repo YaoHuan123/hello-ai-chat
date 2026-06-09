@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { getAssistMolItems } from "../../services/molDataLocalStorage";
 import { getMyMols, type MolInMyCollection } from "../../services/stageApi";
 
 const MAX_MOLS = 6;
@@ -10,11 +11,30 @@ type Props = {
   onNewMol: () => void;
 };
 
-function MolRow({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
+function molDataCounts(molId: string) {
+  const items = getAssistMolItems(molId);
+  return {
+    dialogue: items.filter((x) => x.type === "dialogue").length,
+    rule: items.filter((x) => x.type === "rule").length,
+  };
+}
+
+function MolCard({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
+  const { dialogue, rule } = molDataCounts(m.id);
+
   return (
-    <button type="button" className="aichat-nav-item" style={{ textAlign: "left", width: "100%" }} onClick={onOpen}>
-      <span style={{ fontWeight: 600 }}>{m.name}</span>
-      <span className="phase">{m.primaryCategory}</span>
+    <button type="button" className="assist-mol-a-card" onClick={onOpen}>
+      <div className="assist-mol-a-card__head">
+        <h2 className="assist-mol-a-card__name">{m.name}</h2>
+        <span className="assist-mol-a-card__chev" aria-hidden>
+          ›
+        </span>
+      </div>
+      <p className="assist-mol-a-card__cat">{m.primaryCategory}</p>
+      <div className="assist-mol-a-card__stats">
+        <span className="assist-mol-a-stat assist-mol-a-stat--d">{dialogue} 样例</span>
+        <span className="assist-mol-a-stat assist-mol-a-stat--r">{rule} 约束</span>
+      </div>
     </button>
   );
 }
@@ -23,10 +43,15 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }:
   const [items, setItems] = useState<MolInMyCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [listEpoch, setListEpoch] = useState(0);
+  void listEpoch;
 
   const refresh = useCallback(() => {
     return getMyMols()
-      .then(setItems)
+      .then((next) => {
+        setItems(next);
+        setListEpoch((n) => n + 1);
+      })
       .catch((e: unknown) => setErr(e instanceof Error ? e.message : String(e)));
   }, []);
 
@@ -45,57 +70,51 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }:
   const overflow = items.length > MAX_MOLS;
 
   return (
-    <div className="aichat-shell">
-      <header className="aichat-topbar aichat-topbar-flex">
-        <button className="aichat-btn-ghost" type="button" onClick={onBack}>
+    <div className="aichat-shell assist-mol-a-shell">
+      <header className="aichat-topbar aichat-topbar-flex assist-mol-a-topbar">
+        <button className="assist-mol-a-topbar__link" type="button" onClick={onBack}>
           返回
         </button>
-        <div className="aichat-stage-head">
-          <h1>辅助聊天 MOL</h1>
-          <p>共 {items.length} 个 · 上限 {MAX_MOLS}</p>
+        <div className="assist-mol-a-topbar__mid">
+          <h1>我的 Mol</h1>
         </div>
-        <button className="aichat-btn-ghost" type="button" onClick={onOpenWorld} disabled={atCap}>
-          MOL 世界
-        </button>
+        <span className="aichat-topbar-spacer" aria-hidden />
       </header>
 
-      <div className="aichat-main aichat-page-main">
+      <div className="assist-mol-a-scroll">
         {err && <p className="aichat-form-msg err">{err}</p>}
-        {overflow && (
-          <div className="aichat-card" style={{ marginBottom: 12, fontSize: 14, color: "var(--aichat-muted)" }}>
-            当前超过上限，仅显示前 {MAX_MOLS} 个。请在「更多功能」中进入「我的 Mol」管理已应用项。
-          </div>
+        {!loading && (
+          <span className="assist-mol-a-quota" role="status">
+            已用 {items.length} / {MAX_MOLS}
+          </span>
         )}
-        {atCap && (
-          <div className="aichat-card" style={{ marginBottom: 12, fontSize: 14 }}>
-            已达上限 {MAX_MOLS} 个，无法新建或从 MOL 世界继续拉取，请先移除不再使用的 MOL。
-          </div>
-        )}
+        {overflow ? (
+          <p className="assist-mol-a-notice">仅显示前 {MAX_MOLS} 个</p>
+        ) : null}
+        {atCap && !overflow ? (
+          <p className="assist-mol-a-notice">已达上限</p>
+        ) : null}
 
-        <div className="aichat-mymols-toolbar" style={{ marginBottom: 12 }}>
-          <button type="button" className="aichat-btn-primary" onClick={onNewMol} disabled={loading || atCap}>
-            新建 MOL
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="aichat-card">加载中…</div>
-        ) : displayItems.length === 0 ? (
-          <div className="aichat-card aichat-page-card">
-            <p style={{ margin: 0, fontWeight: 600 }}>暂无 MOL</p>
-            <p style={{ margin: "10px 0 0", fontSize: 14, color: "var(--aichat-muted)", lineHeight: 1.5 }}>
-              可新建，或通过右上角「MOL 世界」拉取模板到列表（未满 {MAX_MOLS} 个时）。
-            </p>
+        {loading ? null : displayItems.length === 0 ? (
+          <div className="assist-mol-a-empty">
+            <p className="assist-mol-a-empty__t">暂无 Mol</p>
           </div>
         ) : (
-          <ul className="aichat-list" aria-label="MOL 列表">
+          <div className="assist-mol-a-list" aria-label="Mol 列表">
             {displayItems.map((m) => (
-              <li key={m.id}>
-                <MolRow m={m} onOpen={() => onOpenData(m.id)} />
-              </li>
+              <MolCard key={m.id} m={m} onOpen={() => onOpenData(m.id)} />
             ))}
-          </ul>
+          </div>
         )}
+      </div>
+
+      <div className="assist-mol-a-dock">
+        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--sec" onClick={onOpenWorld} disabled={loading || atCap}>
+          从 Mol 世界添加
+        </button>
+        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--pri" onClick={onNewMol} disabled={loading || atCap}>
+          新建 Mol
+        </button>
       </div>
     </div>
   );

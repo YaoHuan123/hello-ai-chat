@@ -8,27 +8,35 @@ type Props = {
 
 export function MeTab({ onNavigateFeature, onLogout }: Props) {
   const phone = getMaskedPhone();
+  const avatarLetter = phone ? phone.replace(/\D/g, "").slice(-1) || "我" : "我";
 
   return (
-    <div className="aichat-main-shell-tab">
-      <header className="aichat-topbar">
+    <div className="aichat-main-shell-tab me-tab">
+      <header className="aichat-topbar aichat-topbar--plain">
         <h1>我的</h1>
-        <p>{phone || "已登录"}</p>
       </header>
       <div className="aichat-main">
-        <ul className="aichat-list" aria-label="账号">
-          <li>
-            <button type="button" className="aichat-nav-item" onClick={() => onNavigateFeature("delete-account")}>
-              <span>注销账号</span>
-            </button>
-          </li>
-        </ul>
+        <div className="me-tab__hero">
+          <div className="me-tab__avatar" aria-hidden>
+            {avatarLetter}
+          </div>
+          <div className="me-tab__hero-meta">
+            <strong>{phone || "—"}</strong>
+          </div>
+        </div>
 
-        <button type="button" className="aichat-btn-ghost" style={{ marginTop: 12, width: "100%" }} onClick={() => onNavigateFeature("home")}>
-          更多功能
-        </button>
+        <section className="me-tab__group" aria-label="设置">
+          <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("delete-account")}>
+            <span className="me-tab__row-body">
+              <b>注销账号</b>
+            </span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
+        </section>
 
-        <button type="button" className="aichat-btn-ghost" style={{ marginTop: 20, width: "100%" }} onClick={onLogout}>
+        <button type="button" className="me-tab__logout" onClick={onLogout}>
           退出登录
         </button>
       </div>

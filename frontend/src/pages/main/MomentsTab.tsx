@@ -138,17 +138,13 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
 
   return (
     <div className="moments-tab-inner">
-      <header className="aichat-topbar">
+      <header className="aichat-topbar aichat-topbar--plain">
         <h1>朋友圈</h1>
       </header>
 
       <div className="aichat-main msg-tab-main moments-tab-scroll">
         {err && <p className="aichat-form-msg err">{err}</p>}
-        {loading ? (
-          <p className="aichat-muted-line" style={{ marginTop: 24 }}>
-            加载中…
-          </p>
-        ) : (
+        {loading ? null : (
           <>
             <div className="moments-tab-entry-list" role="group" aria-label="朋友圈入口">
               <button type="button" className="moments-tab-entry" onClick={() => setPickerOpen(true)}>
@@ -157,7 +153,6 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                 </span>
                 <span className="moments-tab-entry__txt">
                   <b>探索好友</b>
-                  <span>选联系人，和分身聊聊</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -169,7 +164,6 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                 </span>
                 <span className="moments-tab-entry__txt">
                   <b>我的日常</b>
-                  <span>发布与管理动态</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -181,7 +175,6 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                 </span>
                 <span className="moments-tab-entry__txt">
                   <b>热点</b>
-                  <span>热门话题</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -192,7 +185,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
             <section className="moments-tab-section" aria-label="探索记录">
               {exploreRecords.length === 0 ? (
                 <div className="moments-tab-empty-card">
-                  <p>还没有有效探索。点「探索好友」选一位联系人，和 TA 的分身聊聊。</p>
+                  <p>暂无记录</p>
                 </div>
               ) : (
                 <ul className="moments-tab-history" aria-label="探索记录列表">
@@ -238,9 +231,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
           <div className="aichat-modal-box moments-contact-pick" onClick={(e) => e.stopPropagation()}>
             <h2 className="aichat-modal-t">选择联系人</h2>
             {contacts.length === 0 ? (
-              <p className="aichat-muted-line" style={{ margin: "0 0 16px", textAlign: "center", lineHeight: 1.55 }}>
-                暂无联系人。添加好友并互为联系人后，可在此探索对方的日常。
-              </p>
+              <p className="aichat-muted-line moments-contact-pick-empty">暂无联系人</p>
             ) : (
               <ul className="aichat-list moments-friend-list moments-contact-pick-list" aria-label="联系人列表">
                 {contacts.map((c) => (

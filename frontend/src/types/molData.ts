@@ -1,4 +1,4 @@
-/** 辅助聊天 MOL：单条数据（对话样例或约束） */
+/** 我的 Mol：单条数据（对话样例或约束） */
 export type AssistMolDataKind = "dialogue" | "rule";
 
 export type AssistMolDataItem = {

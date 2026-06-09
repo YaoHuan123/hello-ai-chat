@@ -242,10 +242,6 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
             <span className="msg-chat-c1-peer-sub">在线</span>
           </div>
         </div>
-        <button type="button" className="msg-chat-c1-mode" title="当前普通模式" aria-label="当前普通模式">
-          <span className="msg-chat-c1-mode-dot" aria-hidden />
-          普通
-        </button>
       </header>
 
       {loadErr ? (

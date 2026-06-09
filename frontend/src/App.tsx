@@ -129,10 +129,12 @@ function App() {
         return true;
       }
       if (route === "guardian-create-group") {
-        setRoute("guardian-hall");
+        setMainTab("people");
+        setRoute("main");
         return true;
       }
       if (route === "guardian-hall") {
+        setMainTab("people");
         setRoute("main");
         return true;
       }
@@ -163,12 +165,14 @@ function App() {
         return true;
       }
       if (route === "assist-mol-list") {
+        setMainTab("people");
         setRoute("main");
         return true;
       }
       if (route === "assist-mol-data") {
         setAssistMolDataMolId(null);
-        setRoute("assist-mol-list");
+        setMainTab("people");
+        setRoute("main");
         return true;
       }
       if (route === "mol-detail") {
@@ -196,8 +200,10 @@ function App() {
 
   if (!authReady) {
     return (
-      <div className="aichat-shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
-        <p style={{ color: "var(--aichat-muted)", fontSize: 15 }}>加载中…</p>
+      <div className="aichat-shell aichat-loading-shell">
+        <div className="aichat-loading">
+          <span className="aichat-loading__spinner" aria-hidden />
+        </div>
       </div>
     );
   }
@@ -229,8 +235,10 @@ function App() {
   if (route === "guardian-hall") {
     return (
       <GuardianHallPage
-        onBack={() => setRoute("main")}
-        onCreateGroup={() => setRoute("guardian-create-group")}
+        onBack={() => {
+          setMainTab("people");
+          setRoute("main");
+        }}
       />
     );
   }
@@ -238,7 +246,10 @@ function App() {
   if (route === "guardian-create-group") {
     return (
       <CreateGuardianGroupPage
-        onBack={() => setRoute("guardian-hall")}
+        onBack={() => {
+          setMainTab("people");
+          setRoute("main");
+        }}
         onCreated={(id) => {
           setGuardianGroupId(id);
           setRoute("guardian-group-chat");
@@ -303,6 +314,7 @@ function App() {
           setRoute("guardian-group-chat");
         }}
         onOpenGuardianHall={() => setRoute("guardian-hall")}
+        onOpenMolList={() => setRoute("assist-mol-list")}
         onNavigateFeature={(r) => {
           setFeatureReturnRoute("main");
           if (r === "home") {
@@ -363,7 +375,10 @@ function App() {
   if (route === "assist-mol-list") {
     return (
       <AssistMolListPage
-        onBack={() => setRoute("main")}
+        onBack={() => {
+          setMainTab("people");
+          setRoute("main");
+        }}
         onOpenWorld={() => {
           setMolWorldBackRoute("assist-mol-list");
           setRoute("mol-world");
@@ -388,7 +403,8 @@ function App() {
         molId={assistMolDataMolId}
         onBack={() => {
           setAssistMolDataMolId(null);
-          setRoute("assist-mol-list");
+          setMainTab("people");
+          setRoute("main");
         }}
         onOpenInfo={() => {
           setMolDetailBackRoute("assist-mol-data");
