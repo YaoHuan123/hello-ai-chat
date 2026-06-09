@@ -3123,7 +3123,7 @@ button.msg-mol-placeholder-bubble--switchable::after {
 
 .msg-chat-c1-row {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
   list-style: none;
 }
@@ -3138,6 +3138,13 @@ button.msg-mol-placeholder-bubble--switchable::after {
   max-width: 75%;
   gap: 4px;
   min-width: 0;
+  padding-top: 2px;
+}
+
+.msg-chat-c1-row > .msg-chat-c1-avatar,
+.msg-chat-c1-row > .msg-chat-c1-me-avatar-wrap {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .msg-chat-c1-row--me .msg-chat-c1-col {
@@ -3166,11 +3173,17 @@ button.msg-mol-placeholder-bubble--switchable::after {
 
 .msg-chat-c1-meta {
   font-size: 11px;
+  line-height: 1.2;
   color: var(--aichat-muted);
 }
 
 .msg-chat-c1-mol-row {
   margin-top: 2px;
+  align-items: flex-end;
+}
+
+.msg-chat-c1-mol-row > .msg-chat-c1-me-avatar-wrap {
+  margin-top: 0;
 }
 
 .msg-chat-c1-mol-row--open {
