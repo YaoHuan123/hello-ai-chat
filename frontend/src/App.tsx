@@ -28,7 +28,7 @@ import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { CreateGuardianGroupPage } from "./pages/guardian/CreateGuardianGroupPage";
 import { GroupChatRoomPage } from "./pages/guardian/GroupChatRoomPage";
 
-type MolDetailBackTarget = "mol-mine" | "assist-mol-list" | "assist-mol-data";
+type MolDetailBackTarget = "mol-mine" | "assist-mol-list" | "assist-mol-data" | "chat-room";
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -177,6 +177,8 @@ function App() {
           setRoute("assist-mol-data");
         } else if (molDetailBackRoute === "assist-mol-list") {
           setRoute("assist-mol-list");
+        } else if (molDetailBackRoute === "chat-room") {
+          setRoute("chat-room");
         } else {
           setRoute("mol-mine");
         }
@@ -266,6 +268,11 @@ function App() {
         onBack={() => {
           setChatRoomContact(null);
           setRoute("main");
+        }}
+        onOpenMolDetail={(molId) => {
+          setMolDetailBackRoute("chat-room");
+          setMolDetailId(molId);
+          setRoute("mol-detail");
         }}
         onManageMols={() => {
           setFeatureReturnRoute("chat-room");
@@ -465,6 +472,8 @@ function App() {
             setRoute("assist-mol-data");
           } else if (molDetailBackRoute === "assist-mol-list") {
             setRoute("assist-mol-list");
+          } else if (molDetailBackRoute === "chat-room") {
+            setRoute("chat-room");
           } else {
             setRoute("mol-mine");
           }

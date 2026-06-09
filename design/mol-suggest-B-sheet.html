@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>方案 B · 底部抽屉 · Mol 建议</title>
+    <style>
+      :root { --bg: #ededed; --surface: #fff; --text: #14171a; --muted: #6b7380; --border: rgba(20,23,26,0.1); --accent: #2f9e6f; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; background: #dfe3ea; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+      body { display: flex; align-items: center; justify-content: center; padding: 24px; gap: 28px; flex-wrap: wrap; color: var(--text); }
+      .phone { width: 390px; height: 844px; background: var(--bg); border-radius: 40px; overflow: hidden; box-shadow: 0 8px 28px rgba(20,23,26,0.14); display: flex; flex-direction: column; position: relative; }
+      .note { max-width: 300px; font-size: 13px; line-height: 1.65; color: #6b7380; }
+      .note h2 { font-size: 15px; margin: 0 0 8px; color: #14171a; }
+      .note a { color: var(--accent); }
+      .topbar { background: var(--surface); padding: 52px 16px 10px; border-bottom: 0.5px solid var(--border); }
+      .topbar .name { font-size: 17px; font-weight: 600; }
+      .chat { flex: 1; overflow: hidden; padding: 12px 14px; opacity: 0.45; }
+      .bubble { max-width: 78%; padding: 10px 12px; border-radius: 12px; background: var(--surface); font-size: 15px; border: 0.5px solid var(--border); }
+      .backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 4; }
+      .sheet {
+        position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+        background: var(--surface); border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.12); max-height: 62%; display: flex; flex-direction: column;
+      }
+      .sheet__grab { width: 36px; height: 4px; background: #d8dbe0; border-radius: 999px; margin: 10px auto 0; }
+      .sheet__head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; }
+      .sheet__head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+      .sheet__actions { display: flex; gap: 12px; }
+      .ghost { border: none; background: none; color: var(--accent); font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+      .sheet__banner {
+        margin: 0 18px 12px; padding: 10px 12px; border-radius: 12px;
+        background: rgba(47,158,111,0.08); display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      }
+      .sheet__banner p { margin: 0; font-size: 12px; color: var(--muted); flex: 1; }
+      .sheet__banner button { border: none; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; }
+      .sheet__body { flex: 1; overflow-y: auto; padding: 0 18px 28px; }
+      .sheet__item {
+        display: block; width: 100%; text-align: left; border: none; border-bottom: 1px solid var(--border);
+        padding: 16px 4px; font-size: 15px; line-height: 1.5; background: transparent; cursor: pointer; font-family: inherit;
+      }
+      .sheet__item:last-child { border-bottom: none; }
+      .sheet__item:active { background: #f7f8fb; }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <header class="topbar"><span class="name">张经理</span></header>
+      <div class="chat"><div class="bubble">本周对接进度能同步一下吗？</div></div>
+      <div class="backdrop" aria-hidden></div>
+      <div class="sheet" role="dialog" aria-label="Mol 建议">
+        <div class="sheet__grab" aria-hidden></div>
+        <div class="sheet__head">
+          <h2>Mol 建议</h2>
+          <div class="sheet__actions">
+            <button type="button" class="ghost">刷新</button>
+            <button type="button" class="ghost">关闭</button>
+          </div>
+        </div>
+        <div class="sheet__banner">
+          <p>建议基于「我的 Mol」中的资料</p>
+          <button type="button">修改 Mol</button>
+        </div>
+        <div class="sheet__body">
+          <button type="button" class="sheet__item">您好，关于本次对接的相关事项，我想和您沟通一下具体推进细节。</button>
+          <button type="button" class="sheet__item">您好，关于近期的工作安排，我想和您沟通一下各环节的对接要求。</button>
+          <button type="button" class="sheet__item">您好，关于本次项目的落地事宜，我想和您沟通一下当前的进度卡点。</button>
+        </div>
+      </div>
+    </div>
+    <aside class="note">
+      <h2>方案 B · 底部抽屉</h2>
+      <p>半屏 Sheet + 遮罩，聊天区弱化。Mol 资料说明做成绿色 banner，建议项用分割线列表，适合长文案阅读。</p>
+      <p><a href="./mol-suggest-index.html">← 返回索引</a></p>
+    </aside>
+  </body>
+</html>

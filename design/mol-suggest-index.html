@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mol 建议面板 · 方案索引</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #eef0f5; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #14171a; }
+      .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 60px; }
+      h1 { font-size: 22px; margin: 0 0 6px; }
+      .lead { color: #6b7380; margin: 0 0 20px; font-size: 14px; line-height: 1.65; }
+      .checklist { background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      .checklist h3 { margin: 0 0 8px; font-size: 14px; }
+      .checklist ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.85; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+      .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 6px 22px rgba(20,23,26,0.06); border: 1px solid rgba(20,23,26,0.06); display: flex; flex-direction: column; gap: 8px; }
+      .card h2 { margin: 0; font-size: 16px; }
+      .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(47,158,111,0.12); color: #1f6f4a; margin-left: 6px; }
+      .card p { margin: 0; color: #6b7380; font-size: 13px; line-height: 1.55; }
+      .fit { font-size: 12px; line-height: 1.6; padding: 8px 10px; border-radius: 8px; background: #f7f8fb; color: #3a3a3c; }
+      .btn { align-self: flex-start; margin-top: 4px; text-decoration: none; padding: 8px 14px; border-radius: 999px; background: #2f9e6f; color: #fff; font-size: 13px; font-weight: 700; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 14px; overflow: hidden; margin-top: 24px; border: 1px solid rgba(20,23,26,0.06); }
+      th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(20,23,26,0.06); }
+      th { background: #f7f8fb; }
+      tr:last-child td { border-bottom: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Mol 建议面板 · 5 种方案</h1>
+      <p class="lead">
+        场景：聊天室点击「Mol」后，在输入框上方展示 AI 生成的 3 条回复备选。
+        每稿均在手机聊天上下文中预览，包含标题、刷新/关闭、Mol 资料说明、修改入口与三条示例文案。
+      </p>
+
+      <div class="checklist">
+        <h3>必备元素</h3>
+        <ul>
+          <li>标题「Mol 建议」+ 刷新 / 关闭</li>
+          <li>「建议基于『我的 Mol』中的资料」+「修改 Mol」</li>
+          <li>最多 3 条可点击采纳的回复文案</li>
+          <li>与下方输入框、聊天气泡的层级关系清晰</li>
+          <li>加载态 / 空态 / 错误态（实现时可复用同一布局）</li>
+        </ul>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>方案 A <span class="badge">接近现版</span></h2>
+          <p>浮层卡片叠在输入框上方，白底圆角，建议项为全宽按钮行。</p>
+          <div class="fit"><b>适合：</b>改动最小，与当前 ChatRoom 结构一致。</div>
+          <a class="btn" href="./mol-suggest-A-card.html" target="_blank">查看 A</a>
+        </div>
+        <div class="card">
+          <h2>方案 B · 底部抽屉</h2>
+          <p>半屏 Bottom Sheet，顶栏拖拽条，建议列表留白更大，操作区固定在抽屉内。</p>
+          <div class="fit"><b>适合：</b>文案较长、需要专注挑选时；拇指友好。</div>
+          <a class="btn" href="./mol-suggest-B-sheet.html" target="_blank">查看 B</a>
+        </div>
+        <div class="card">
+          <h2>方案 C · 草稿气泡</h2>
+          <p>建议以「我方待发气泡」形态出现在聊天区，虚线边框 + 轻绿底，贴近消息流。</p>
+          <div class="fit"><b>适合：</b>强调「点一下就能发」；与 chat-C 占位思路一致。</div>
+          <a class="btn" href="./mol-suggest-C-bubbles.html" target="_blank">查看 C</a>
+        </div>
+        <div class="card">
+          <h2>方案 D · 紧凑列表</h2>
+          <p>窄标题栏 + 编号列表，每条一行预览 + 右侧「用这条」，信息密度高。</p>
+          <div class="fit"><b>适合：</b>屏幕空间紧张、用户熟悉 Mol 功能。</div>
+          <a class="btn" href="./mol-suggest-D-compact.html" target="_blank">查看 D</a>
+        </div>
+        <div class="card">
+          <h2>方案 E · 分卡操作</h2>
+          <p>每条建议独立卡片，底部「采用并发送」主按钮，Mol 资料区做成顶部 banner。</p>
+          <div class="fit"><b>适合：</b>降低误触；长文案可读性最好。</div>
+          <a class="btn" href="./mol-suggest-E-cards.html" target="_blank">查看 E</a>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>维度</th><th>A 浮层卡</th><th>B 抽屉</th><th>C 气泡</th><th>D 紧凑</th><th>E 分卡</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>开发成本</td><td>低</td><td>中</td><td>中</td><td>低</td><td>中</td></tr>
+          <tr><td>长文案可读</td><td>中</td><td>高</td><td>中</td><td>低</td><td>高</td></tr>
+          <tr><td>与聊天融合</td><td>中</td><td>低</td><td>高</td><td>中</td><td>中</td></tr>
+          <tr><td>误触风险</td><td>中</td><td>低</td><td>中</td><td>中</td><td>低</td></tr>
+          <tr><td>修改 Mol 入口</td><td>明显</td><td>明显</td><td>内嵌</td><td>弱</td><td>banner</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top: 24px; font-size: 13px; color: #6b7380;">
+        <a href="./index.html" style="color: #2f9e6f;">← 返回设计稿总索引</a>
+      </p>
+    </div>
+  </body>
+</html>

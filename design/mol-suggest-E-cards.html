@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>方案 E · 分卡操作 · Mol 建议</title>
+    <style>
+      :root { --bg: #ededed; --surface: #fff; --text: #14171a; --muted: #6b7380; --border: rgba(20,23,26,0.08); --accent: #2f9e6f; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #dfe3ea; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--text); }
+      body { display: flex; align-items: center; justify-content: center; padding: 24px; gap: 28px; flex-wrap: wrap; }
+      .phone { width: 390px; height: 844px; background: var(--bg); border-radius: 40px; overflow: hidden; box-shadow: 0 8px 28px rgba(20,23,26,0.14); display: flex; flex-direction: column; position: relative; }
+      .note { max-width: 300px; font-size: 13px; line-height: 1.65; color: #6b7380; }
+      .note h2 { font-size: 15px; margin: 0 0 8px; }
+      .note a { color: var(--accent); }
+      .topbar { background: var(--surface); padding: 52px 16px 10px; border-bottom: 0.5px solid var(--border); font-weight: 600; font-size: 17px; }
+      .chat { flex: 1; overflow-y: auto; padding: 12px 14px 360px; }
+      .bubble { max-width: 78%; padding: 10px 12px; background: var(--surface); border-radius: 12px; font-size: 15px; border: 0.5px solid var(--border); }
+      .panel-e {
+        position: absolute; left: 0; right: 0; bottom: 72px; z-index: 5;
+        background: #f5f6f8; border-top: 0.5px solid var(--border);
+        max-height: 360px; overflow-y: auto; padding: 10px 12px 12px;
+      }
+      .panel-e__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 2px; }
+      .panel-e__head h2 { margin: 0; font-size: 16px; font-weight: 800; }
+      .panel-e__actions { display: flex; gap: 8px; }
+      .ghost { border: none; background: none; color: var(--accent); font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+      .panel-e__banner {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 10px 12px; margin-bottom: 10px; border-radius: 12px;
+        background: linear-gradient(135deg, rgba(47,158,111,0.12), rgba(47,158,111,0.06));
+        border: 0.5px solid rgba(47,158,111,0.2);
+      }
+      .panel-e__banner p { margin: 0; font-size: 12px; color: #1f6f4a; flex: 1; line-height: 1.4; }
+      .panel-e__banner button {
+        border: none; background: var(--surface); color: var(--accent); font-size: 12px; font-weight: 700;
+        padding: 6px 10px; border-radius: 999px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; font-family: inherit;
+      }
+      .s-card {
+        background: var(--surface); border-radius: 14px; padding: 12px 12px 10px; margin-bottom: 8px;
+        box-shadow: 0 2px 10px rgba(20,23,26,0.06); border: 0.5px solid var(--border);
+      }
+      .s-card:last-child { margin-bottom: 0; }
+      .s-card p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; }
+      .s-card button {
+        width: 100%; border: none; border-radius: 10px; background: var(--accent); color: #fff;
+        font-size: 13px; font-weight: 700; padding: 10px; cursor: pointer; font-family: inherit;
+      }
+      .composer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px 26px; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; gap: 8px; }
+      .composer input { flex: 1; border: 0.5px solid var(--border); border-radius: 10px; padding: 10px; }
+      .composer .send { border: none; background: var(--accent); color: #fff; font-weight: 700; padding: 10px 16px; border-radius: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <header class="topbar">张经理</header>
+      <div class="chat"><div class="bubble">本周对接进度能同步一下吗？</div></div>
+      <div class="panel-e" role="dialog" aria-label="Mol 建议">
+        <div class="panel-e__head">
+          <h2>Mol 建议</h2>
+          <div class="panel-e__actions">
+            <button type="button" class="ghost">刷新</button>
+            <button type="button" class="ghost">关闭</button>
+          </div>
+        </div>
+        <div class="panel-e__banner">
+          <p>建议基于「我的 Mol」中的资料</p>
+          <button type="button">修改 Mol</button>
+        </div>
+        <article class="s-card">
+          <p>您好，关于本次对接的相关事项，我想和您沟通一下具体推进细节。</p>
+          <button type="button">采用并发送</button>
+        </article>
+        <article class="s-card">
+          <p>您好，关于近期的工作安排，我想和您沟通一下各环节的对接要求。</p>
+          <button type="button">采用并发送</button>
+        </article>
+        <article class="s-card">
+          <p>您好，关于本次项目的落地事宜，我想和您沟通一下当前的进度卡点。</p>
+          <button type="button">采用并发送</button>
+        </article>
+      </div>
+      <div class="composer"><input placeholder="输入消息" /><button type="button" class="send">发送</button></div>
+    </div>
+    <aside class="note">
+      <h2>方案 E · 分卡操作</h2>
+      <p>每条建议独立卡片 + 明确「采用并发送」按钮，顶部 gradient banner 承载 Mol 资料说明。误触最低，适合长商务话术。</p>
+      <p><a href="./mol-suggest-index.html">← 返回索引</a></p>
+    </aside>
+  </body>
+</html>

@@ -8,6 +8,7 @@ import type { UserMolsService } from "../services/userMols.service";
 
 const bodySchema = z.object({
   peerUserId: z.string().min(1),
+  molId: z.string().min(1).optional(),
   lastMessages: z
     .array(
       z.object({
@@ -20,17 +21,36 @@ const bodySchema = z.object({
     .optional(),
 });
 
-function buildPersonaBlock(userMols: UserMolsService, ownerUserId: string): string {
-  const owned = userMols.listByOwnerWithMeta(ownerUserId);
+function appendMolPersonaLines(lines: string[], record: { name: string; summary: string; infoItems: { title: string; body: string; softRemoved?: boolean }[] }): void {
+  const items = record.infoItems.filter((it) => !it.softRemoved);
+  let addedItem = false;
+  for (const it of items) {
+    const title = it.title.trim();
+    const body = it.body.trim();
+    if (!title || !body) continue;
+    lines.push(`[${record.name}] ${title}: ${body}`);
+    addedItem = true;
+  }
+  if (addedItem) return;
+  const summary = record.summary.trim();
+  if (summary) {
+    lines.push(`[${record.name}] 简介: ${summary}`);
+    return;
+  }
+  const name = record.name.trim();
+  if (name) lines.push(`[${name}]`);
+}
+
+function buildPersonaBlock(userMols: UserMolsService, ownerUserId: string, molId?: string): string {
+  const owned = molId
+    ? (() => {
+        const detail = userMols.getDetailForOwner(ownerUserId, molId);
+        return detail ? [{ record: detail.record, source: detail.source }] : [];
+      })()
+    : userMols.listByOwnerWithMeta(ownerUserId);
   const lines: string[] = [];
   for (const { record } of owned) {
-    const items = record.infoItems.filter((it) => !it.softRemoved);
-    for (const it of items) {
-      const title = it.title.trim();
-      const body = it.body.trim();
-      if (!title || !body) continue;
-      lines.push(`[${record.name}] ${title}: ${body}`);
-    }
+    appendMolPersonaLines(lines, record);
   }
   return lines.join("\n");
 }
@@ -92,7 +112,7 @@ export const createMolSuggestRouter = (
       res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
       return;
     }
-    const { peerUserId, lastMessages } = parsed.data;
+    const { peerUserId, molId, lastMessages } = parsed.data;
 
     if (!contacts.areMutualContacts(user.userId, peerUserId)) {
       res.status(403).json({ code: "NOT_FRIENDS", message: "双方不是联系人，无法生成建议" });
@@ -103,9 +123,18 @@ export const createMolSuggestRouter = (
       return;
     }
 
-    const personaBlock = buildPersonaBlock(userMols, user.userId);
+    if (molId && !userMols.owns(user.userId, molId)) {
+      res.status(404).json({ code: "MOL_NOT_FOUND", message: "未找到该 Mol" });
+      return;
+    }
+
+    const personaBlock = buildPersonaBlock(userMols, user.userId, molId);
     if (!personaBlock.trim()) {
-      res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加 Mol，无法生成建议" });
+      if (molId) {
+        res.status(409).json({ code: "MOL_PERSONA_EMPTY", message: "该 Mol 资料为空，无法生成建议" });
+      } else {
+        res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加 Mol，无法生成建议" });
+      }
       return;
     }
 

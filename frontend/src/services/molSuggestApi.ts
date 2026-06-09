@@ -12,11 +12,12 @@ function authT(): string {
 export async function suggestRepliesApi(
   peerUserId: string,
   lastMessages: MolSuggestLastMessage[],
+  molId?: string,
   token?: string,
 ): Promise<{ suggestions: string[] }> {
   return postJson<{ suggestions: string[] }>(
     "/api/mol/suggest",
-    { peerUserId, lastMessages },
+    { peerUserId, lastMessages, ...(molId ? { molId } : {}) },
     token ?? authT(),
   );
 }
