@@ -47,7 +47,7 @@ export function appendGuardianGroupMessages(groupId: string, ...items: GuardianG
 }
 
 function formatGuardianPreviewLine(last: GuardianGroupMessage): string {
-  const prefix = last.senderKind === "guardian" ? "AI：" : last.senderKind === "owner" ? "我：" : "";
+  const prefix = last.senderKind === "guardian" ? "搭子：" : last.senderKind === "owner" ? "我：" : "";
   const t = last.text.trim();
   const line = `${prefix}${t}`;
   return line.length > 36 ? `${line.slice(0, 34)}…` : line;

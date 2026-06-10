@@ -23,6 +23,7 @@ export class GuardianAiService {
     const lines = [
       `名称：${role.name}（${role.title}）`,
       `人设：${role.tagline}`,
+      `对用户：${role.userMessage}`,
       `话术风格：${role.speechStyle}`,
       `触发场景：${role.triggers.join("、")}`,
       `接话策略：${role.guardActions.join("、")}`,

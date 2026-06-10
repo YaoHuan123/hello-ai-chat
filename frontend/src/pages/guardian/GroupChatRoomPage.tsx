@@ -217,7 +217,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       )}
 
       {guardianNames && (
-        <p className="guardian-group-hint">AI联系人可主动参与聊天、轮流接话</p>
+        <p className="guardian-group-hint">搭子可主动参与聊天、轮流接话</p>
       )}
 
       {isProtected && latestHint && (

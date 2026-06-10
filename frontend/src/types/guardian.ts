@@ -6,6 +6,7 @@ export type GuardianRole = {
   name: string;
   title: string;
   tagline: string;
+  userMessage: string;
   speechStyle: string;
   triggers: string[];
   guardActions: string[];
@@ -67,10 +68,4 @@ export const GUARDIAN_RISK_LABEL: Record<GuardianRiskLevel, string> = {
   low: "留意",
   medium: "注意",
   high: "预警",
-};
-
-export const GUARDIAN_SCENE_HINT: Record<GuardianScene, string> = {
-  恋爱暧昧: "暧昧期识套路、活跃气氛",
-  校园师生: "学业压力下讲分寸、接话解围",
-  家庭亲子: "家庭话题里给台阶、缓和气氛",
 };

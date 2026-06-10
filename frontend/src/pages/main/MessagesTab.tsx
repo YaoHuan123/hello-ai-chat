@@ -56,7 +56,7 @@ function guardianGroupTitle(g: GuardianGroupListItem): string {
   const name = g.name?.trim();
   if (name) return name;
   const count = g.memberCount ?? g.members?.length ?? 2;
-  return `AI 群聊 · ${count}人`;
+  return `搭子群 · ${count}人`;
 }
 
 export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup }: Props) {

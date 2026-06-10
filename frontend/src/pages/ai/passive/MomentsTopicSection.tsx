@@ -30,6 +30,12 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
     onCollected();
   }
 
+  function openTopic(id: string) {
+    if (isTopicCollected(id)) return;
+    setAnswerFor(id);
+    setAnswerText("");
+  }
+
   const layered = variant === "layered";
 
   return (
@@ -38,25 +44,30 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
       <ul className="aichat-list" aria-label={title || "热门话题"}>
         {topics.map((t) => {
           const done = isTopicCollected(t.id);
+          const cardClass = [
+            "moments-add-topic-card",
+            layered ? "moments-add-topic-card--layered" : "aichat-card aichat-page-card",
+            done ? "moments-add-topic-card--done" : "moments-add-topic-card--clickable",
+          ].join(" ");
+
+          if (done) {
+            return (
+              <li key={t.id}>
+                <div className={cardClass}>
+                  <p className={layered ? "moments-add-topic-card__q" : "aichat-card-title"}>{t.question}</p>
+                  {t.hint ? <p className={layered ? "moments-add-topic-card__hint" : "aichat-card-hint"}>{t.hint}</p> : null}
+                  <span className={layered ? "moments-hot-tag-ok" : "aichat-tag-ok"}>已收录</span>
+                </div>
+              </li>
+            );
+          }
+
           return (
             <li key={t.id}>
-              <div className={`moments-add-topic-card${layered ? " moments-add-topic-card--layered" : " aichat-card aichat-page-card"}`}>
+              <button type="button" className={cardClass} onClick={() => openTopic(t.id)}>
                 <p className={layered ? "moments-add-topic-card__q" : "aichat-card-title"}>{t.question}</p>
-                {t.hint && <p className={layered ? "moments-add-topic-card__hint" : "aichat-card-hint"}>{t.hint}</p>}
-                <div className="moments-add-topic-card__act">
-                  {done ? (
-                    <span className={layered ? "moments-hot-tag-ok" : "aichat-tag-ok"}>已收录</span>
-                  ) : layered ? (
-                    <button type="button" className="moments-hot-answer-btn" onClick={() => setAnswerFor(t.id)}>
-                      回答
-                    </button>
-                  ) : (
-                    <button type="button" className="aichat-btn-primary aichat-btn-fit" onClick={() => setAnswerFor(t.id)}>
-                      回答
-                    </button>
-                  )}
-                </div>
-              </div>
+                {t.hint ? <p className={layered ? "moments-add-topic-card__hint" : "aichat-card-hint"}>{t.hint}</p> : null}
+              </button>
             </li>
           );
         })}
@@ -73,9 +84,10 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
             }
           }}
         >
-          <div className="aichat-moldt-info-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <h4 className="aichat-moldt-info-form__h">回答</h4>
-            <p style={{ fontSize: 14, margin: "0 0 8px", color: "var(--aichat-muted)" }}>{topic.question}</p>
+          <div className="aichat-moldt-info-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby={`topic-q-${topic.id}`}>
+            <p id={`topic-q-${topic.id}`} className="moments-topic-answer-form__q">
+              {topic.question}
+            </p>
             <label className="aichat-moldt-info-form__lab" htmlFor={`topic-ans-${topic.id}`}>
               你的回答
             </label>
@@ -87,19 +99,9 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
               rows={4}
               maxLength={2000}
             />
-            <div className="aichat-moldt-info-form__act">
-              <button
-                type="button"
-                className="aichat-btn-ghost"
-                onClick={() => {
-                  setAnswerFor(null);
-                  setAnswerText("");
-                }}
-              >
-                取消
-              </button>
-              <button type="button" className="aichat-btn-primary aichat-btn-fit" onClick={submitAnswer}>
-                发布
+            <div className="aichat-moldt-info-form__act moments-topic-answer-form__act">
+              <button type="button" className="aichat-btn-primary aichat-btn-fit moments-topic-answer-form__submit" onClick={submitAnswer}>
+                添加到我的日常
               </button>
             </div>
           </div>

@@ -18,8 +18,8 @@ export function AiTab({ onNavigateFeature }: Props) {
         </button>
 
         <button type="button" className="aichat-ai-big-card aichat-ai-big-card--guardian" onClick={() => onNavigateFeature("guardian-hall")}>
-          <span className="aichat-ai-big-card__title">AI联系人</span>
-          <span className="aichat-ai-big-card__body">群聊虚拟成员，可主动接话</span>
+          <span className="aichat-ai-big-card__title">搭子</span>
+          <span className="aichat-ai-big-card__body">性格各异，进群主动接话</span>
         </button>
       </div>
     </div>

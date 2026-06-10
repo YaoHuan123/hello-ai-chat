@@ -410,7 +410,7 @@ export class GuardianGroupsService {
   ): GuardianChatLine {
     if (m.senderKind === "guardian") {
       const role = m.guardianRoleId ? getGuardianRole(m.guardianRoleId) : undefined;
-      return { from: "guardian", speaker: role?.name ?? "AI联系人", text: m.text, ts: m.ts };
+      return { from: "guardian", speaker: role?.name ?? "搭子", text: m.text, ts: m.ts };
     }
     if (m.fromUserId === protectedId) {
       return { from: "owner", speaker: "群主", text: m.text, ts: m.ts };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { listGuardianRolesApi } from "../../services/guardianApi";
 import type { GuardianRole, GuardianScene } from "../../types/guardian";
@@ -9,6 +9,12 @@ type Props = {
 };
 
 const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
+
+function roleCardStyle(role: GuardianRole): CSSProperties {
+  return {
+    "--guardian-role-accent": role.avatarColor,
+  } as CSSProperties;
+}
 
 export function GuardianHallPage({ onBack, onOpenRole }: Props) {
   const [scene, setScene] = useState<GuardianScene | "全部">("全部");
@@ -37,24 +43,31 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
 
   return (
     <div className="aichat-shell guardian-hall">
-      <header className="aichat-topbar aichat-topbar-flex">
+      <header className="aichat-topbar aichat-topbar-flex guardian-hall__topbar">
         <button className="aichat-btn-ghost" type="button" onClick={onBack}>
           返回
         </button>
-        <div className="aichat-stage-head" style={{ flex: 1, textAlign: "center" }}>
-          <h1 style={{ fontSize: 17 }}>AI联系人</h1>
+        <div className="aichat-stage-head guardian-hall__head">
+          <h1>搭子</h1>
         </div>
         <span className="aichat-topbar-spacer" aria-hidden />
       </header>
 
-      <div className="aichat-main">
-        <div className="guardian-scene-chips" role="tablist" aria-label="场景筛选">
+      <div className="aichat-main guardian-hall__main">
+        <section className="guardian-hall__banner" aria-label="介绍">
+          <p className="guardian-hall__banner-kicker">群聊搭子</p>
+          <p className="guardian-hall__banner-title">挑几位，进群帮你盯场子</p>
+          <p className="guardian-hall__banner-sub">每人性格不同，会主动接话、帮你解围</p>
+        </section>
+
+        <div className="guardian-scene-chips guardian-hall__chips" role="tablist" aria-label="场景筛选">
           {(["全部", ...SCENES] as const).map((s) => (
             <button
               key={s}
               type="button"
               role="tab"
               aria-selected={scene === s}
+              data-scene={s === "全部" ? undefined : s}
               className={`guardian-scene-chip${scene === s ? " guardian-scene-chip--on" : ""}`}
               onClick={() => setScene(s)}
             >
@@ -67,16 +80,28 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
         {loading ? (
           <p className="aichat-muted-line">正在加载…</p>
         ) : (
-          <ul className="guardian-role-list" aria-label="AI联系人列表">
+          <ul className="guardian-role-list guardian-role-list--hall" aria-label="搭子列表">
             {roles.map((r) => (
               <li key={r.id}>
-                <button type="button" className="guardian-role-row" onClick={() => onOpenRole(r.id)}>
-                  <GuardianAvatar role={r} className="guardian-role-row__avatar" alt="" />
-                  <span className="guardian-role-row__mid">
-                    <strong className="guardian-role-row__name">{r.name}</strong>
-                    <span className="guardian-role-row__quote">{r.tagline}</span>
+                <button
+                  type="button"
+                  className="guardian-role-card-v2"
+                  data-scene={r.scene}
+                  style={roleCardStyle(r)}
+                  onClick={() => onOpenRole(r.id)}
+                >
+                  <span className="guardian-role-card-v2__shine" aria-hidden />
+                  <GuardianAvatar role={r} className="guardian-role-card-v2__avatar" alt="" />
+                  <span className="guardian-role-card-v2__body">
+                    <span className="guardian-role-card-v2__head">
+                      <strong className="guardian-role-card-v2__name">{r.name}</strong>
+                      <span className="guardian-role-card-v2__scene">{r.scene}</span>
+                    </span>
+                    {r.userMessage.trim() ? (
+                      <span className="guardian-role-card-v2__tagline">{r.userMessage}</span>
+                    ) : null}
                   </span>
-                  <span className="guardian-role-row__chev" aria-hidden>
+                  <span className="guardian-role-card-v2__chev" aria-hidden>
                     ›
                   </span>
                 </button>

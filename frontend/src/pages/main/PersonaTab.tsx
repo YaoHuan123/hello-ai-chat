@@ -72,7 +72,7 @@ export function PersonaTab({
   }, [contacts, q]);
 
   const showMolEntry = !q || "mol".includes(q) || q.includes("mol") || q.includes("我的");
-  const showAiEntry = !q || "ai".includes(q) || q.includes("ai") || q.includes("联系人");
+  const showAiEntry = !q || q.includes("搭") || q.includes("搭子") || q.includes("ai");
 
   async function onAddSubmit(e: FormEvent) {
     e.preventDefault();
@@ -155,7 +155,7 @@ export function PersonaTab({
                 <AppIcon name="aiContact" className="app-icon app-icon--guardian" />
               </span>
               <span className="contacts-entry-card__body">
-                <span className="contacts-entry-card__title">AI联系人</span>
+                <span className="contacts-entry-card__title">搭子</span>
               </span>
               <span className="contacts-entry-card__arrow" aria-hidden>
                 ›

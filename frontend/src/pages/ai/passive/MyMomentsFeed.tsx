@@ -62,20 +62,25 @@ function ItemEditorModal({
 }
 
 function formatPublishedAt(ts: number): string {
+  const now = Date.now();
+  const diffMs = Math.max(0, now - ts);
+  const diffHours = Math.floor(diffMs / 3_600_000);
+
+  if (diffHours < 1) return "刚刚";
+  if (diffHours < 24) return `${diffHours}小时前`;
+
   const d = new Date(ts);
-  const now = new Date();
-  const time = d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
+  const nowDate = new Date(now);
+  const yesterday = new Date(nowDate);
+  yesterday.setDate(nowDate.getDate() - 1);
   const isSameDay = (a: Date, b: Date) =>
     a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
-  if (isSameDay(d, now)) return `今天 ${time}`;
-  if (isSameDay(d, yesterday)) return `昨天 ${time}`;
-  if (d.getFullYear() === now.getFullYear()) {
-    return `${d.getMonth() + 1}月${d.getDate()}日 ${time}`;
+  if (isSameDay(d, yesterday)) return "昨天";
+  if (d.getFullYear() === nowDate.getFullYear()) {
+    return `${d.getMonth() + 1}月${d.getDate()}日`;
   }
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${time}`;
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
 export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
@@ -116,12 +121,12 @@ export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
     <>
       <ul className="moments-my-feed" aria-label="我的动态">
         {items.map((it) => (
-          <li key={it.id}>
+          <li key={it.id} className="moments-my-feed-item">
+            <time className="moments-my-feed-time" dateTime={new Date(it.ts).toISOString()}>
+              {formatPublishedAt(it.ts)}
+            </time>
             <article className="moments-my-card">
               <div className="moments-my-card__top">
-                <time className="moments-my-time" dateTime={new Date(it.ts).toISOString()}>
-                  {formatPublishedAt(it.ts)}
-                </time>
                 <div className="moments-feed-more-wrap">
                   <button
                     type="button"

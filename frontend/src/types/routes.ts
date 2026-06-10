@@ -39,8 +39,8 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   "mol-mine": { title: "我的 Mol", phase: "阶段 5" },
   "mol-detail": { title: "Mol 信息管理", phase: "阶段 5" },
   "friend-requests": { title: "好友请求", phase: "通讯" },
-  "guardian-hall": { title: "AI联系人", phase: "群聊" },
-  "guardian-role-detail": { title: "AI 联系人设定", phase: "群聊" },
+  "guardian-hall": { title: "搭子", phase: "群聊" },
+  "guardian-role-detail": { title: "搭子详情", phase: "群聊" },
   "guardian-create-group": { title: "发起群聊", phase: "群聊" },
   "guardian-group-chat": { title: "群聊", phase: "群聊" },
 };

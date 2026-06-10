@@ -25,7 +25,7 @@ const historyItemSchema = z.object({
 
 const sendBodySchema = z.object({
   text: z.string().min(1).max(4000),
-  /** 客户端本地群聊摘录，供 AI联系人 判断；服务端不存聊天内容。 */
+  /** 客户端本地群聊摘录，供搭子判断；服务端不存聊天内容。 */
   lastMessages: z.array(historyItemSchema).max(80).optional(),
 });
 
@@ -38,7 +38,7 @@ function mapError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "INVALID_GUARDIANS") {
-    res.status(400).json({ code, message: "AI联系人无效或与场景不匹配" });
+    res.status(400).json({ code, message: "搭子无效或与场景不匹配" });
     return true;
   }
   if (code === "NOT_FRIENDS") {

@@ -73,7 +73,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
       return;
     }
     if (picked.length < 1) {
-      setErr("请至少选择 1 位 AI联系人");
+      setErr("请至少选择 1 位搭子");
       setGuardianOpen(true);
       return;
     }
@@ -160,7 +160,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
             onClick={() => setGuardianOpen((v) => !v)}
             aria-expanded={guardianOpen}
           >
-            <span>AI联系人</span>
+            <span>搭子</span>
             <span className="guardian-guardian-toggle__meta">
               {scene} · 已选 {picked.length} 个
             </span>
@@ -183,7 +183,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
                 ))}
               </div>
               <h3 className="guardian-create-label" style={{ marginTop: 14 }}>
-                AI联系人（最多 {MAX_PICK} 位）
+                搭子（最多 {MAX_PICK} 位）
               </h3>
               <ul className="guardian-pick-list">
                 {roles.map((r) => {
@@ -196,9 +196,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
                         onClick={() => toggleRole(r.id)}
                       >
                         <GuardianAvatar role={r} className="guardian-pick-row__av" alt="" />
-                        <span>
-                          {r.name} · {r.title}
-                        </span>
+                        <span>{r.name}</span>
                       </button>
                     </li>
                   );
