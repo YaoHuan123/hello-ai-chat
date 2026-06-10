@@ -8,6 +8,9 @@ import type { ContactItem } from "../../types/contact";
 import type { ChatLocalMessage } from "../../types/chat";
 import { MOMENTS_EXPLORE_ERROR_REPLY, MOMENTS_EXPLORE_FALLBACK_REPLY } from "../../types/momentsExplore";
 import { contactDisplayName } from "../../lib/contactDisplay";
+import { ContactAvatar } from "../../components/ContactAvatar";
+import { AppIcon } from "../../components/AppIcons";
+import { getMyAvatarContact } from "../../services/storage";
 
 type Props = {
   contact: ContactItem;
@@ -18,12 +21,30 @@ function nextId(): string {
   return `mex-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+function formatMessageTime(ts: number): string {
+  const d = new Date(ts);
+  return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+}
+
 function toExploreHistory(messages: ChatLocalMessage[]): ExploreChatLine[] {
   return messages.map((m) => ({
     from: m.from === "me" ? ("explorer" as const) : ("clone" as const),
     text: m.text,
     ts: m.ts,
   }));
+}
+
+function MeAvatar() {
+  const me = getMyAvatarContact();
+  const hasPhoto = Boolean(me.avatarUrl?.trim());
+  if (hasPhoto) {
+    return <ContactAvatar contact={me} className="msg-chat-c1-avatar msg-chat-c1-avatar--me msg-chat-c1-avatar--photo" alt="" />;
+  }
+  return (
+    <span className="msg-chat-c1-avatar msg-chat-c1-avatar--me" aria-hidden>
+      <AppIcon name="user" className="app-icon app-icon--xs app-icon--mol" />
+    </span>
+  );
 }
 
 export function MomentsExploreChatPage({ contact, onBack }: Props) {
@@ -89,56 +110,58 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
   const name = contactDisplayName(contact);
 
   return (
-    <div className="aichat-shell msg-chat-room msg-mode-oneway moments-explore-chat">
-      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar">
-        <button className="aichat-btn-ghost" type="button" onClick={onBack}>
-          返回
+    <div className="aichat-shell msg-chat-room msg-mode-oneway msg-chat-c1 moments-explore-chat">
+      <header className="msg-chat-c1-topbar">
+        <button type="button" className="msg-chat-c1-icon-btn" onClick={onBack} aria-label="返回">
+          ‹
         </button>
-        <div className="aichat-stage-head" style={{ flex: 1, textAlign: "center", minWidth: 0 }}>
-          <h1 style={{ fontSize: 17 }}>{name}</h1>
-          <p style={{ marginTop: 2 }}>探索 · 单向对话</p>
+        <div className="msg-chat-c1-peer">
+          <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
+          <div className="msg-chat-c1-peer-meta">
+            <span className="msg-chat-c1-peer-name">{name}</span>
+          </div>
         </div>
-        <span style={{ width: 44, flexShrink: 0 }} aria-hidden />
       </header>
 
-      <p className="moments-explore-chat-hint">仅你可见：对方不会收到消息，分身根据 TA 的日常资料由 AI 回复</p>
+      {err ? <p className="aichat-form-msg err msg-chat-c1-banner-err">{err}</p> : null}
 
-      {err && (
-        <p className="aichat-form-msg err" style={{ padding: "6px 16px", margin: 0, fontSize: 12 }}>
-          {err}
-        </p>
-      )}
-
-      <div ref={scRef} className="msg-chat-scroll">
-        {messages.length === 0 ? (
-          <p className="aichat-muted-line" style={{ padding: "24px 16px", textAlign: "center" }}>
-            发一条消息，和 TA 的分身聊聊 TA 的日常
-          </p>
+      <div ref={scRef} className="msg-chat-scroll msg-chat-c1-scroll">
+        {messages.length === 0 && !sending ? (
+          <p className="msg-chat-c1-empty">发一条消息，和 TA 的分身聊聊 TA 的日常</p>
         ) : (
-          <ul className="msg-chat-list" aria-label="探索对话">
+          <ul className="msg-chat-list msg-chat-c1-list" aria-label="探索对话">
             {messages.map((m) => (
-              <li key={m.id} className={`msg-chat-bubble-wrap msg-chat-bubble-wrap--${m.from}`}>
-                <div className={`msg-chat-bubble msg-chat-bubble--${m.from}`}>
-                  <p className="msg-chat-bubble-text">{m.text}</p>
+              <li key={m.id} className={`msg-chat-c1-row msg-chat-c1-row--${m.from === "me" ? "me" : "other"}`}>
+                {m.from === "other" ? (
+                  <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
+                ) : (
+                  <MeAvatar />
+                )}
+                <div className="msg-chat-c1-col">
+                  <div className={`msg-chat-c1-bubble msg-chat-c1-bubble--${m.from === "me" ? "me" : "other"}`}>
+                    {m.text}
+                  </div>
+                  <span className="msg-chat-c1-meta">{formatMessageTime(m.ts)}</span>
                 </div>
               </li>
             ))}
-            {sending && (
-              <li className="msg-chat-bubble-wrap msg-chat-bubble-wrap--other">
-                <div className="msg-chat-bubble msg-chat-bubble--other">
-                  <p className="msg-chat-bubble-text aichat-muted-line" style={{ margin: 0 }}>
-                    分身正在想…
-                  </p>
+            {sending ? (
+              <li className="msg-chat-c1-row msg-chat-c1-row--other">
+                <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
+                <div className="msg-chat-c1-col">
+                  <div className="msg-chat-c1-bubble msg-chat-c1-bubble--other">
+                    <span className="aichat-muted-line">分身正在想…</span>
+                  </div>
                 </div>
               </li>
-            )}
+            ) : null}
           </ul>
         )}
       </div>
 
-      <div className="msg-chat-composer">
+      <div className="msg-chat-composer msg-chat-c1-composer">
         <input
-          className="aichat-input"
+          className="msg-chat-c1-input"
           placeholder="探索 TA 的日常…"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -147,8 +170,8 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
           }}
           disabled={sending}
         />
-        <button type="button" className="aichat-btn-primary" onClick={() => void onSend()} disabled={sending}>
-          {sending ? "…" : "发送"}
+        <button type="button" className="msg-chat-c1-send" onClick={() => void onSend()} disabled={sending}>
+          发送
         </button>
       </div>
     </div>

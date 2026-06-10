@@ -3,7 +3,7 @@ import { listContactsApi } from "../../services/api";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { createGuardianGroupApi, listGuardianRolesApi } from "../../services/guardianApi";
 import type { ContactItem } from "../../types/contact";
-import type { GuardianRole, GuardianScene } from "../../types/guardian";
+import type { GuardianRole } from "../../types/guardian";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { ContactAvatar } from "../../components/ContactAvatar";
 
@@ -12,18 +12,15 @@ type Props = {
   onCreated: (groupId: string) => void;
 };
 
-const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
 const MAX_PICK = 3;
 const MAX_INVITE = 19;
 
 export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
   const [groupName, setGroupName] = useState("");
-  const [scene, setScene] = useState<GuardianScene>("恋爱暧昧");
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [roles, setRoles] = useState<GuardianRole[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
-  const [guardianOpen, setGuardianOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
@@ -34,7 +31,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
       setLoading(true);
       setErr("");
       try {
-        const [{ items: cs }, { items: rs }] = await Promise.all([listContactsApi(), listGuardianRolesApi(scene)]);
+        const [{ items: cs }, { items: rs }] = await Promise.all([listContactsApi(), listGuardianRolesApi()]);
         if (!cancelled) {
           setContacts(cs);
           setRoles(rs);
@@ -49,7 +46,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [scene]);
+  }, []);
 
   function toggleContact(id: string) {
     setSelectedIds((prev) => {
@@ -60,21 +57,38 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
   }
 
   function toggleRole(id: string) {
+    const role = roles.find((r) => r.id === id);
+    if (!role) return;
     setPicked((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
       if (prev.length >= MAX_PICK) return prev;
+      if (prev.length > 0) {
+        const anchor = roles.find((r) => r.id === prev[0]);
+        if (anchor && role.scene !== anchor.scene) {
+          setErr("搭子类型不一致");
+          return prev;
+        }
+      }
+      setErr("");
       return [...prev, id];
     });
   }
 
   async function onSubmit() {
     if (selectedIds.length < 1) {
-      setErr("请至少选择 1 位联系人");
+      setErr("请至少选择 1 位成员");
       return;
     }
     if (picked.length < 1) {
       setErr("请至少选择 1 位搭子");
-      setGuardianOpen(true);
+      return;
+    }
+    const pickedRoles = picked
+      .map((id) => roles.find((r) => r.id === id))
+      .filter((r): r is GuardianRole => Boolean(r));
+    const scene = pickedRoles[0]?.scene;
+    if (!scene || pickedRoles.some((r) => r.scene !== scene)) {
+      setErr("搭子选择无效");
       return;
     }
     setSubmitting(true);
@@ -95,17 +109,23 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
     }
   }
 
+  const canSubmit = !submitting && !loading && selectedIds.length >= 1 && picked.length >= 1;
+
   return (
     <div className="aichat-shell guardian-create guardian-create--wechat">
-      <header className="aichat-topbar aichat-topbar-flex">
-        <button className="aichat-btn-ghost" type="button" onClick={onBack}>
+      <header className="aichat-topbar aichat-topbar-flex guardian-create__topbar">
+        <button className="aichat-btn-ghost" type="button" onClick={onBack} disabled={submitting}>
           取消
         </button>
-        <div className="aichat-stage-head" style={{ flex: 1, textAlign: "center" }}>
-          <h1 style={{ fontSize: 17 }}>发起群聊</h1>
-          <p style={{ marginTop: 2 }}>选择联系人 · 可选群名称</p>
-        </div>
-        <span style={{ width: 44 }} aria-hidden />
+        <h1 className="guardian-create__title">发起群聊</h1>
+        <button
+          type="button"
+          className="guardian-create__done"
+          disabled={!canSubmit}
+          onClick={() => void onSubmit()}
+        >
+          {submitting ? "创建中…" : "完成"}
+        </button>
       </header>
 
       <div className="aichat-main guardian-create-main">
@@ -120,15 +140,23 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
             maxLength={32}
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
+            disabled={submitting}
           />
         </div>
 
-        <section className="guardian-create-section">
-          <h2 className="guardian-create-label">选择联系人</h2>
+        <section className="guardian-create-section" aria-labelledby="guardian-create-members">
+          <div className="guardian-create-section__head">
+            <h2 id="guardian-create-members" className="guardian-create-section__title">
+              邀请成员
+            </h2>
+            {selectedIds.length > 0 ? (
+              <span className="guardian-create-section__meta">已选 {selectedIds.length} 人</span>
+            ) : null}
+          </div>
           {loading ? (
-            <p className="aichat-muted-line">加载中…</p>
+            <p className="aichat-muted-line guardian-create-section__empty">加载中…</p>
           ) : contacts.length === 0 ? (
-            <p className="aichat-muted-line">请先在联系人中添加已注册用户</p>
+            <p className="aichat-muted-line guardian-create-section__empty">暂无联系人，请先添加好友</p>
           ) : (
             <ul className="guardian-contact-list">
               {contacts.map((c) => {
@@ -138,6 +166,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
                     <button
                       type="button"
                       className={`guardian-contact-row${on ? " guardian-contact-row--on" : ""}`}
+                      disabled={submitting}
                       onClick={() => toggleContact(c.contactUserId)}
                     >
                       <span className={`guardian-contact-check${on ? " guardian-contact-check--on" : ""}`} aria-hidden>
@@ -153,75 +182,51 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
           )}
         </section>
 
-        <section className="guardian-create-section">
-          <button
-            type="button"
-            className="guardian-guardian-toggle"
-            onClick={() => setGuardianOpen((v) => !v)}
-            aria-expanded={guardianOpen}
-          >
-            <span>搭子</span>
-            <span className="guardian-guardian-toggle__meta">
-              {scene} · 已选 {picked.length} 个
+        <section className="guardian-create-section" aria-labelledby="guardian-create-guardians">
+          <div className="guardian-create-section__head">
+            <h2 id="guardian-create-guardians" className="guardian-create-section__title">
+              选择搭子
+            </h2>
+            <span className="guardian-create-section__meta">
+              已选 {picked.length}/{MAX_PICK}
             </span>
-            <span className="guardian-guardian-toggle__arrow">{guardianOpen ? "▾" : "▸"}</span>
-          </button>
-
-          {guardianOpen && (
-            <div className="guardian-guardian-panel">
-              <h3 className="guardian-create-label">场景</h3>
-              <div className="guardian-scene-chips">
-                {SCENES.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`guardian-scene-chip${scene === s ? " guardian-scene-chip--on" : ""}`}
-                    onClick={() => setScene(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-              <h3 className="guardian-create-label" style={{ marginTop: 14 }}>
-                搭子（最多 {MAX_PICK} 位）
-              </h3>
-              <ul className="guardian-pick-list">
-                {roles.map((r) => {
-                  const on = picked.includes(r.id);
-                  return (
-                    <li key={r.id}>
-                      <button
-                        type="button"
-                        className={`guardian-pick-row guardian-pick-row--role${on ? " guardian-pick-row--on" : ""}`}
-                        onClick={() => toggleRole(r.id)}
-                      >
-                        <GuardianAvatar role={r} className="guardian-pick-row__av" alt="" />
-                        <span>{r.name}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+          </div>
+          {loading ? (
+            <p className="aichat-muted-line guardian-create-section__empty">加载中…</p>
+          ) : roles.length === 0 ? (
+            <p className="aichat-muted-line guardian-create-section__empty">暂无搭子</p>
+          ) : (
+            <ul className="guardian-create-role-list">
+              {roles.map((r) => {
+                const on = picked.includes(r.id);
+                return (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      className={`guardian-create-role-row${on ? " guardian-create-role-row--on" : ""}`}
+                      disabled={submitting}
+                      onClick={() => toggleRole(r.id)}
+                    >
+                      <span className={`guardian-contact-check${on ? " guardian-contact-check--on" : ""}`} aria-hidden>
+                        {on ? "✓" : ""}
+                      </span>
+                      <GuardianAvatar role={r} className="guardian-create-role-row__av" alt="" />
+                      <span className="guardian-create-role-row__body">
+                        <strong className="guardian-create-role-row__name">{r.name}</strong>
+                        {r.userMessage.trim() ? (
+                          <span className="guardian-create-role-row__msg">{r.userMessage}</span>
+                        ) : null}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </section>
 
-        {err && <p className="aichat-form-msg err">{err}</p>}
+        {err ? <p className="aichat-form-msg err">{err}</p> : null}
       </div>
-
-      <footer className="guardian-create-footer">
-        <p className="guardian-create-footer__hint">
-          已选 <strong>{selectedIds.length}</strong> 人 · 含你共 {selectedIds.length + 1} 人
-        </p>
-        <button
-          type="button"
-          className="aichat-btn-primary guardian-create-footer__btn"
-          disabled={submitting || loading || selectedIds.length < 1}
-          onClick={() => void onSubmit()}
-        >
-          {submitting ? "创建中…" : `完成${selectedIds.length > 0 ? `(${selectedIds.length})` : ""}`}
-        </button>
-      </footer>
     </div>
   );
 }

@@ -37,6 +37,24 @@ const SCENE_RULES: Record<GuardianScene, Rule[]> = {
     { pattern: /断供|赶出去|没收/i, label: "控制威胁", hint: "以经济或居住威胁施压时，先稳住边界再沟通。", level: "high" },
     ...COMMON_HIGH,
   ],
+  居家装修: [
+    { pattern: /今天必须|马上签|最后优惠|错过就没了/i, label: "签约催促", hint: "装修合同不必当天签，明细看清再决定。", level: "high" },
+    { pattern: /增项|另算|到时候再说|口头答应/i, label: "增项风险", hint: "增项和材料变更建议写进书面确认。", level: "medium" },
+    { pattern: /预付|全款|定金不退/i, label: "付款节奏", hint: "预付款比例和节点验收挂钩，大额预付需谨慎。", level: "high" },
+    ...COMMON_HIGH,
+  ],
+  大件采购: [
+    { pattern: /仅此一次|库存不多|马上涨价|不买就没了/i, label: "销售施压", hint: "限时话术常见，大件可以慢一天对比再决定。", level: "medium" },
+    { pattern: /捆绑|必须一起买|套餐才划算/i, label: "捆绑销售", hint: "捆绑项目可以拆开问清单价和是否必选。", level: "medium" },
+    { pattern: /无发票|私下转账|不走平台/i, label: "交易风险", hint: "无凭证交易售后难保障，建议正规渠道与发票。", level: "high" },
+    ...COMMON_HIGH,
+  ],
+  店铺经营: [
+    { pattern: /差评|曝光|投诉到底|工商/i, label: "客诉升级", hint: "客诉先核实事实，公开对峙容易扩大影响。", level: "high" },
+    { pattern: /扣工资|开除|你走人|不用来了/i, label: "用工冲突", hint: "人事决定宜私下沟通并留痕，避免群内激化。", level: "high" },
+    { pattern: /先上再说|随便定价|亏本就卖/i, label: "经营冒进", hint: "促销和定价先算成本和库存，再对外承诺。", level: "medium" },
+    ...COMMON_HIGH,
+  ],
 };
 
 export function assessPeerMessageRisk(scene: GuardianScene, peerText: string, peerMessageId: number): GuardianOwnerHint | null {

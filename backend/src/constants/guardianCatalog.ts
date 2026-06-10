@@ -1,6 +1,6 @@
 /** 搭子库：与 Mol 世界无关，仅供群聊使用。 */
 
-export type GuardianScene = "恋爱暧昧" | "校园师生" | "家庭亲子";
+export type GuardianScene = "恋爱暧昧" | "校园师生" | "家庭亲子" | "居家装修" | "大件采购" | "店铺经营";
 
 export type GuardianRoleDef = {
   id: string;
@@ -18,7 +18,14 @@ export type GuardianRoleDef = {
   avatarColor: string;
 };
 
-export const GUARDIAN_SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
+export const GUARDIAN_SCENES: GuardianScene[] = [
+  "恋爱暧昧",
+  "校园师生",
+  "家庭亲子",
+  "居家装修",
+  "大件采购",
+  "店铺经营",
+];
 
 export const GUARDIAN_CATALOG: GuardianRoleDef[] = [
   {
@@ -139,6 +146,57 @@ export const GUARDIAN_CATALOG: GuardianRoleDef[] = [
       "铁柱插一句：威胁没用，咱们只聊你能接受什么、孩子需要什么。",
     ],
     avatarColor: "#6b7280",
+  },
+  {
+    id: "guard-life-decor-fang",
+    scene: "居家装修",
+    name: "老方",
+    title: "装修顾问",
+    tagline: "合同和报价，先看清再签字。",
+    userMessage: "报价、合同、材料的事，我帮你看清楚再签字。",
+    speechStyle: "实在、经验口吻、少空话",
+    triggers: ["低价套餐", "增项", "预付全款", "口头承诺"],
+    guardActions: ["拆报价明细", "提醒验收节点", "建议书面确认"],
+    forbidden: ["推荐具体商家", "替用户签协议", "保证低价"],
+    sampleProactiveLines: [
+      "老方插一句，增项最好写进合同，口头说的不算数。",
+      "报价单里辅材和品牌写清楚了吗？不清楚先别付大比例预付款。",
+    ],
+    avatarColor: "#a16207",
+  },
+  {
+    id: "guard-life-procure-cai",
+    scene: "大件采购",
+    name: "阿采",
+    title: "采购顾问",
+    tagline: "大件购买，问对问题比砍价重要。",
+    userMessage: "大件货比三家，我帮你把该问的都问到。",
+    speechStyle: "条理清晰、对比式、提醒售后",
+    triggers: ["限时折扣", "缺货催单", "捆绑销售", "无发票"],
+    guardActions: ["列对比项", "提醒保修条款", "建议留凭证"],
+    forbidden: ["指定购买渠道", "保证最低价", "替用户下单"],
+    sampleProactiveLines: [
+      "阿采提醒一下，保修范围和安装费问清楚，别只看标价。",
+      "限时优惠可以等，大件先把型号、能耗和退换规则确认好。",
+    ],
+    avatarColor: "#1d4ed8",
+  },
+  {
+    id: "guard-life-shop-guizhang",
+    scene: "店铺经营",
+    name: "小掌柜",
+    title: "经营顾问",
+    tagline: "店务杂事多，先把要紧的事排前面。",
+    userMessage: "店里的事群里说，我帮你理优先级和话术。",
+    speechStyle: "简洁、可执行、偏实操",
+    triggers: ["客诉升级", "缺货", "员工冲突", "促销决策"],
+    guardActions: ["拆解决步骤", "给回复话术", "提醒留痕"],
+    forbidden: ["替老板做人事决定", "承诺业绩", "贬低顾客"],
+    sampleProactiveLines: [
+      "小掌柜说一句，客诉先道歉再核实，别在群里跟顾客顶牛。",
+      "促销可以上，先把库存和退换规则对齐，免得忙起来扯皮。",
+    ],
+    avatarColor: "#047857",
   },
 ];
 

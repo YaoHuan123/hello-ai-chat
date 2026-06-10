@@ -23,6 +23,10 @@ const historyItemSchema = z.object({
   ts: z.number(),
 });
 
+const addMembersBodySchema = z.object({
+  memberUserIds: z.array(z.string().min(1).max(64)).min(1).max(19),
+});
+
 const sendBodySchema = z.object({
   text: z.string().min(1).max(4000),
   /** 客户端本地群聊摘录，供搭子判断；服务端不存聊天内容。 */
@@ -49,12 +53,28 @@ function mapError(res: Response, error: unknown): boolean {
     res.status(400).json({ code, message: "群成员最多 20 人（含自己）" });
     return true;
   }
+  if (code === "ALREADY_MEMBER") {
+    res.status(400).json({ code, message: "成员已在群中" });
+    return true;
+  }
+  if (code === "CANNOT_REMOVE_OWNER") {
+    res.status(400).json({ code, message: "不能移除群主" });
+    return true;
+  }
+  if (code === "NOT_IN_GROUP") {
+    res.status(400).json({ code, message: "该用户不在群内" });
+    return true;
+  }
+  if (code === "MIN_MEMBERS") {
+    res.status(400).json({ code, message: "群聊至少保留 1 位其他成员" });
+    return true;
+  }
   if (code === "NOT_FOUND") {
     res.status(404).json({ code, message: "群不存在或无权访问" });
     return true;
   }
   if (code === "FORBIDDEN") {
-    res.status(403).json({ code, message: "仅群主可查看风险提示" });
+    res.status(403).json({ code, message: "无权操作" });
     return true;
   }
   return false;
@@ -62,6 +82,13 @@ function mapError(res: Response, error: unknown): boolean {
 
 function pushGroupMessage(groupId: string, message: unknown, userIds: string[]): void {
   const payload = { type: "guardian_group_message", payload: { groupId, message } };
+  for (const uid of userIds) {
+    pushToUser(uid, payload);
+  }
+}
+
+function pushGroupUpdated(groupId: string, group: unknown, userIds: string[]): void {
+  const payload = { type: "guardian_group_updated", payload: { groupId, group } };
   for (const uid of userIds) {
     pushToUser(uid, payload);
   }
@@ -213,6 +240,48 @@ export const createGuardianRouter = (svc: GuardianGroupsService): Router => {
       return;
     }
     res.status(200).json({ group });
+  });
+
+  router.post("/groups/:groupId/members", authMiddleware, (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    const groupId = String(req.params.groupId ?? "").trim();
+    const parsed = addMembersBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
+      return;
+    }
+    try {
+      const group = svc.addMembers(groupId, user.userId, parsed.data.memberUserIds);
+      const members = svc.memberUserIds(groupId);
+      pushGroupUpdated(groupId, group, members);
+      res.status(200).json({ group });
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "添加失败" });
+    }
+  });
+
+  router.delete("/groups/:groupId/members/:userId", authMiddleware, (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    const groupId = String(req.params.groupId ?? "").trim();
+    const targetUserId = String(req.params.userId ?? "").trim();
+    try {
+      const group = svc.removeMember(groupId, user.userId, targetUserId);
+      const members = svc.memberUserIds(groupId);
+      pushGroupUpdated(groupId, group, members);
+      res.status(200).json({ group });
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "移除失败" });
+    }
   });
 
   return router;

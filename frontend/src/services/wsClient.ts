@@ -19,6 +19,10 @@ export type WsServerMessage =
         groupId: string;
         hint: { peerMessageId: number; level: string; label: string; hint: string; ts: number };
       };
+    }
+  | {
+      type: "guardian_group_updated";
+      payload: { groupId: string; group: Record<string, unknown> };
     };
 
 type Handler = (msg: WsServerMessage) => void;

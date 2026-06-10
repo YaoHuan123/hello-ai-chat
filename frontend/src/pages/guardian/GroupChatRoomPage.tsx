@@ -6,6 +6,7 @@ import {
   listGuardianRolesApi,
   sendGuardianGroupMessageApi,
 } from "../../services/guardianApi";
+import { GuardianGroupMembersPanel } from "./GuardianGroupMembersPanel";
 import {
   getGuardianGroupMessages,
   setGuardianGroupMessages,
@@ -15,7 +16,9 @@ import type { ContactItem } from "../../types/contact";
 import type { GuardianGroup, GuardianGroupMessage, GuardianOwnerHint, GuardianRole } from "../../types/guardian";
 import { GUARDIAN_RISK_LABEL } from "../../types/guardian";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
+import { ContactAvatar } from "../../components/ContactAvatar";
 import { contactDisplayName, maskPhoneDisplay } from "../../lib/contactDisplay";
+import { getMyAvatarContact } from "../../services/storage";
 
 type Props = {
   groupId: string;
@@ -35,6 +38,42 @@ function bubbleKind(m: GuardianGroupMessage, myUserId: string): BubbleKind {
   return "peer";
 }
 
+function formatMessageTime(ts: number): string {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+}
+
+function contactForMember(
+  contactById: Map<string, ContactItem>,
+  userId: string,
+  phone: string,
+): ContactItem {
+  const found = contactById.get(userId);
+  if (found) return found;
+  return {
+    contactUserId: userId,
+    phone,
+    remark: null,
+    nickname: null,
+    avatarUrl: null,
+    avatarUpdatedAt: null,
+    createdAt: 0,
+  };
+}
+
+function MeMessageAvatar() {
+  const me = getMyAvatarContact();
+  const hasPhoto = Boolean(me.avatarUrl?.trim());
+  return (
+    <ContactAvatar
+      contact={me}
+      className={`msg-chat-c1-avatar msg-chat-c1-avatar--me${hasPhoto ? " msg-chat-c1-avatar--photo" : ""}`}
+      alt=""
+    />
+  );
+}
+
 export function GroupChatRoomPage({ groupId, onBack }: Props) {
   const [group, setGroup] = useState<GuardianGroup | null>(null);
   const [roles, setRoles] = useState<Map<string, GuardianRole>>(new Map());
@@ -44,8 +83,8 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   const [input, setInput] = useState("");
   const [loadErr, setLoadErr] = useState("");
   const [sending, setSending] = useState(false);
-  const [ownerHints, setOwnerHints] = useState<GuardianOwnerHint[]>([]);
   const [latestHint, setLatestHint] = useState<GuardianOwnerHint | null>(null);
+  const [membersOpen, setMembersOpen] = useState(false);
   const scRef = useRef<HTMLDivElement>(null);
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesRef = useRef<GuardianGroupMessage[]>(messages);
@@ -74,16 +113,6 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
     }
   };
 
-  const mergeHint = (hint: GuardianOwnerHint) => {
-    setOwnerHints((prev) => {
-      const next = prev.filter((h) => h.peerMessageId !== hint.peerMessageId);
-      return [hint, ...next].slice(0, 30);
-    });
-    setLatestHint(hint);
-  };
-
-  const hintByPeerMsgId = new Map(ownerHints.map((h) => [h.peerMessageId, h]));
-
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -107,7 +136,6 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
           try {
             const { items: hints } = await listGuardianOwnerHintsApi(groupId);
             if (!cancelled && hints.length > 0) {
-              setOwnerHints(hints);
               setLatestHint(hints[0] ?? null);
             }
           } catch {
@@ -134,7 +162,12 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       }
       if (msg.type === "guardian_owner_hint") {
         if (msg.payload.groupId !== groupId) return;
-        mergeHint(msg.payload.hint as GuardianOwnerHint);
+        setLatestHint(msg.payload.hint as GuardianOwnerHint);
+        return;
+      }
+      if (msg.type === "guardian_group_updated") {
+        if (msg.payload.groupId !== groupId) return;
+        setGroup(msg.payload.group as GuardianGroup);
       }
     });
     return unsub;
@@ -165,62 +198,51 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   }
 
   const isProtected = group && myUserId === group.protectedUserId;
+  const isOwner = isProtected;
   const humanMembers = group?.members ?? [];
+  const otherHumanCount = humanMembers.filter((m) => m.userId !== myUserId).length;
+  const showPeerSender = otherHumanCount > 1;
   const title =
     group?.name?.trim() ||
     (humanMembers.length > 0 ? `群聊(${humanMembers.length})` : "群聊");
-  const guardianNames = group?.guardianRoleIds.map((id) => roles.get(id)?.name ?? "AI").join("、") ?? "";
+
+  if (membersOpen && group) {
+    return (
+      <GuardianGroupMembersPanel
+        groupId={groupId}
+        group={group}
+        roles={roles}
+        contacts={contacts}
+        myUserId={myUserId}
+        isOwner={Boolean(isOwner)}
+        onBack={() => setMembersOpen(false)}
+        onGroupUpdated={setGroup}
+      />
+    );
+  }
 
   return (
-    <div className="aichat-shell msg-chat-room guardian-group-room">
-      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar">
+    <div className="aichat-shell msg-chat-room msg-chat-c1 msg-mode-normal guardian-group-room guardian-group-room--simple">
+      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar guardian-group-room__topbar">
         <button className="aichat-btn-ghost" type="button" onClick={onBack}>
           返回
         </button>
-        <div className="aichat-stage-head" style={{ flex: 1, textAlign: "center", minWidth: 0 }}>
-          <h1 style={{ fontSize: 17 }}>{title}</h1>
-          <p style={{ marginTop: 2 }}>
-            {group?.scene ?? "…"} · {humanMembers.length} 人
-            {guardianNames ? ` · ${guardianNames}` : ""}
-          </p>
+        <h1 className="guardian-group-room__title">{title}</h1>
+        <div className="guardian-group-room__menu-wrap">
+          <button
+            type="button"
+            className="contacts-more-btn guardian-group-room__more"
+            aria-label="群成员"
+            onClick={() => setMembersOpen(true)}
+          >
+            ···
+          </button>
         </div>
-        <span style={{ width: 44, flexShrink: 0 }} aria-hidden />
       </header>
 
-      {group && (
-        <div className="guardian-group-members" aria-label="群成员">
-          {humanMembers.map((m) => {
-            const label =
-              m.userId === group.protectedUserId
-                ? `${memberDisplayName(m.userId, m.phone)}（群主）`
-                : memberDisplayName(m.userId, m.phone);
-            return (
-              <span key={m.userId} className="guardian-group-members__chip guardian-group-members__chip--human">
-                {label}
-              </span>
-            );
-          })}
-          {group.guardianRoleIds.map((id) => {
-            const r = roles.get(id);
-            return (
-              <span
-                key={id}
-                className="guardian-group-members__chip guardian-group-members__chip--ai"
-                style={{ borderColor: r?.avatarColor }}
-              >
-                {r ? <GuardianAvatar role={r} className="guardian-group-members__av" alt="" /> : null}
-                {r?.name ?? "AI"}
-              </span>
-            );
-          })}
-        </div>
-      )}
+      {loadErr ? <p className="aichat-form-msg err msg-chat-c1-banner-err">{loadErr}</p> : null}
 
-      {guardianNames && (
-        <p className="guardian-group-hint">搭子可主动参与聊天、轮流接话</p>
-      )}
-
-      {isProtected && latestHint && (
+      {isProtected && latestHint ? (
         <div className={`guardian-risk-bar guardian-risk-bar--${latestHint.level}`} role="status">
           <span className="guardian-risk-bar__badge">{GUARDIAN_RISK_LABEL[latestHint.level]}</span>
           <div className="guardian-risk-bar__body">
@@ -231,66 +253,46 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
             ×
           </button>
         </div>
-      )}
+      ) : null}
 
-      {isProtected && !latestHint && (
-        <p className="guardian-owner-only-hint">仅你可见：敏感话题会显示提醒</p>
-      )}
-
-      {loadErr && (
-        <p className="aichat-form-msg err" style={{ padding: "8px 16px", margin: 0 }}>
-          {loadErr}
-        </p>
-      )}
-
-      <div ref={scRef} className="msg-chat-scroll">
+      <div ref={scRef} className="msg-chat-scroll msg-chat-c1-scroll">
         {messages.length === 0 ? (
-          <p className="aichat-muted-line" style={{ padding: "24px 16px", textAlign: "center" }}>
-            暂无消息，发送第一条开始
-          </p>
+          <p className="msg-chat-c1-empty">暂无消息</p>
         ) : (
-          <ul className="msg-chat-list" aria-label="群消息">
+          <ul className="msg-chat-list msg-chat-c1-list" aria-label="群消息">
             {messages.map((m) => {
               const kind = myUserId ? bubbleKind(m, myUserId) : "peer";
               const role = m.guardianRoleId ? roles.get(m.guardianRoleId) : undefined;
               const member = humanMembers.find((x) => x.userId === m.fromUserId);
+              const isMe = kind === "me";
               const senderLabel =
                 kind === "guardian"
-                  ? role?.name ?? "AI"
-                  : kind === "peer" && member
+                  ? (role?.name ?? "搭子")
+                  : kind === "peer" && showPeerSender && member
                     ? memberDisplayName(member.userId, member.phone)
                     : null;
+
               return (
                 <li
                   key={m.id}
-                  className={`msg-chat-bubble-wrap msg-chat-bubble-wrap--${kind === "guardian" ? "guardian" : kind}`}
+                  className={`msg-chat-c1-row${isMe ? " msg-chat-c1-row--me" : ""}`}
                 >
-                  {senderLabel && (
-                    <span
-                      className="guardian-bubble-label"
-                      style={kind === "guardian" && role ? { color: role.avatarColor } : undefined}
-                    >
-                      {senderLabel}
-                    </span>
-                  )}
-                  <div
-                    className={`msg-chat-bubble msg-chat-bubble--${kind === "guardian" ? "guardian" : kind}`}
-                    style={kind === "guardian" && role ? { borderColor: role.avatarColor } : undefined}
-                  >
-                    <p className="msg-chat-bubble-text">{m.text}</p>
+                  {kind === "guardian" && role ? (
+                    <GuardianAvatar role={role} className="msg-chat-c1-avatar msg-chat-c1-avatar--guardian" alt="" />
+                  ) : isMe ? (
+                    <MeMessageAvatar />
+                  ) : member ? (
+                    <ContactAvatar
+                      contact={contactForMember(contactById, member.userId, member.phone)}
+                      className="msg-chat-c1-avatar msg-chat-c1-avatar--peer msg-chat-c1-avatar--photo"
+                      alt=""
+                    />
+                  ) : null}
+                  <div className="msg-chat-c1-col">
+                    {senderLabel ? <span className="guardian-group-msg-name">{senderLabel}</span> : null}
+                    <div className={`msg-chat-c1-bubble msg-chat-c1-bubble--${isMe ? "me" : "other"}`}>{m.text}</div>
+                    <span className="msg-chat-c1-meta">{formatMessageTime(m.ts)}</span>
                   </div>
-                  {isProtected &&
-                    kind === "peer" &&
-                    (() => {
-                      const h = hintByPeerMsgId.get(m.id);
-                      if (!h) return null;
-                      return (
-                        <div className={`guardian-inline-risk guardian-inline-risk--${h.level}`}>
-                          <span className="guardian-inline-risk__label">{h.label}</span>
-                          <span className="guardian-inline-risk__text">{h.hint}</span>
-                        </div>
-                      );
-                    })()}
                 </li>
               );
             })}
@@ -298,9 +300,9 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
         )}
       </div>
 
-      <div className="msg-chat-composer">
+      <div className="msg-chat-composer msg-chat-c1-composer guardian-group-room__composer">
         <input
-          className="aichat-input"
+          className="msg-chat-c1-input"
           placeholder="输入消息"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -308,7 +310,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
             if (e.key === "Enter") void onSend();
           }}
         />
-        <button type="button" className="aichat-btn-primary" onClick={() => void onSend()} disabled={sending}>
+        <button type="button" className="msg-chat-c1-send" onClick={() => void onSend()} disabled={sending}>
           发送
         </button>
       </div>

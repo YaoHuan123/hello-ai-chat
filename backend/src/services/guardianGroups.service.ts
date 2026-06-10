@@ -265,13 +265,6 @@ export class GuardianGroupsService {
     return out;
   }
 
-  /** 群聊内容仅存客户端本地，服务端不返回历史。 */
-  listMessages(groupId: string, userId: string): GuardianGroupMessageRow[] {
-    const g = this.getById(groupId, userId);
-    if (!g) throw new Error("NOT_FOUND");
-    return [];
-  }
-
   sendHuman(groupId: string, userId: string, textRaw: string): GuardianGroupMessageRow {
     const g = this.getById(groupId, userId);
     if (!g) throw new Error("NOT_FOUND");
@@ -290,6 +283,66 @@ export class GuardianGroupsService {
       text,
       ts,
     };
+  }
+
+  /** 群聊内容仅存客户端本地，服务端不返回历史。 */
+  listMessages(groupId: string, userId: string): GuardianGroupMessageRow[] {
+    const g = this.getById(groupId, userId);
+    if (!g) throw new Error("NOT_FOUND");
+    return [];
+  }
+
+  private assertOwner(groupId: string, userId: string): GuardianGroupRow {
+    const g = this.getById(groupId, userId);
+    if (!g) throw new Error("NOT_FOUND");
+    if (g.protectedUserId !== userId) throw new Error("FORBIDDEN");
+    return g;
+  }
+
+  addMembers(groupId: string, operatorUserId: string, memberUserIds: string[]): GuardianGroupRow {
+    const g = this.assertOwner(groupId, operatorUserId);
+    const existing = new Set(g.members.map((m) => m.userId));
+    const toAdd = [...new Set(memberUserIds.map((x) => x.trim()).filter(Boolean))];
+    if (toAdd.length === 0) throw new Error("INVALID_PARAMS");
+
+    for (const id of toAdd) {
+      if (existing.has(id)) throw new Error("ALREADY_MEMBER");
+      if (id === g.protectedUserId) throw new Error("INVALID_PARAMS");
+      if (!this.contacts.areMutualContacts(operatorUserId, id)) throw new Error("NOT_FRIENDS");
+    }
+
+    if (g.members.length + toAdd.length > MAX_HUMANS) throw new Error("TOO_MANY_MEMBERS");
+
+    const insertMember = this.db.prepare(
+      `INSERT INTO guardian_group_members (group_id, user_id, joined_at) VALUES (?, ?, ?)`,
+    );
+    const now = Date.now();
+    for (const id of toAdd) {
+      insertMember.run(groupId, id, now);
+    }
+
+    return this.getById(groupId, operatorUserId)!;
+  }
+
+  removeMember(groupId: string, operatorUserId: string, targetUserId: string): GuardianGroupRow {
+    const g = this.assertOwner(groupId, operatorUserId);
+    const target = targetUserId.trim();
+    if (!target) throw new Error("INVALID_PARAMS");
+    if (target === g.protectedUserId) throw new Error("CANNOT_REMOVE_OWNER");
+
+    const peers = g.members.filter((m) => m.userId !== g.protectedUserId);
+    if (!peers.some((m) => m.userId === target)) throw new Error("NOT_IN_GROUP");
+    if (peers.length <= 1) throw new Error("MIN_MEMBERS");
+
+    this.db.prepare(`DELETE FROM guardian_group_members WHERE group_id = ? AND user_id = ?`).run(groupId, target);
+
+    if (target === g.peerUserId) {
+      const remaining = this.loadMembers(groupId);
+      const nextPeer = remaining.find((m) => m.userId !== g.protectedUserId)?.userId ?? g.protectedUserId;
+      this.db.prepare(`UPDATE guardian_groups SET peer_user_id = ? WHERE id = ?`).run(nextPeer, groupId);
+    }
+
+    return this.getById(groupId, operatorUserId)!;
   }
 
   listOwnerHints(groupId: string, userId: string, limit = 20): GuardianOwnerHint[] {

@@ -1,4 +1,4 @@
-import { getJson, postJson } from "./api";
+import { deleteJson, getJson, postJson } from "./api";
 import { getAuthToken } from "./storage";
 import type {
   GuardianGroup,
@@ -74,6 +74,27 @@ export async function sendGuardianGroupMessageApi(
         ts: m.ts,
       })),
     },
+    authT(),
+  );
+}
+
+export async function addGuardianGroupMembersApi(
+  groupId: string,
+  memberUserIds: string[],
+): Promise<{ group: GuardianGroup }> {
+  return postJson<{ group: GuardianGroup }>(
+    `/api/guardian/groups/${encodeURIComponent(groupId)}/members`,
+    { memberUserIds },
+    authT(),
+  );
+}
+
+export async function removeGuardianGroupMemberApi(
+  groupId: string,
+  userId: string,
+): Promise<{ group: GuardianGroup }> {
+  return deleteJson<{ group: GuardianGroup }>(
+    `/api/guardian/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(userId)}`,
     authT(),
   );
 }

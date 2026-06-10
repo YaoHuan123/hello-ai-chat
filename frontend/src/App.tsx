@@ -47,6 +47,7 @@ function App() {
   const [guardianRoleId, setGuardianRoleId] = useState<string | null>(null);
   const [momentsFriendContact, setMomentsFriendContact] = useState<ContactItem | null>(null);
   const [mainTab, setMainTab] = useState<MainTabId>("messages");
+  const [guardianHallReturnTab, setGuardianHallReturnTab] = useState<MainTabId>("people");
 
   const refreshFriendPending = useCallback(() => {
     void getFriendRequestPendingCountApi()
@@ -132,16 +133,17 @@ function App() {
       }
       if (route === "guardian-group-chat") {
         setGuardianGroupId(null);
+        setMainTab("groups");
         setRoute("main");
         return true;
       }
       if (route === "guardian-create-group") {
-        setMainTab("people");
+        setMainTab("groups");
         setRoute("main");
         return true;
       }
       if (route === "guardian-hall") {
-        setMainTab("people");
+        setMainTab(guardianHallReturnTab);
         setRoute("main");
         return true;
       }
@@ -208,7 +210,7 @@ function App() {
       return true;
     });
     return () => setAndroidBackHandler(null);
-  }, [authed, route, featureReturnRoute, molDetailBackRoute]);
+  }, [authed, route, featureReturnRoute, molDetailBackRoute, guardianHallReturnTab]);
 
   if (!authReady) {
     return (
@@ -248,7 +250,7 @@ function App() {
     return (
       <GuardianHallPage
         onBack={() => {
-          setMainTab("people");
+          setMainTab(guardianHallReturnTab);
           setRoute("main");
         }}
         onOpenRole={(id) => {
@@ -276,11 +278,12 @@ function App() {
     return (
       <CreateGuardianGroupPage
         onBack={() => {
-          setMainTab("people");
+          setMainTab("groups");
           setRoute("main");
         }}
         onCreated={(id) => {
           setGuardianGroupId(id);
+          setMainTab("groups");
           setRoute("guardian-group-chat");
         }}
       />
@@ -294,6 +297,7 @@ function App() {
         groupId={guardianGroupId}
         onBack={() => {
           setGuardianGroupId(null);
+          setMainTab("groups");
           setRoute("main");
         }}
       />
@@ -342,7 +346,11 @@ function App() {
           setGuardianGroupId(groupId);
           setRoute("guardian-group-chat");
         }}
-        onOpenGuardianHall={() => setRoute("guardian-hall")}
+        onCreateGuardianGroup={() => setRoute("guardian-create-group")}
+        onOpenGuardianHall={(fromTab) => {
+          setGuardianHallReturnTab(fromTab);
+          setRoute("guardian-hall");
+        }}
         onOpenMolList={() => setRoute("assist-mol-list")}
         onNavigateFeature={(r) => {
           setFeatureReturnRoute("main");

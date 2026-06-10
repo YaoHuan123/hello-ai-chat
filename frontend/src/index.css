@@ -3213,6 +3213,55 @@ body {
   color: var(--aichat-text);
 }
 
+.groups-tab__topbar h1 {
+  flex: 1;
+}
+
+.groups-tab__create {
+  border: none;
+  background: transparent;
+  padding: 6px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aichat-accent);
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.groups-tab__empty {
+  margin-top: 48px;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.groups-tab__empty-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--aichat-text);
+}
+
+.groups-tab__empty-sub {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--aichat-muted);
+}
+
+.groups-tab__empty-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.groups-tab__empty-actions .aichat-btn-primary,
+.groups-tab__empty-actions .aichat-btn-ghost {
+  min-width: 10em;
+}
+
 .msg-conv-empty__hint {
   margin: 10px 0 0;
   font-size: 14px;
@@ -4962,17 +5011,6 @@ button.msg-chat-c1-placeholder:active {
   margin-bottom: 0;
 }
 
-.moments-explore-chat-hint {
-  margin: 0;
-  padding: 8px 16px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--aichat-muted);
-  background: var(--aichat-surface);
-  border-bottom: 0.5px solid var(--aichat-border);
-  text-align: center;
-}
-
 .aichat-passive-subtabs {
   display: flex;
   gap: 0;
@@ -5132,6 +5170,18 @@ button.msg-chat-c1-placeholder:active {
   background: linear-gradient(135deg, #ffb86a, #e07a2f);
 }
 
+.guardian-scene-chip--on[data-scene="居家装修"] {
+  background: linear-gradient(135deg, #d4a574, #a16207);
+}
+
+.guardian-scene-chip--on[data-scene="大件采购"] {
+  background: linear-gradient(135deg, #60a5fa, #1d4ed8);
+}
+
+.guardian-scene-chip--on[data-scene="店铺经营"] {
+  background: linear-gradient(135deg, #34d399, #047857);
+}
+
 .guardian-role-list--hall {
   gap: 10px;
 }
@@ -5178,6 +5228,18 @@ button.msg-chat-c1-placeholder:active {
   background: linear-gradient(180deg, #ffb86a, #e07a2f);
 }
 
+.guardian-role-card-v2[data-scene="居家装修"] .guardian-role-card-v2__shine {
+  background: linear-gradient(180deg, #d4a574, #a16207);
+}
+
+.guardian-role-card-v2[data-scene="大件采购"] .guardian-role-card-v2__shine {
+  background: linear-gradient(180deg, #60a5fa, #1d4ed8);
+}
+
+.guardian-role-card-v2[data-scene="店铺经营"] .guardian-role-card-v2__shine {
+  background: linear-gradient(180deg, #34d399, #047857);
+}
+
 .guardian-role-card-v2__scene {
   display: inline-flex;
   flex-shrink: 0;
@@ -5199,6 +5261,18 @@ button.msg-chat-c1-placeholder:active {
 
 .guardian-role-card-v2[data-scene="家庭亲子"] .guardian-role-card-v2__scene {
   background: linear-gradient(135deg, #ffb86a, #e07a2f);
+}
+
+.guardian-role-card-v2[data-scene="居家装修"] .guardian-role-card-v2__scene {
+  background: linear-gradient(135deg, #d4a574, #a16207);
+}
+
+.guardian-role-card-v2[data-scene="大件采购"] .guardian-role-card-v2__scene {
+  background: linear-gradient(135deg, #60a5fa, #1d4ed8);
+}
+
+.guardian-role-card-v2[data-scene="店铺经营"] .guardian-role-card-v2__scene {
+  background: linear-gradient(135deg, #34d399, #047857);
 }
 
 .guardian-role-card-v2__avatar {
@@ -5379,6 +5453,18 @@ button.msg-chat-c1-placeholder:active {
   background: linear-gradient(180deg, #fff6ec 0%, #f3f4f8 280px);
 }
 
+.guardian-role-detail[data-scene="居家装修"] {
+  background: linear-gradient(180deg, #faf6ef 0%, #f3f4f8 280px);
+}
+
+.guardian-role-detail[data-scene="大件采购"] {
+  background: linear-gradient(180deg, #eef4ff 0%, #f3f4f8 280px);
+}
+
+.guardian-role-detail[data-scene="店铺经营"] {
+  background: linear-gradient(180deg, #ecfdf5 0%, #f3f4f8 280px);
+}
+
 .guardian-role-detail__topbar {
   display: flex;
   align-items: center;
@@ -5447,6 +5533,24 @@ button.msg-chat-c1-placeholder:active {
   background:
     radial-gradient(circle at 16% 20%, rgba(255, 184, 106, 0.42), transparent 42%),
     radial-gradient(circle at 84% 8%, rgba(224, 122, 47, 0.18), transparent 36%);
+}
+
+.guardian-role-detail[data-scene="居家装修"] .guardian-role-detail__hero-bg {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(212, 165, 116, 0.4), transparent 42%),
+    radial-gradient(circle at 82% 10%, rgba(161, 98, 7, 0.16), transparent 36%);
+}
+
+.guardian-role-detail[data-scene="大件采购"] .guardian-role-detail__hero-bg {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(96, 165, 250, 0.38), transparent 42%),
+    radial-gradient(circle at 82% 10%, rgba(29, 78, 216, 0.16), transparent 36%);
+}
+
+.guardian-role-detail[data-scene="店铺经营"] .guardian-role-detail__hero-bg {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(52, 211, 153, 0.38), transparent 42%),
+    radial-gradient(circle at 82% 10%, rgba(4, 120, 87, 0.16), transparent 36%);
 }
 
 .guardian-role-detail__hero-inner {
@@ -5527,6 +5631,18 @@ button.msg-chat-c1-placeholder:active {
 
 .guardian-role-detail[data-scene="家庭亲子"] .guardian-role-detail__scene {
   background: linear-gradient(135deg, #ffb86a, #e07a2f);
+}
+
+.guardian-role-detail[data-scene="居家装修"] .guardian-role-detail__scene {
+  background: linear-gradient(135deg, #d4a574, #a16207);
+}
+
+.guardian-role-detail[data-scene="大件采购"] .guardian-role-detail__scene {
+  background: linear-gradient(135deg, #60a5fa, #1d4ed8);
+}
+
+.guardian-role-detail[data-scene="店铺经营"] .guardian-role-detail__scene {
+  background: linear-gradient(135deg, #34d399, #047857);
 }
 
 .guardian-role-detail__pitch {
@@ -5782,10 +5898,144 @@ button.msg-chat-c1-placeholder:active {
   margin-bottom: 22px;
 }
 
+.guardian-create-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.guardian-create-section__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aichat-muted);
+}
+
+.guardian-create-section__meta {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--aichat-accent);
+  flex-shrink: 0;
+}
+
+.guardian-create-section__empty {
+  margin: 0;
+  padding: 0 4px;
+}
+
 .guardian-create-label {
   font-size: 14px;
   font-weight: 700;
   margin: 0 0 10px;
+}
+
+.guardian-create__topbar {
+  gap: 0;
+}
+
+.guardian-create__title {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.guardian-create__done {
+  border: none;
+  background: transparent;
+  color: var(--aichat-accent);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 0 4px;
+  min-width: 44px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.guardian-create__done:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.guardian-create-role-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.guardian-create-role-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 0.5px solid var(--aichat-border);
+}
+
+.guardian-create-role-row--on {
+  background: rgba(0, 122, 255, 0.04);
+}
+
+.guardian-create-role-row:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.guardian-create-role-row__av {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: var(--aichat-avatar-radius);
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guardian-create-role-row__av .guardian-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+.guardian-create-role-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guardian-create-role-row__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--aichat-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guardian-create-role-row__msg {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--aichat-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .guardian-pick-list {
@@ -5860,7 +6110,7 @@ button.msg-chat-c1-placeholder:active {
 
 .guardian-create-main {
   flex: 1;
-  padding-bottom: 88px;
+  padding-bottom: 24px;
 }
 
 .guardian-create-name-row {
@@ -6030,6 +6280,294 @@ button.msg-chat-c1-placeholder:active {
   margin-left: 6px;
   vertical-align: middle;
   line-height: 1.4;
+}
+
+.guardian-group-room--simple {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.guardian-group-room--simple .msg-chat-c1-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.guardian-group-room--simple .msg-chat-c1-avatar--guardian {
+  width: var(--msg-chat-avatar-size, 40px);
+  height: var(--msg-chat-avatar-size, 40px);
+  min-width: var(--msg-chat-avatar-size, 40px);
+  border-radius: var(--aichat-avatar-radius);
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.guardian-group-room--simple .msg-chat-c1-avatar--guardian .guardian-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+.guardian-group-msg-name {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--aichat-muted);
+}
+
+.msg-chat-c1-row--me .guardian-group-msg-name {
+  text-align: right;
+}
+
+.guardian-group-room--simple .guardian-group-room__topbar {
+  gap: 0;
+}
+
+.guardian-group-room__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guardian-group-members {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--aichat-bg);
+}
+
+.guardian-group-members__topbar {
+  gap: 0;
+}
+
+.guardian-group-members__title {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.guardian-group-members__topbar-spacer {
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.guardian-group-members__main {
+  padding-top: 8px;
+}
+
+.guardian-group-members__section {
+  margin-bottom: 22px;
+}
+
+.guardian-group-members__section-title {
+  margin: 0 0 8px;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aichat-muted);
+}
+
+.guardian-group-members__hint {
+  margin: 0;
+  padding: 0 4px;
+}
+
+.guardian-group-members__remove {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c44d72;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.guardian-group-members__remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guardian-group-members__add-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--aichat-accent);
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.guardian-group-members__add-btn:active:not(:disabled) {
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.guardian-group-members__add-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.guardian-group-members__add-sheet .guardian-group-sheet__pick-list {
+  margin-top: 12px;
+}
+
+.guardian-group-room__menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.guardian-group-room__more {
+  margin: 0;
+}
+
+.guardian-group-room__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 9em;
+}
+
+.guardian-group-sheet__list,
+.guardian-group-sheet__pick-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  max-height: min(52vh, 360px);
+  overflow-y: auto;
+}
+
+.guardian-group-sheet__row,
+.guardian-group-sheet__pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 4px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.guardian-group-sheet__pick {
+  border-radius: var(--aichat-radius-md);
+}
+
+.guardian-group-sheet__pick:active:not(:disabled) {
+  opacity: 0.92;
+}
+
+.guardian-group-sheet__pick--on {
+  background: rgba(79, 109, 245, 0.08);
+}
+
+.guardian-group-sheet__pick--danger .guardian-group-sheet__act {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c44d72;
+}
+
+.guardian-group-sheet__av {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--aichat-avatar-radius);
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #6e88ff, #b6c3ff);
+}
+
+.guardian-group-sheet__av--ai {
+  background: transparent;
+}
+
+.guardian-group-sheet__av .contact-avatar__img,
+.guardian-group-sheet__av .guardian-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.guardian-group-sheet__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aichat-text);
+}
+
+.guardian-group-sheet__row--ai {
+  padding: 10px 4px;
+}
+
+.guardian-group-sheet__tag {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #c44d72;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(196, 77, 114, 0.1);
+}
+
+.guardian-group-room__topbar-spacer {
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.guardian-group-room--simple .msg-chat-c1-empty {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.guardian-group-room--simple .msg-chat-c1-input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  font-size: 16px;
+}
+
+.guardian-group-room--simple .msg-chat-c1-send {
+  height: 44px;
+  padding: 0 20px;
 }
 
 .guardian-group-room .guardian-group-members {

@@ -1,4 +1,4 @@
-export type GuardianScene = "恋爱暧昧" | "校园师生" | "家庭亲子";
+export type GuardianScene = "恋爱暧昧" | "校园师生" | "家庭亲子" | "居家装修" | "大件采购" | "店铺经营";
 
 export type GuardianRole = {
   id: string;

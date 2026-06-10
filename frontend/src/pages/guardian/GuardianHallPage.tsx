@@ -8,7 +8,7 @@ type Props = {
   onOpenRole: (roleId: string) => void;
 };
 
-const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
+const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子", "居家装修", "大件采购", "店铺经营"];
 
 function roleCardStyle(role: GuardianRole): CSSProperties {
   return {
