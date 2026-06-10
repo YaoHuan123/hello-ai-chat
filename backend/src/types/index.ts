@@ -1,6 +1,9 @@
 export interface UserRecord {
   id: string;
   phone: string;
+  nickname: string | null;
+  avatar_url: string | null;
+  avatar_updated_at: number | null;
   created_at: string;
   token_version: number;
 }

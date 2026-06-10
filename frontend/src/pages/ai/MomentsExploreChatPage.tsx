@@ -7,23 +7,12 @@ import { momentsExploreReplyApi, type ExploreChatLine } from "../../services/mom
 import type { ContactItem } from "../../types/contact";
 import type { ChatLocalMessage } from "../../types/chat";
 import { MOMENTS_EXPLORE_ERROR_REPLY, MOMENTS_EXPLORE_FALLBACK_REPLY } from "../../types/momentsExplore";
+import { contactDisplayName } from "../../lib/contactDisplay";
 
 type Props = {
   contact: ContactItem;
   onBack: () => void;
 };
-
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function titleFor(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
 
 function nextId(): string {
   return `mex-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -97,7 +86,7 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
     }
   }
 
-  const name = titleFor(contact);
+  const name = contactDisplayName(contact);
 
   return (
     <div className="aichat-shell msg-chat-room msg-mode-oneway moments-explore-chat">

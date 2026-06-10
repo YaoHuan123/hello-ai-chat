@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
 import type { MolWorldFile } from "../services/molWorld.service";
 import type { MolWorldService } from "../services/molWorld.service";
+import { isPrivateMolId } from "../services/molWorld.service";
 import type { UserMolsService } from "../services/userMols.service";
 
 const importBodySchema = z.object({
@@ -28,6 +29,18 @@ function mapError(res: Response, error: unknown): boolean {
   }
   if (code === "NOT_OWNED") {
     res.status(404).json({ code, message: "未在列表中找到该 Mol" });
+    return true;
+  }
+  if (code === "INVALID_CATEGORY") {
+    res.status(400).json({ code, message: "场景类型无效" });
+    return true;
+  }
+  if (code === "MOL_PRIVATE_LIMIT_EXCEEDED") {
+    res.status(429).json({ code, message: "自建 Mol 数量已达上限" });
+    return true;
+  }
+  if (code === "FORBIDDEN") {
+    res.status(403).json({ code, message: "无权操作" });
     return true;
   }
   return false;
@@ -103,6 +116,22 @@ export const createMyMolsRouter = (molWorld: MolWorldService, userMols: UserMols
     }
   });
 
+  router.post("/", authMiddleware, (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    try {
+      const created = userMols.createPrivateMol(user.userId, user.phone, req.body);
+      const item = toMineItem(created, "created", user.userId);
+      res.status(201).json(item);
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "创建失败" });
+    }
+  });
+
   router.post("/import", authMiddleware, (req, res) => {
     const user = req.user;
     if (!user) {
@@ -163,7 +192,11 @@ export const createMyMolsRouter = (molWorld: MolWorldService, userMols: UserMols
       return;
     }
     try {
+      const detail = userMols.getDetailForOwner(user.userId, molWorldId);
       userMols.removeFromMine(user.userId, molWorldId);
+      if (detail?.source === "created" && isPrivateMolId(molWorldId)) {
+        molWorld.deleteById(molWorldId, user.userId);
+      }
       res.status(200).json({ ok: true as const });
     } catch (error) {
       if (mapError(res, error)) return;

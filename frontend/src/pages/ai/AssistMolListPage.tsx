@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAssistMolItems } from "../../services/molDataLocalStorage";
-import { getMyMols, type MolInMyCollection } from "../../services/stageApi";
+import { createMyMolAuto, getMyMols, type MolInMyCollection } from "../../services/stageApi";
 
 const MAX_MOLS = 6;
 
@@ -8,7 +8,6 @@ type Props = {
   onBack: () => void;
   onOpenWorld: () => void;
   onOpenData: (molId: string) => void;
-  onNewMol: () => void;
 };
 
 function molDataCounts(molId: string) {
@@ -21,6 +20,7 @@ function molDataCounts(molId: string) {
 
 function MolCard({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
   const { dialogue, rule } = molDataCounts(m.id);
+  const hasContent = dialogue + rule > 0;
 
   return (
     <button type="button" className="assist-mol-a-card" onClick={onOpen}>
@@ -30,7 +30,7 @@ function MolCard({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
           ›
         </span>
       </div>
-      <p className="assist-mol-a-card__cat">{m.primaryCategory}</p>
+      <p className="assist-mol-a-card__cat">{hasContent ? "点击进入添加或编辑内容" : "点击进入添加对话样例与约束"}</p>
       <div className="assist-mol-a-card__stats">
         <span className="assist-mol-a-stat assist-mol-a-stat--d">{dialogue} 样例</span>
         <span className="assist-mol-a-stat assist-mol-a-stat--r">{rule} 约束</span>
@@ -39,11 +39,12 @@ function MolCard({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
   );
 }
 
-export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }: Props) {
+export function AssistMolListPage({ onBack, onOpenWorld, onOpenData }: Props) {
   const [items, setItems] = useState<MolInMyCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [listEpoch, setListEpoch] = useState(0);
+  const [creating, setCreating] = useState(false);
   void listEpoch;
 
   const refresh = useCallback(() => {
@@ -64,6 +65,20 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }:
       cancelled = true;
     };
   }, [refresh]);
+
+  async function handleCreate() {
+    if (creating) return;
+    setCreating(true);
+    setErr("");
+    try {
+      await createMyMolAuto(items.map((m) => m.name));
+      await refresh();
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setCreating(false);
+    }
+  }
 
   const atCap = items.length >= MAX_MOLS;
   const displayItems = items.slice(0, MAX_MOLS);
@@ -98,6 +113,7 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }:
         {loading ? null : displayItems.length === 0 ? (
           <div className="assist-mol-a-empty">
             <p className="assist-mol-a-empty__t">暂无 Mol</p>
+            <p className="assist-mol-a-empty__d">点击下方「新建 Mol」将自动创建 MOL-1、MOL-2…，点击进入后可修改名称并添加内容。</p>
           </div>
         ) : (
           <div className="assist-mol-a-list" aria-label="Mol 列表">
@@ -109,11 +125,11 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData, onNewMol }:
       </div>
 
       <div className="assist-mol-a-dock">
-        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--sec" onClick={onOpenWorld} disabled={loading || atCap}>
+        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--sec" onClick={onOpenWorld} disabled={loading || atCap || creating}>
           从 Mol 世界添加
         </button>
-        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--pri" onClick={onNewMol} disabled={loading || atCap}>
-          新建 Mol
+        <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--pri" onClick={handleCreate} disabled={loading || atCap || creating}>
+          {creating ? "创建中…" : "新建 Mol"}
         </button>
       </div>
     </div>

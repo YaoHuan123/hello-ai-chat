@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyMolDetailForEdit } from "../../services/stageApi";
+import { getMyMolDetailForEdit, updateMyMol } from "../../services/stageApi";
 import {
   addAssistMolItem,
   getAssistMolItems,
@@ -11,7 +11,6 @@ import type { AssistMolDataItem, AssistMolDataKind } from "../../types/molData";
 type Props = {
   molId: string;
   onBack: () => void;
-  onOpenInfo: () => void;
 };
 
 type DataTab = "dialogue" | "rule";
@@ -94,11 +93,69 @@ function DataEditorModal({
   );
 }
 
-export function AssistMolDataPage({ molId, onBack, onOpenInfo }: Props) {
+function RenameMolModal({
+  initialName,
+  busy,
+  err,
+  onClose,
+  onSave,
+}: {
+  initialName: string;
+  busy: boolean;
+  err: string;
+  onClose: () => void;
+  onSave: (name: string) => void;
+}) {
+  const [name, setName] = useState(initialName);
+
+  return (
+    <div
+      className="aichat-moldt-info-back"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !busy) onClose();
+      }}
+    >
+      <div className="aichat-moldt-info-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <h4 className="aichat-moldt-info-form__h">修改名称</h4>
+        <label className="aichat-moldt-info-form__lab" htmlFor="assist-mol-rename">
+          Mol 名称
+        </label>
+        <input
+          id="assist-mol-rename"
+          className="aichat-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={40}
+          autoFocus
+          disabled={busy}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && name.trim() && !busy) onSave(name);
+          }}
+        />
+        {err && <p className="aichat-form-msg err">{err}</p>}
+        <div className="aichat-moldt-info-form__act">
+          <button type="button" className="aichat-btn-ghost" onClick={onClose} disabled={busy}>
+            取消
+          </button>
+          <button type="button" className="aichat-btn-primary aichat-btn-fit" disabled={busy || !name.trim()} onClick={() => onSave(name)}>
+            {busy ? "保存中…" : "保存"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AssistMolDataPage({ molId, onBack }: Props) {
   const [molName, setMolName] = useState("");
+  const [canRename, setCanRename] = useState(false);
   const [loadErr, setLoadErr] = useState("");
   const [tab, setTab] = useState<DataTab>("dialogue");
   const [editor, setEditor] = useState<EditorState>(null);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameBusy, setRenameBusy] = useState(false);
+  const [renameErr, setRenameErr] = useState("");
   const [itemEpoch, setItemEpoch] = useState(0);
   void itemEpoch;
 
@@ -113,6 +170,7 @@ export function AssistMolDataPage({ molId, onBack, onOpenInfo }: Props) {
       .then(({ item }) => {
         if (!cancelled) {
           setMolName(item.name);
+          setCanRename(item.uploaderIsMe !== false && item.source === "created");
           setLoadErr("");
         }
       })
@@ -126,6 +184,40 @@ export function AssistMolDataPage({ molId, onBack, onOpenInfo }: Props) {
 
   function bumpItems() {
     setItemEpoch((n) => n + 1);
+  }
+
+  function openRename() {
+    setRenameErr("");
+    setRenameOpen(true);
+  }
+
+  function closeRename() {
+    if (renameBusy) return;
+    setRenameOpen(false);
+    setRenameErr("");
+  }
+
+  async function saveRename(name: string) {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setRenameErr("请输入 Mol 名称。");
+      return;
+    }
+    if (trimmed === molName) {
+      closeRename();
+      return;
+    }
+    setRenameBusy(true);
+    setRenameErr("");
+    try {
+      await updateMyMol(molId, { name: trimmed });
+      setMolName(trimmed);
+      setRenameOpen(false);
+    } catch (e: unknown) {
+      setRenameErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setRenameBusy(false);
+    }
   }
 
   function onSave(kind: AssistMolDataKind, title: string, body: string) {
@@ -161,9 +253,13 @@ export function AssistMolDataPage({ molId, onBack, onOpenInfo }: Props) {
           <h1>{molName || "Mol 数据"}</h1>
           <p>对话样例与约束</p>
         </div>
-        <button className="assist-mol-a-topbar__link" type="button" onClick={onOpenInfo}>
-          信息
-        </button>
+        {canRename ? (
+          <button className="assist-mol-a-topbar__link" type="button" onClick={openRename}>
+            重命名
+          </button>
+        ) : (
+          <span className="aichat-topbar-spacer" aria-hidden />
+        )}
       </header>
 
       <div className="assist-mol-a-scroll">
@@ -223,6 +319,10 @@ export function AssistMolDataPage({ molId, onBack, onOpenInfo }: Props) {
           onSave={onSave}
           onDelete={editor.mode === "edit" ? () => onDeleteItem(editor.item.id) : undefined}
         />
+      )}
+
+      {renameOpen && (
+        <RenameMolModal initialName={molName} busy={renameBusy} err={renameErr} onClose={closeRename} onSave={saveRename} />
       )}
     </div>
   );

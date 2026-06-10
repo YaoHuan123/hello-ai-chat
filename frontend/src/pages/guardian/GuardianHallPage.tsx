@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
+import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { listGuardianRolesApi } from "../../services/guardianApi";
 import type { GuardianRole, GuardianScene } from "../../types/guardian";
 
 type Props = {
   onBack: () => void;
+  onOpenRole: (roleId: string) => void;
 };
 
 const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
 
-export function GuardianHallPage({ onBack }: Props) {
+export function GuardianHallPage({ onBack, onOpenRole }: Props) {
   const [scene, setScene] = useState<GuardianScene | "全部">("全部");
   const [roles, setRoles] = useState<GuardianRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,21 +64,22 @@ export function GuardianHallPage({ onBack }: Props) {
         </div>
 
         {err && <p className="aichat-form-msg err">{err}</p>}
-        {loading ? null : (
+        {loading ? (
+          <p className="aichat-muted-line">正在加载…</p>
+        ) : (
           <ul className="guardian-role-list" aria-label="AI联系人列表">
             {roles.map((r) => (
-              <li key={r.id} className="guardian-role-card">
-                <div className="guardian-role-card__avatar" style={{ background: r.avatarColor }}>
-                  {r.name.slice(0, 1)}
-                </div>
-                <div className="guardian-role-card__body">
-                  <div className="guardian-role-card__head">
-                    <span className="guardian-role-card__name">{r.name}</span>
-                    <span className="guardian-role-card__scene">{r.scene}</span>
-                  </div>
-                  <p className="guardian-role-card__title">{r.title}</p>
-                  <p className="guardian-role-card__tagline">「{r.tagline}」</p>
-                </div>
+              <li key={r.id}>
+                <button type="button" className="guardian-role-row" onClick={() => onOpenRole(r.id)}>
+                  <GuardianAvatar role={r} className="guardian-role-row__avatar" alt="" />
+                  <span className="guardian-role-row__mid">
+                    <strong className="guardian-role-row__name">{r.name}</strong>
+                    <span className="guardian-role-row__quote">{r.tagline}</span>
+                  </span>
+                  <span className="guardian-role-row__chev" aria-hidden>
+                    ›
+                  </span>
+                </button>
               </li>
             ))}
           </ul>

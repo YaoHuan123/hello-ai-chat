@@ -4,6 +4,9 @@ import { normalizePhoneDigits } from "../utils/phone";
 export type ContactRow = {
   contactUserId: string;
   phone: string;
+  nickname: string | null;
+  avatarUrl: string | null;
+  avatarUpdatedAt: number | null;
   remark: string | null;
   createdAt: number;
 };
@@ -25,7 +28,9 @@ export class ContactsService {
   list(ownerUserId: string): ContactRow[] {
     const rows = this.db
       .prepare(
-        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, c.remark AS remark, c.created_at AS createdAt
+        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
+                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
+                c.remark AS remark, c.created_at AS createdAt
          FROM contacts c
          INNER JOIN users u ON u.id = c.contact_user_id
          WHERE c.owner_user_id = ?
@@ -119,7 +124,9 @@ export class ContactsService {
   private getOne(ownerUserId: string, contactUserId: string): ContactRow | undefined {
     return this.db
       .prepare(
-        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, c.remark AS remark, c.created_at AS createdAt
+        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
+                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
+                c.remark AS remark, c.created_at AS createdAt
          FROM contacts c
          INNER JOIN users u ON u.id = c.contact_user_id
          WHERE c.owner_user_id = ? AND c.contact_user_id = ?`,

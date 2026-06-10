@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { listContactsApi } from "../../services/api";
 import { listMomentsExploreRecords } from "../../services/momentsExploreChatLocalStorage";
+import { AppIcon } from "../../components/AppIcons";
+import { ContactAvatar } from "../../components/ContactAvatar";
+import { contactDisplayName } from "../../lib/contactDisplay";
 import type { ContactItem } from "../../types/contact";
 import type { MomentsExploreRecord } from "../../types/momentsExplore";
 import type { RouteName } from "../../types/routes";
@@ -9,26 +12,6 @@ type Props = {
   onOpenFriend: (c: ContactItem) => void;
   onNavigateFeature: (route: RouteName) => void;
 };
-
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function displayName(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
-
-function avatarLetter(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r.slice(0, 1).toUpperCase();
-  const d = c.phone.replace(/\D/g, "");
-  if (d.length >= 1) return d.slice(-1);
-  return "?";
-}
 
 function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -148,33 +131,33 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
           <>
             <div className="moments-tab-entry-list" role="group" aria-label="朋友圈入口">
               <button type="button" className="moments-tab-entry" onClick={() => setPickerOpen(true)}>
-                <span className="moments-tab-entry__ico moments-tab-entry__ico--explore" aria-hidden>
-                  探
-                </span>
-                <span className="moments-tab-entry__txt">
-                  <b>探索好友</b>
+                <span className="moments-tab-entry__label">
+                  <span className="moments-tab-entry__ico" aria-hidden>
+                    <AppIcon name="explore" className="app-icon app-icon--sm app-icon--brand" />
+                  </span>
+                  <span className="moments-tab-entry__title">探索好友</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
                 </span>
               </button>
               <button type="button" className="moments-tab-entry" onClick={() => onNavigateFeature("moments-my")}>
-                <span className="moments-tab-entry__ico moments-tab-entry__ico--mine" aria-hidden>
-                  我
-                </span>
-                <span className="moments-tab-entry__txt">
-                  <b>我的日常</b>
+                <span className="moments-tab-entry__label">
+                  <span className="moments-tab-entry__ico" aria-hidden>
+                    <AppIcon name="mine" className="app-icon app-icon--sm app-icon--purple" />
+                  </span>
+                  <span className="moments-tab-entry__title">我的日常</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
                 </span>
               </button>
               <button type="button" className="moments-tab-entry" onClick={() => onNavigateFeature("moments-hot")}>
-                <span className="moments-tab-entry__ico moments-tab-entry__ico--hot" aria-hidden>
-                  热
-                </span>
-                <span className="moments-tab-entry__txt">
-                  <b>热点</b>
+                <span className="moments-tab-entry__label">
+                  <span className="moments-tab-entry__ico" aria-hidden>
+                    <AppIcon name="hot" className="app-icon app-icon--sm app-icon--hot" />
+                  </span>
+                  <span className="moments-tab-entry__title">热点</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -197,8 +180,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                       <ul className="moments-tab-history-rows">
                         {group.records.map((record) => {
                           const contact = contactById.get(record.peerUserId);
-                          const name = contact ? displayName(contact) : "好友";
-                          const letter = contact ? avatarLetter(contact) : "?";
+                          const name = contact ? contactDisplayName(contact) : "好友";
                           return (
                             <li key={record.id}>
                               <button
@@ -207,7 +189,11 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                                 onClick={() => openRecord(record)}
                                 disabled={!contact}
                               >
-                                <span className="moments-tab-hist-av">{letter}</span>
+                                {contact ? (
+                                  <ContactAvatar contact={contact} className="moments-tab-hist-av" alt="" />
+                                ) : (
+                                  <span className="moments-tab-hist-av">?</span>
+                                )}
                                 <span className="moments-tab-hist-main">
                                   <b>{name}</b>
                                   <span>{record.question}</span>
@@ -237,9 +223,9 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                 {contacts.map((c) => (
                   <li key={c.contactUserId}>
                     <button type="button" className="aichat-nav-item moments-friend-row" onClick={() => pickContact(c)}>
-                      <span className="moments-friend-avatar">{avatarLetter(c)}</span>
+                      <ContactAvatar contact={c} className="moments-friend-avatar" alt="" />
                       <span className="moments-friend-mid">
-                        <span className="moments-friend-name">{displayName(c)}</span>
+                        <span className="moments-friend-name">{contactDisplayName(c)}</span>
                       </span>
                       <span className="moments-friend-arrow" aria-hidden>
                         ›

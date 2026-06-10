@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { listContactsApi } from "../../services/api";
+import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { createGuardianGroupApi, listGuardianRolesApi } from "../../services/guardianApi";
 import type { ContactItem } from "../../types/contact";
 import type { GuardianRole, GuardianScene } from "../../types/guardian";
+import { contactDisplayName } from "../../lib/contactDisplay";
+import { ContactAvatar } from "../../components/ContactAvatar";
 
 type Props = {
   onBack: () => void;
@@ -12,14 +15,6 @@ type Props = {
 const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子"];
 const MAX_PICK = 3;
 const MAX_INVITE = 19;
-
-function displayContact(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  const d = c.phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return c.phone;
-}
 
 export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
   const [groupName, setGroupName] = useState("");
@@ -148,8 +143,8 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
                       <span className={`guardian-contact-check${on ? " guardian-contact-check--on" : ""}`} aria-hidden>
                         {on ? "✓" : ""}
                       </span>
-                      <span className="guardian-contact-avatar">{displayContact(c).slice(0, 1)}</span>
-                      <span className="guardian-contact-name">{displayContact(c)}</span>
+                      <ContactAvatar contact={c} className="guardian-contact-avatar" alt="" />
+                      <span className="guardian-contact-name">{contactDisplayName(c)}</span>
                     </button>
                   </li>
                 );
@@ -200,7 +195,7 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
                         className={`guardian-pick-row guardian-pick-row--role${on ? " guardian-pick-row--on" : ""}`}
                         onClick={() => toggleRole(r.id)}
                       >
-                        <span className="guardian-pick-row__dot" style={{ background: r.avatarColor }} />
+                        <GuardianAvatar role={r} className="guardian-pick-row__av" alt="" />
                         <span>
                           {r.name} · {r.title}
                         </span>

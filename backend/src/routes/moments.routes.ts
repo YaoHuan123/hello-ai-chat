@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import type { HotTopicsService } from "../services/hotTopics.service";
 import type { MomentsService } from "../services/moments.service";
 
 const itemSchema = z.object({
@@ -57,10 +58,26 @@ function mapError(res: Response, error: unknown): boolean {
     res.status(502).json({ code, message: "AI 生成失败" });
     return true;
   }
+  if (code === "HOT_TOPICS_NOT_READY") {
+    res.status(503).json({ code, message: "热点尚未生成，请稍后再试" });
+    return true;
+  }
+  if (code === "HOT_TOPICS_REFRESH_IN_PROGRESS") {
+    res.status(503).json({ code, message: "热点正在更新" });
+    return true;
+  }
+  if (code === "TRENDS_EMPTY" || code.startsWith("WEIBO_") || code.startsWith("ZHIHU_") || code.startsWith("DOUYIN_")) {
+    res.status(502).json({ code, message: "热搜抓取失败" });
+    return true;
+  }
+  if (code === "FETCH_TIMEOUT") {
+    res.status(504).json({ code, message: "热搜抓取超时" });
+    return true;
+  }
   return false;
 }
 
-export const createMomentsRouter = (svc: MomentsService): Router => {
+export const createMomentsRouter = (svc: MomentsService, hotTopics: HotTopicsService): Router => {
   const router = Router();
 
   router.get("/items", authMiddleware, (req, res) => {
@@ -108,6 +125,25 @@ export const createMomentsRouter = (svc: MomentsService): Router => {
     try {
       const items = svc.listForFriend(user.userId, ownerId);
       res.status(200).json({ items });
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "获取失败" });
+    }
+  });
+
+  router.get("/hot-topics", authMiddleware, (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    try {
+      const feed = hotTopics.getFeed();
+      res.status(200).json({
+        topics: feed.topics,
+        updatedAt: feed.updatedAt,
+        nextRefreshAt: feed.nextRefreshAt,
+      });
     } catch (error) {
       if (mapError(res, error)) return;
       res.status(500).json({ code: "INTERNAL_ERROR", message: "获取失败" });

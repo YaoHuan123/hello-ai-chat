@@ -1,6 +1,6 @@
 import { getJson, postJson, putJson } from "./api";
 import { getAuthToken } from "./storage";
-import type { PassiveCloneItem } from "../types/passiveClone";
+import type { PassiveCloneItem, PassiveTopic } from "../types/passiveClone";
 
 function authT(): string {
   const t = getAuthToken().trim();
@@ -39,4 +39,14 @@ export async function momentsExploreReplyApi(
     },
     authT(),
   );
+}
+
+export type HotTopicsFeedResponse = {
+  topics: PassiveTopic[];
+  updatedAt: number;
+  nextRefreshAt: number;
+};
+
+export async function fetchHotTopicsApi(): Promise<HotTopicsFeedResponse> {
+  return getJson<HotTopicsFeedResponse>("/api/moments/hot-topics", authT());
 }

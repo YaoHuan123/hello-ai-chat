@@ -7,6 +7,7 @@ import { normalizePhoneDigits } from "../utils/phone";
 import type { AliyunSmsService } from "./aliyunSms.service";
 import type { AuthAuditLogService } from "./authAuditLog.service";
 import type { SmsRateLimitService, SmsScene } from "./smsRateLimit.service";
+import { deleteUserAvatarFiles, detectAvatarExt, saveUserAvatar } from "./avatarStorage";
 
 export interface AuthRequestContext {
   ip?: string;
@@ -77,8 +78,69 @@ export class AuthService {
 
   getById = (userId: string): UserRecord | undefined => {
     return this.db
-      .prepare("SELECT id, phone, created_at, token_version FROM users WHERE id = ?")
+      .prepare(
+        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, created_at, token_version FROM users WHERE id = ?",
+      )
       .get(userId) as UserRecord | undefined;
+  };
+
+  updateNickname = (userId: string, nicknameRaw: string | null): UserRecord => {
+    const nickname = normalizeNickname(nicknameRaw);
+    const info = this.db.prepare("UPDATE users SET nickname = ? WHERE id = ?").run(nickname, userId);
+    if (info.changes === 0) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    const row = this.getById(userId);
+    if (!row) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    return row;
+  };
+
+  updateAvatar = (userId: string, imageBase64: string): UserRecord => {
+    const buffer = decodeAvatarBase64(imageBase64);
+    if (!buffer) {
+      throw new Error("INVALID_AVATAR");
+    }
+    return this.updateAvatarFromBuffer(userId, buffer);
+  };
+
+  updateAvatarFromBuffer = (userId: string, buffer: Buffer): UserRecord => {
+    if (buffer.length > 1024 * 1024) {
+      throw new Error("AVATAR_TOO_LARGE");
+    }
+    const ext = detectAvatarExt(buffer);
+    if (!ext) {
+      throw new Error("INVALID_AVATAR");
+    }
+    const avatarUrl = saveUserAvatar(userId, buffer, ext);
+    const updatedAt = Date.now();
+    const info = this.db
+      .prepare("UPDATE users SET avatar_url = ?, avatar_updated_at = ? WHERE id = ?")
+      .run(avatarUrl, updatedAt, userId);
+    if (info.changes === 0) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    const row = this.getById(userId);
+    if (!row) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    return row;
+  };
+
+  clearAvatar = (userId: string): UserRecord => {
+    deleteUserAvatarFiles(userId);
+    const info = this.db
+      .prepare("UPDATE users SET avatar_url = NULL, avatar_updated_at = NULL WHERE id = ?")
+      .run(userId);
+    if (info.changes === 0) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    const row = this.getById(userId);
+    if (!row) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    return row;
   };
 
   deleteAccount = async (userId: string, code: string, ctx: AuthRequestContext = {}): Promise<void> => {
@@ -88,6 +150,7 @@ export class AuthService {
     }
     await this.sms.checkSmsCode(row.phone, "delete_account", code.trim());
 
+    deleteUserAvatarFiles(userId);
     this.db.prepare("DELETE FROM users WHERE id = ?").run(userId);
     this.audit.record({
       event: "delete_account",
@@ -107,7 +170,9 @@ export class AuthService {
 
   private findByPhone(phone: string): UserRecord | undefined {
     return this.db
-      .prepare("SELECT id, phone, created_at, token_version FROM users WHERE phone = ?")
+      .prepare(
+        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, created_at, token_version FROM users WHERE phone = ?",
+      )
       .get(phone) as UserRecord | undefined;
   }
 
@@ -133,4 +198,24 @@ export class AuthService {
     const options = { expiresIn: JWT_EXPIRES_IN } as SignOptions;
     return jwt.sign(payload, JWT_SECRET, options);
   };
+}
+
+function normalizeNickname(input: string | null | undefined): string | null {
+  if (input === null || input === undefined) return null;
+  const t = input.trim();
+  if (!t) return null;
+  return t.slice(0, 32);
+}
+
+function decodeAvatarBase64(raw: string): Buffer | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const base64 = trimmed.includes(",") ? (trimmed.split(",").pop() ?? "") : trimmed;
+  if (!base64 || !/^[A-Za-z0-9+/=\s]+$/.test(base64)) return null;
+  try {
+    const buf = Buffer.from(base64.replace(/\s/g, ""), "base64");
+    return buf.length > 0 ? buf : null;
+  } catch {
+    return null;
+  }
 }

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="??">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0e8ff"/>
+      <stop offset="100%" stop-color="#c4a8ef"/>
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+  <rect width="200" height="200" fill="url(#sky)"/>
+  <ellipse cx="48" cy="52" rx="32" ry="20" fill="#fff" opacity="0.45" filter="url(#blur)"/>
+  <ellipse cx="160" cy="40" rx="24" ry="14" fill="#fff" opacity="0.35" filter="url(#blur)"/>
+  <!-- ???? · ???? -->
+  <ellipse cx="108" cy="172" rx="40" ry="8" fill="#9b7ed9" opacity="0.25"/>
+  <path d="M72 168 Q88 120 108 108 Q128 120 144 168 Q120 176 108 174 Q96 176 72 168 Z" fill="#b898e8" opacity="0.85"/>
+  <path d="M88 168 L92 132 Q96 112 108 104 Q120 112 124 132 L128 168" fill="#d4c0f5"/>
+  <circle cx="108" cy="82" r="20" fill="#f5d5c8"/>
+  <path d="M88 76 Q108 58 128 76 Q124 88 108 90 Q92 88 88 76 Z" fill="#5c4868" opacity="0.9"/>
+  <path d="M92 82 Q96 78 100 82 M116 82 Q120 78 124 82" fill="none" stroke="#5c4868" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="100" cy="84" rx="2" ry="2.2" fill="#4a3a55"/>
+  <ellipse cx="116" cy="84" rx="2" ry="2.2" fill="#4a3a55"/>
+  <path d="M102 92 Q108 96 114 92" fill="none" stroke="#e8a090" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M76 128 Q68 148 72 164" fill="none" stroke="#d4c0f5" stroke-width="7" stroke-linecap="round"/>
+  <path d="M140 128 Q148 148 144 164" fill="none" stroke="#d4c0f5" stroke-width="7" stroke-linecap="round"/>
+  <rect x="52" y="118" width="20" height="24" rx="6" fill="#7a6a90" opacity="0.8"/>
+  <path d="M52 124 Q62 120 72 124" fill="none" stroke="#9b7ed9" stroke-width="2"/>
+  <circle cx="164" cy="148" r="3" fill="#fff" opacity="0.5"/>
+  <circle cx="172" cy="156" r="2" fill="#fff" opacity="0.35"/>
+</svg>

@@ -115,7 +115,6 @@ export function MainShellPage({
               <MessagesTab
                 onOpenChatRoom={onOpenChatRoom}
                 onOpenGuardianGroup={onOpenGuardianGroup}
-                onOpenGuardianHall={onOpenGuardianHall}
               />
             </div>
           )}

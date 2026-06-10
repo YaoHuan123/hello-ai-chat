@@ -20,6 +20,11 @@ export async function listGuardianRolesApi(scene?: GuardianScene): Promise<{ ite
   return getJson<{ items: GuardianRole[] }>(`/api/guardian/roles${q}`, authT());
 }
 
+export async function getGuardianRoleApi(roleId: string): Promise<GuardianRole | null> {
+  const { items } = await listGuardianRolesApi();
+  return items.find((r) => r.id === roleId) ?? null;
+}
+
 export async function listGuardianGroupsApi(): Promise<{ items: GuardianGroupListItem[] }> {
   return getJson<{ items: GuardianGroupListItem[] }>("/api/guardian/groups", authT());
 }

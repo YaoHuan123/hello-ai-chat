@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
 import type { MolWorldService } from "../services/molWorld.service";
+import { isPrivateMolId } from "../services/molWorld.service";
 import type { UserMolsService } from "../services/userMols.service";
 
 function mapMolWorldError(res: Response, error: unknown): boolean {
@@ -87,7 +88,7 @@ export const createMolWorldRouter = (molWorld: MolWorldService, userMols: UserMo
     }
     try {
       const rec = molWorld.getById(id);
-      if (!rec) {
+      if (!rec || isPrivateMolId(id)) {
         res.status(404).json({ code: "NOT_FOUND", message: "未找到该 Mol" });
         return;
       }
@@ -96,21 +97,6 @@ export const createMolWorldRouter = (molWorld: MolWorldService, userMols: UserMo
     } catch (error) {
       if (mapMolWorldError(res, error)) return;
       res.status(500).json({ code: "INTERNAL_ERROR", message: "查询失败" });
-    }
-  });
-
-  router.post("/", authMiddleware, (req, res) => {
-    const user = req.user;
-    if (!user) {
-      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
-      return;
-    }
-    try {
-      const created = molWorld.create(user.userId, user.phone, req.body);
-      res.status(201).json(created);
-    } catch (error) {
-      if (mapMolWorldError(res, error)) return;
-      res.status(500).json({ code: "INTERNAL_ERROR", message: "创建失败" });
     }
   });
 

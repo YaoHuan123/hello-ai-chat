@@ -14,22 +14,17 @@ import { wsClient, type WsServerMessage } from "../../services/wsClient";
 import type { ContactItem } from "../../types/contact";
 import type { GuardianGroup, GuardianGroupMessage, GuardianOwnerHint, GuardianRole } from "../../types/guardian";
 import { GUARDIAN_RISK_LABEL } from "../../types/guardian";
+import { GuardianAvatar } from "../../components/GuardianAvatar";
+import { contactDisplayName, maskPhoneDisplay } from "../../lib/contactDisplay";
 
 type Props = {
   groupId: string;
   onBack: () => void;
 };
 
-function maskPhone(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
 function displayFromContact(c: ContactItem | undefined, phone: string): string {
-  const r = c?.remark?.trim();
-  if (r) return r;
-  return maskPhone(phone);
+  if (c) return contactDisplayName(c);
+  return maskPhoneDisplay(phone);
 }
 
 type BubbleKind = "me" | "peer" | "guardian";
@@ -213,6 +208,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
                 className="guardian-group-members__chip guardian-group-members__chip--ai"
                 style={{ borderColor: r?.avatarColor }}
               >
+                {r ? <GuardianAvatar role={r} className="guardian-group-members__av" alt="" /> : null}
                 {r?.name ?? "AI"}
               </span>
             );

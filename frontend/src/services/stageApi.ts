@@ -70,6 +70,9 @@ export type CreateMyMolInput = {
   initialInfo?: Array<Omit<MolInfoItem, "id"> & { id?: string }>;
 };
 
+const DEFAULT_MOL_CATEGORY = "职场沟通";
+const DEFAULT_MOL_SUMMARY = "待完善";
+
 export type UpdateMyMolInput = {
   name?: string;
   summary?: string;
@@ -425,7 +428,8 @@ export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolI
   return getJson<{ item: MolInMyCollection; info: MolInfoItem[] }>(`/api/mol-mine/${encodeURIComponent(molId)}/detail`, authT());
 }
 
-export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogItem> {
+/** 自建 Mol（私有）：仅出现在「我的 Mol」，不上架 Mol 世界。 */
+export async function createMyMolPrivate(input: CreateMyMolInput): Promise<MolCatalogItem> {
   const name = input.name.trim();
   const summary = input.summary.trim();
   const primaryCategory = input.primaryCategory.trim();
@@ -435,7 +439,7 @@ export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogIt
   if (isApiMock()) {
     await wait(200);
     const newItem: MolCatalogItem = {
-      id: `c-${Date.now()}`,
+      id: `mp-${Date.now()}`,
       name,
       summary,
       price: 0,
@@ -450,7 +454,6 @@ export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogIt
       uploaderIsMe: true,
     };
     userMolsList = [...userMolsList, newItem];
-    molCatalogMock = [...molCatalogMock, { ...newItem, owned: true, uploaderIsMe: true }];
     const initial = normalizeInfoDrafts(input.initialInfo);
     molInfoById = { ...molInfoById, [newItem.id]: initial };
     return { ...newItem };
@@ -464,12 +467,42 @@ export async function createMyMol(input: CreateMyMolInput): Promise<MolCatalogIt
     softRemoved: row.softRemoved,
   }));
   const created = await postJson<Record<string, unknown>>(
-    "/api/mol-world",
+    "/api/mol-mine",
     { name, summary, primaryCategory, initialInfo },
     t,
   );
-  await postJson<unknown>("/api/mol-mine/import", { molWorldId: String(created.id) }, t);
   return fileRecordToCatalogItem(created, true);
+}
+
+/** 仅名称快速创建，简介与场景使用默认值，详情在 Mol 数据页维护。 */
+export async function createMyMolQuick(name: string): Promise<MolCatalogItem> {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("请输入 Mol 名称。");
+  }
+  return createMyMolPrivate({
+    name: trimmed,
+    summary: DEFAULT_MOL_SUMMARY,
+    primaryCategory: DEFAULT_MOL_CATEGORY,
+  });
+}
+
+const MOL_AUTO_NAME_RE = /^MOL-(\d+)$/i;
+
+/** 根据已有 Mol 名称生成下一个 MOL-N 序号名。 */
+export function nextAutoMolName(existingNames: string[]): string {
+  let max = 0;
+  for (const raw of existingNames) {
+    const m = raw.trim().match(MOL_AUTO_NAME_RE);
+    if (m) max = Math.max(max, Number.parseInt(m[1]!, 10));
+  }
+  return `MOL-${max + 1}`;
+}
+
+/** 自动命名为 MOL-1、MOL-2… 并创建。 */
+export async function createMyMolAuto(existingNames?: string[]): Promise<MolCatalogItem> {
+  const names = existingNames ?? (await getMyMols()).map((m) => m.name);
+  return createMyMolQuick(nextAutoMolName(names));
 }
 
 export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promise<void> {

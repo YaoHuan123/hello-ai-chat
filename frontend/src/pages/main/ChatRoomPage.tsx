@@ -15,6 +15,10 @@ import type { ChatLocalMessage } from "../../types/chat";
 import type { RemoteMessage } from "../../types/messages";
 import { MolSuggestPanel } from "./MolSuggestPanel";
 import { ChatMolSwitchModal } from "./ChatMolSwitchModal";
+import { AppIcon } from "../../components/AppIcons";
+import { ContactAvatar } from "../../components/ContactAvatar";
+import { contactDisplayName } from "../../lib/contactDisplay";
+import { getMyAvatarContact } from "../../services/storage";
 
 type Props = {
   contact: ContactItem;
@@ -22,23 +26,6 @@ type Props = {
   onOpenMolDetail?: (molId: string) => void;
   onManageMols?: () => void;
 };
-
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function titleFor(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
-
-function initialChar(label: string): string {
-  const t = label.trim();
-  return t.slice(0, 1) || "?";
-}
 
 function formatMessageTime(ts: number): string {
   const d = new Date(ts);
@@ -66,13 +53,19 @@ function resolveActiveMol(mols: MolInMyCollection[], peerUserId: string): MolInM
 }
 
 function MeAvatarMolBadge() {
+  const me = getMyAvatarContact();
+  const hasPhoto = Boolean(me.avatarUrl?.trim());
   return (
     <div className="msg-chat-c1-me-avatar-wrap">
-      <span className="msg-chat-c1-avatar msg-chat-c1-avatar--me" aria-hidden>
-        我
-      </span>
+      {hasPhoto ? (
+        <ContactAvatar contact={me} className="msg-chat-c1-avatar msg-chat-c1-avatar--me msg-chat-c1-avatar--photo" alt="" />
+      ) : (
+        <span className="msg-chat-c1-avatar msg-chat-c1-avatar--me" aria-hidden>
+          <AppIcon name="user" className="app-icon app-icon--xs app-icon--mol" />
+        </span>
+      )}
       <span className="msg-chat-c1-mol-badge" title="Mol">
-        M
+        <AppIcon name="molSpark" className="app-icon app-icon--badge app-icon--brand" />
       </span>
     </div>
   );
@@ -80,8 +73,7 @@ function MeAvatarMolBadge() {
 
 export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }: Props) {
   const peerId = contact.contactUserId;
-  const peerTitle = titleFor(contact);
-  const peerInitial = initialChar(peerTitle);
+  const peerTitle = contactDisplayName(contact);
   const [messages, setMessages] = useState<ChatLocalMessage[]>(() => getNormalChatMessages(peerId));
   const [input, setInput] = useState("");
   const scRef = useRef<HTMLDivElement>(null);
@@ -234,9 +226,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
           ‹
         </button>
         <div className="msg-chat-c1-peer">
-          <span className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" aria-hidden>
-            {peerInitial}
-          </span>
+          <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
           <div className="msg-chat-c1-peer-meta">
             <span className="msg-chat-c1-peer-name">{peerTitle}</span>
             <span className="msg-chat-c1-peer-sub">在线</span>
@@ -259,9 +249,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
             {messages.map((m) => (
               <li key={m.id} className={`msg-chat-c1-row msg-chat-c1-row--${m.from === "me" ? "me" : "other"}`}>
                 {m.from === "other" ? (
-                  <span className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" aria-hidden>
-                    {peerInitial}
-                  </span>
+                  <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
                 ) : (
                   <MeAvatarMolBadge />
                 )}
@@ -278,41 +266,43 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
               className={`msg-chat-c1-row msg-chat-c1-row--me msg-chat-c1-mol-row${molPanelOpen ? " msg-chat-c1-mol-row--open" : ""}`}
             >
               <MeAvatarMolBadge />
-              {molPanelOpen && activeMol ? (
-                <MolSuggestPanel
-                  open={molPanelOpen}
-                  peerUserId={peerId}
-                  molId={activeMol.id}
-                  molName={activeMol.name}
-                  getLastMessages={getLastMessagesForSuggest}
-                  onAdopt={(text) => {
-                    setMolPanelOpen(false);
-                    void sendText(text);
-                  }}
-                  onSwitchMol={openMolSwitch}
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="msg-chat-c1-placeholder"
-                  onClick={() => {
-                    if (activeMol) setMolPanelOpen(true);
-                    else onManageMols?.();
-                  }}
-                  aria-label={activeMol ? "让 Mol 帮你想 3 条回复" : "添加 Mol"}
-                >
-                  {activeMol ? (
-                    <>
-                      <span className="msg-chat-c1-placeholder__spark" aria-hidden>
-                        ✨
-                      </span>
-                      <span>让 Mol 帮我想 3 条回复</span>
-                    </>
-                  ) : (
-                    <span>添加 Mol 后再使用建议</span>
-                  )}
-                </button>
-              )}
+              <div className="msg-chat-c1-col">
+                {molPanelOpen && activeMol ? (
+                  <MolSuggestPanel
+                    open={molPanelOpen}
+                    peerUserId={peerId}
+                    molId={activeMol.id}
+                    molName={activeMol.name}
+                    getLastMessages={getLastMessagesForSuggest}
+                    onAdopt={(text) => {
+                      setMolPanelOpen(false);
+                      void sendText(text);
+                    }}
+                    onSwitchMol={openMolSwitch}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="msg-chat-c1-placeholder"
+                    onClick={() => {
+                      if (activeMol) setMolPanelOpen(true);
+                      else onManageMols?.();
+                    }}
+                    aria-label={activeMol ? "让 Mol 帮你想 3 条回复" : "添加 Mol"}
+                  >
+                    {activeMol ? (
+                      <>
+                        <span className="msg-chat-c1-placeholder__spark" aria-hidden>
+                          ✨
+                        </span>
+                        <span>让 Mol 帮我想 3 条回复</span>
+                      </>
+                    ) : (
+                      <span>添加 Mol 后再使用建议</span>
+                    )}
+                  </button>
+                )}
+              </div>
             </li>
           </ul>
         ) : (

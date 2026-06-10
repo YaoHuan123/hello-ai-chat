@@ -1,11 +1,11 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { listContactsApi } from "../../services/api";
 import { createFriendRequestApi } from "../../services/friendRequestsApi";
-import { getMyMols } from "../../services/stageApi";
 import { wsClient } from "../../services/wsClient";
+import { AppIcon } from "../../components/AppIcons";
+import { ContactAvatar } from "../../components/ContactAvatar";
+import { contactDisplayName as displayContactName } from "../../lib/contactDisplay";
 import type { ContactItem } from "../../types/contact";
-
-const MAX_MOLS = 6;
 
 type Props = {
   onOpenChat: (c: ContactItem) => void;
@@ -16,26 +16,6 @@ type Props = {
   onOpenGuardianHall: () => void;
 };
 
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function contactDisplayName(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
-
-function contactAvatarLetter(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r.slice(0, 1).toUpperCase();
-  const d = c.phone.replace(/\D/g, "");
-  if (d.length >= 1) return d.slice(-1);
-  return "?";
-}
-
 export function PersonaTab({
   onOpenChat,
   onOpenFriendRequests,
@@ -45,7 +25,6 @@ export function PersonaTab({
   onOpenGuardianHall,
 }: Props) {
   const [contacts, setContacts] = useState<ContactItem[]>([]);
-  const [molCount, setMolCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [query, setQuery] = useState("");
@@ -56,10 +35,9 @@ export function PersonaTab({
   const [adding, setAdding] = useState(false);
 
   const refresh = useCallback(() => {
-    return Promise.all([listContactsApi(), getMyMols()])
-      .then(([cRes, molItems]) => {
+    return listContactsApi()
+      .then((cRes) => {
         setContacts(cRes.items);
-        setMolCount(Math.min(molItems.length, MAX_MOLS));
         setErr("");
       })
       .catch((e: unknown) => setErr(e instanceof Error ? e.message : String(e)));
@@ -87,7 +65,7 @@ export function PersonaTab({
   const filteredContacts = useMemo(() => {
     if (!q) return contacts;
     return contacts.filter((c) => {
-      const name = contactDisplayName(c).toLowerCase();
+      const name = displayContactName(c).toLowerCase();
       const phone = c.phone.toLowerCase();
       return name.includes(q) || phone.includes(q);
     });
@@ -145,8 +123,8 @@ export function PersonaTab({
 
         <div className="persona-tab__entries">
           <button type="button" className="contacts-entry-card persona-tab__requests" onClick={onOpenFriendRequests}>
-            <span className="contacts-entry-card__icon contacts-entry-card__icon--requests" aria-hidden>
-              ✉
+            <span className="contacts-entry-card__icon" aria-hidden>
+              <AppIcon name="mail" className="app-icon app-icon--warm" />
             </span>
             <span className="contacts-entry-card__body">
               <span className="contacts-entry-card__title">好友请求</span>
@@ -159,14 +137,11 @@ export function PersonaTab({
 
           {showMolEntry ? (
             <button type="button" className="contacts-entry-card persona-tab__entry persona-tab__entry--mol" onClick={onOpenMolList}>
-              <span className="contacts-entry-card__icon persona-tab__entry-icon persona-tab__entry-icon--mol" aria-hidden>
-                M
+              <span className="contacts-entry-card__icon" aria-hidden>
+                <AppIcon name="mol" className="app-icon app-icon--mol" />
               </span>
               <span className="contacts-entry-card__body">
                 <span className="contacts-entry-card__title">我的 Mol</span>
-                {!loading ? (
-                  <span className="contacts-entry-card__hint">{molCount}/{MAX_MOLS}</span>
-                ) : null}
               </span>
               <span className="contacts-entry-card__arrow" aria-hidden>
                 ›
@@ -176,8 +151,8 @@ export function PersonaTab({
 
           {showAiEntry ? (
             <button type="button" className="contacts-entry-card persona-tab__entry persona-tab__entry--ai" onClick={onOpenGuardianHall}>
-              <span className="contacts-entry-card__icon persona-tab__entry-icon persona-tab__entry-icon--ai" aria-hidden>
-                AI
+              <span className="contacts-entry-card__icon" aria-hidden>
+                <AppIcon name="aiContact" className="app-icon app-icon--guardian" />
               </span>
               <span className="contacts-entry-card__body">
                 <span className="contacts-entry-card__title">AI联系人</span>
@@ -212,11 +187,9 @@ export function PersonaTab({
             ) : (
               filteredContacts.map((c) => (
                 <button key={c.contactUserId} type="button" className="persona-tab__row" onClick={() => onOpenChat(c)}>
-                  <span className="persona-tab__av persona-tab__av--human" aria-hidden>
-                    {contactAvatarLetter(c)}
-                  </span>
+                  <ContactAvatar contact={c} className="persona-tab__av persona-tab__av--human" alt="" />
                   <span className="persona-tab__mid">
-                    <strong>{contactDisplayName(c)}</strong>
+                    <strong>{displayContactName(c)}</strong>
                   </span>
                 </button>
               ))

@@ -3,6 +3,9 @@ import type { AuthResult } from "../types/auth";
 const KEY_TOKEN = "authToken";
 const KEY_USER = "userId";
 const KEY_PHONE = "phone";
+const KEY_NICKNAME = "nickname";
+const KEY_AVATAR_URL = "avatarUrl";
+const KEY_AVATAR_UPDATED = "avatarUpdatedAt";
 const KEY_LAST_PHONE = "lastPhone";
 const KEY_LOGIN_PHONE_HISTORY = "loginPhoneHistory";
 
@@ -66,6 +69,69 @@ export function clearAuth(): void {
   localStorage.removeItem(KEY_TOKEN);
   localStorage.removeItem(KEY_USER);
   localStorage.removeItem(KEY_PHONE);
+  localStorage.removeItem(KEY_NICKNAME);
+  localStorage.removeItem(KEY_AVATAR_URL);
+  localStorage.removeItem(KEY_AVATAR_UPDATED);
+}
+
+export function setNicknameCache(nickname: string | null | undefined): void {
+  const t = nickname?.trim();
+  if (t) localStorage.setItem(KEY_NICKNAME, t);
+  else localStorage.removeItem(KEY_NICKNAME);
+}
+
+export function getNickname(): string {
+  return localStorage.getItem(KEY_NICKNAME) ?? "";
+}
+
+/** 我的展示名：昵称优先，否则脱敏手机号 */
+export function getMyDisplayName(): string {
+  const n = getNickname().trim();
+  if (n) return n;
+  return getMaskedPhone();
+}
+
+export function setAvatarCache(avatarUrl: string | null | undefined, avatarUpdatedAt: number | null | undefined): void {
+  const url = avatarUrl?.trim();
+  if (url) {
+    localStorage.setItem(KEY_AVATAR_URL, url);
+    if (avatarUpdatedAt != null) {
+      localStorage.setItem(KEY_AVATAR_UPDATED, String(avatarUpdatedAt));
+    } else {
+      localStorage.removeItem(KEY_AVATAR_UPDATED);
+    }
+  } else {
+    localStorage.removeItem(KEY_AVATAR_URL);
+    localStorage.removeItem(KEY_AVATAR_UPDATED);
+  }
+}
+
+export function getAvatarUrl(): string | null {
+  const url = localStorage.getItem(KEY_AVATAR_URL)?.trim();
+  return url || null;
+}
+
+export function getAvatarUpdatedAt(): number | null {
+  const raw = localStorage.getItem(KEY_AVATAR_UPDATED);
+  if (!raw) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+export function getMyAvatarContact(): {
+  phone: string;
+  remark: null;
+  nickname: string;
+  avatarUrl: string | null;
+  avatarUpdatedAt: number | null;
+} {
+  return {
+    phone: getPhone(),
+    remark: null,
+    nickname: getNickname() || getMyDisplayName(),
+    avatarUrl: getAvatarUrl(),
+    avatarUpdatedAt: getAvatarUpdatedAt(),
+  };
 }
 
 export function getAuthToken(): string {

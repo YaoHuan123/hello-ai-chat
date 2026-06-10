@@ -75,6 +75,23 @@ export const initDb = (): DatabaseSync => {
     );
   `);
   db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users(phone);");
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN nickname TEXT");
+  } catch {
+    /* column may already exist */
+  }
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN avatar_url TEXT");
+  } catch {
+    /* column may already exist */
+  }
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN avatar_updated_at INTEGER");
+  } catch {
+    /* column may already exist */
+  }
+
+  ensureDir(path.join(DATA_ROOT, "uploads", "avatars"));
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS sms_send_log (

@@ -13,6 +13,7 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { ContactsPage } from "./pages/ContactsPage";
 import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { getMeApi } from "./services/api";
+import { setAvatarCache, setNicknameCache } from "./services/storage";
 import { getFriendRequestPendingCountApi } from "./services/friendRequestsApi";
 import { wsClient } from "./services/wsClient";
 import { setAndroidBackHandler } from "./platform/androidShell";
@@ -25,6 +26,7 @@ import { MyMomentsPage } from "./pages/ai/MyMomentsPage";
 import { MomentsHotTopicsPage } from "./pages/ai/MomentsHotTopicsPage";
 import { MomentsExploreChatPage } from "./pages/ai/MomentsExploreChatPage";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
+import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
 import { CreateGuardianGroupPage } from "./pages/guardian/CreateGuardianGroupPage";
 import { GroupChatRoomPage } from "./pages/guardian/GroupChatRoomPage";
 
@@ -42,6 +44,7 @@ function App() {
   const [chatRoomContact, setChatRoomContact] = useState<ContactItem | null>(null);
   const [friendPendingCount, setFriendPendingCount] = useState(0);
   const [guardianGroupId, setGuardianGroupId] = useState<string | null>(null);
+  const [guardianRoleId, setGuardianRoleId] = useState<string | null>(null);
   const [momentsFriendContact, setMomentsFriendContact] = useState<ContactItem | null>(null);
   const [mainTab, setMainTab] = useState<MainTabId>("messages");
 
@@ -71,8 +74,12 @@ function App() {
       };
     }
     getMeApi(token)
-      .then(() => {
-        if (!cancelled) setAuthed(true);
+      .then((me) => {
+        if (!cancelled) {
+          setNicknameCache(me.nickname);
+          setAvatarCache(me.avatarUrl, me.avatarUpdatedAt);
+          setAuthed(true);
+        }
       })
       .catch(() => {
         if (!cancelled) {
@@ -136,6 +143,11 @@ function App() {
       if (route === "guardian-hall") {
         setMainTab("people");
         setRoute("main");
+        return true;
+      }
+      if (route === "guardian-role-detail") {
+        setGuardianRoleId(null);
+        setRoute("guardian-hall");
         return true;
       }
       if (route === "main") {
@@ -238,6 +250,23 @@ function App() {
         onBack={() => {
           setMainTab("people");
           setRoute("main");
+        }}
+        onOpenRole={(id) => {
+          setGuardianRoleId(id);
+          setRoute("guardian-role-detail");
+        }}
+      />
+    );
+  }
+
+  if (route === "guardian-role-detail" && guardianRoleId) {
+    return (
+      <GuardianRoleDetailPage
+        key={guardianRoleId}
+        roleId={guardianRoleId}
+        onBack={() => {
+          setGuardianRoleId(null);
+          setRoute("guardian-hall");
         }}
       />
     );
@@ -387,11 +416,6 @@ function App() {
           setAssistMolDataMolId(id);
           setRoute("assist-mol-data");
         }}
-        onNewMol={() => {
-          setMolDetailBackRoute("assist-mol-list");
-          setMolDetailId("new");
-          setRoute("mol-detail");
-        }}
       />
     );
   }
@@ -403,13 +427,7 @@ function App() {
         molId={assistMolDataMolId}
         onBack={() => {
           setAssistMolDataMolId(null);
-          setMainTab("people");
-          setRoute("main");
-        }}
-        onOpenInfo={() => {
-          setMolDetailBackRoute("assist-mol-data");
-          setMolDetailId(assistMolDataMolId);
-          setRoute("mol-detail");
+          setRoute("assist-mol-list");
         }}
       />
     );
@@ -453,13 +471,7 @@ function App() {
 
   if (route === "mol-world") {
     return (
-      <MolWorldPage
-        onBack={() => setRoute(molWorldBackRoute)}
-        onMyMols={() => {
-          setMolWorldBackRoute("mol-mine");
-          setRoute("mol-mine");
-        }}
-      />
+      <MolWorldPage onBack={() => setRoute(molWorldBackRoute)} />
     );
   }
   if (route === "mol-mine") {

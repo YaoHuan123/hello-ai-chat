@@ -2,10 +2,11 @@ import http from "node:http";
 import express from "express";
 import cors from "cors";
 // 注意：./config 内部已在模块加载时完成 .env 注入，因此必须先 import 它，再读取 process.env。
-import { PORT } from "./config";
+import { PORT, UPLOADS_ROOT } from "./config";
 import { initDb } from "./db/init";
 import { initAuthMiddleware } from "./middleware/auth";
 import { AuthService } from "./services/auth.service";
+import { AvatarText2ImgService } from "./services/avatarText2Img.service";
 import { AliyunSmsService } from "./services/aliyunSms.service";
 import { AuthAuditLogService } from "./services/authAuditLog.service";
 import { SmsRateLimitService } from "./services/smsRateLimit.service";
@@ -20,6 +21,8 @@ import { createGuardianRouter } from "./routes/guardian.routes";
 import { createMomentsRouter } from "./routes/moments.routes";
 import { GuardianAiService } from "./services/guardianAi.service";
 import { GuardianGroupsService } from "./services/guardianGroups.service";
+import { HotTopicsAiService } from "./services/hotTopicsAi.service";
+import { HotTopicsService } from "./services/hotTopics.service";
 import { MomentsAiService } from "./services/momentsAi.service";
 import { MomentsService } from "./services/moments.service";
 import { ContactsService } from "./services/contacts.service";
@@ -50,6 +53,7 @@ const aliyunSmsService = new AliyunSmsService();
 const smsRateLimitService = new SmsRateLimitService(db);
 const authAuditLogService = new AuthAuditLogService(db);
 const authService = new AuthService(db, aliyunSmsService, smsRateLimitService, authAuditLogService);
+const avatarText2ImgService = new AvatarText2ImgService();
 const contactsService = new ContactsService(db);
 const friendRequestsService = new FriendRequestsService(db, contactsService);
 const messagesService = new MessagesService(contactsService);
@@ -58,9 +62,14 @@ const guardianAiService = new GuardianAiService();
 const guardianGroupsService = new GuardianGroupsService(db, contactsService, guardianAiService);
 const momentsAiService = new MomentsAiService();
 const momentsService = new MomentsService(db, contactsService, momentsAiService);
+const hotTopicsAiService = new HotTopicsAiService();
+const hotTopicsService = new HotTopicsService(hotTopicsAiService);
+hotTopicsService.startScheduler();
 
 app.use(cors());
+app.use("/api/auth/me/avatar", express.json({ limit: "768kb" }));
 app.use(express.json({ limit: "256kb" }));
+app.use("/uploads", express.static(UPLOADS_ROOT));
 
 let reqSeq = 0;
 app.use((req, res, next) => {
@@ -90,7 +99,7 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true, service: "aichat-backend" });
 });
 
-app.use("/api/auth", createAuthRouter(authService));
+app.use("/api/auth", createAuthRouter(authService, avatarText2ImgService));
 app.use("/api/contacts", createContactsRouter(contactsService));
 app.use("/api/friend-requests", createFriendRequestsRouter(friendRequestsService));
 app.use("/api/messages", createMessagesRouter(messagesService));
@@ -98,7 +107,7 @@ app.use("/api/mol-world", createMolWorldRouter(molWorldService, userMolsService)
 app.use("/api/mol-mine", createMyMolsRouter(molWorldService, userMolsService));
 app.use("/api/mol", createMolSuggestRouter(aiReplyService, contactsService, userMolsService));
 app.use("/api/guardian", createGuardianRouter(guardianGroupsService));
-app.use("/api/moments", createMomentsRouter(momentsService));
+app.use("/api/moments", createMomentsRouter(momentsService, hotTopicsService));
 
 app.use((_req, res) => {
   res.status(404).json({ code: "NOT_FOUND", message: "未找到接口" });

@@ -2,12 +2,18 @@ import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { MOL_WORLD_DIR } from "../config";
+import { MOL_PRIVATE_DIR, MOL_WORLD_DIR } from "../config";
 import { isValidPrimaryCategory, MOL_PRIMARY_CATEGORIES } from "../constants/molWorld";
 import { logWarn } from "../logger";
 
 const SCHEMA_VERSION = 1;
 const MAX_UPLOADS_PER_USER = 20;
+const MAX_PRIVATE_MOLS_PER_USER = 20;
+const PRIVATE_ID_PREFIX = "mp-";
+
+export function isPrivateMolId(molWorldId: string): boolean {
+  return molWorldId.startsWith(PRIVATE_ID_PREFIX);
+}
 
 export type MolWorldInfoItem = {
   id: string;
@@ -90,6 +96,17 @@ function filePathFor(category: string, id: string): string {
   return path.join(MOL_WORLD_DIR, category, `${id}.json`);
 }
 
+function privateFilePath(ownerUserId: string, id: string): string {
+  return path.join(MOL_PRIVATE_DIR, ownerUserId, `${id}.json`);
+}
+
+function ensurePrivateUserDir(ownerUserId: string): void {
+  const dir = path.join(MOL_PRIVATE_DIR, ownerUserId);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
 function atomicWriteJson(filePath: string, data: unknown): void {
   const dir = path.dirname(filePath);
   const tmp = path.join(dir, `.tmp-${nanoid(12)}.json`);
@@ -165,6 +182,12 @@ const SEED_MOLS: Omit<MolWorldFile, "uploader" | "createdAt" | "updatedAt">[] = 
 export class MolWorldService {
   private purgeUserRefs: (molWorldId: string) => void = () => {};
 
+  constructor() {
+    if (!fs.existsSync(MOL_PRIVATE_DIR)) {
+      fs.mkdirSync(MOL_PRIVATE_DIR, { recursive: true });
+    }
+  }
+
   attachPurgeHandler(fn: (molWorldId: string) => void): void {
     this.purgeUserRefs = fn;
   }
@@ -203,6 +226,16 @@ export class MolWorldService {
     return n;
   }
 
+  countPrivateByUser(userId: string): number {
+    const dir = path.join(MOL_PRIVATE_DIR, userId);
+    if (!fs.existsSync(dir)) return 0;
+    let n = 0;
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (ent.isFile() && ent.name.endsWith(".json") && !ent.name.startsWith(".")) n += 1;
+    }
+    return n;
+  }
+
   listAllRaw(): MolWorldFile[] {
     const out: MolWorldFile[] = [];
     for (const cat of MOL_PRIMARY_CATEGORIES) {
@@ -224,14 +257,38 @@ export class MolWorldService {
     return out;
   }
 
-  findFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile } | null {
+  private findPrivateFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile; ownerUserId: string } | null {
+    if (!isPrivateMolId(molWorldId) || !fs.existsSync(MOL_PRIVATE_DIR)) return null;
+    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
+      if (!ent.isDirectory()) continue;
+      const fp = path.join(MOL_PRIVATE_DIR, ent.name, `${molWorldId}.json`);
+      if (!fs.existsSync(fp)) continue;
+      try {
+        const raw = fs.readFileSync(fp, "utf8");
+        const parsed = parseMolFile(raw, fp);
+        if (parsed && parsed.id === molWorldId) {
+          return { filePath: fp, record: parsed, ownerUserId: ent.name };
+        }
+      } catch {
+        /* skip */
+      }
+    }
+    return null;
+  }
+
+  findFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile; isPrivate: boolean } | null {
+    if (isPrivateMolId(molWorldId)) {
+      const found = this.findPrivateFilePathById(molWorldId);
+      if (!found) return null;
+      return { filePath: found.filePath, record: found.record, isPrivate: true };
+    }
     for (const cat of MOL_PRIMARY_CATEGORIES) {
       const fp = filePathFor(cat, molWorldId);
       if (!fs.existsSync(fp)) continue;
       try {
         const raw = fs.readFileSync(fp, "utf8");
         const parsed = parseMolFile(raw, fp);
-        if (parsed && parsed.id === molWorldId) return { filePath: fp, record: parsed };
+        if (parsed && parsed.id === molWorldId) return { filePath: fp, record: parsed, isPrivate: false };
       } catch {
         /* skip */
       }
@@ -287,10 +344,56 @@ export class MolWorldService {
     return record;
   }
 
+  /** 用户自建 Mol：仅写入私有目录，不出现在 Mol 世界。 */
+  createPrivate(ownerUserId: string, ownerPhone: string, body: unknown): MolWorldFile {
+    const parsed = createBodySchema.safeParse(body);
+    if (!parsed.success) {
+      throw new Error("INVALID_PARAMS");
+    }
+    const data = parsed.data;
+    if (!isValidPrimaryCategory(data.primaryCategory)) {
+      throw new Error("INVALID_CATEGORY");
+    }
+    if (this.countPrivateByUser(ownerUserId) >= MAX_PRIVATE_MOLS_PER_USER) {
+      throw new Error("MOL_PRIVATE_LIMIT_EXCEEDED");
+    }
+    const id = `${PRIVATE_ID_PREFIX}${Date.now()}-${nanoid(8)}`;
+    const now = Date.now();
+    const infoItems: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
+      id: row.id?.trim() || `inf-${now}-${i}-${nanoid(6)}`,
+      title: row.title,
+      body: row.body,
+      source: row.source ?? "custom",
+      softRemoved: row.softRemoved,
+    }));
+    const record: MolWorldFile = {
+      id,
+      schemaVersion: SCHEMA_VERSION,
+      name: data.name.trim(),
+      summary: data.summary.trim(),
+      primaryCategory: data.primaryCategory,
+      taskTags: data.taskTags ?? [],
+      toneTags: data.toneTags ?? [],
+      relationshipTags: data.relationshipTags ?? [],
+      abilityTags: data.abilityTags ?? [],
+      price: 0,
+      popularityScore: 0,
+      recommended: false,
+      uploader: { userId: ownerUserId, phoneMask: maskPhone(ownerPhone) },
+      createdAt: now,
+      updatedAt: now,
+      infoItems,
+    };
+    ensurePrivateUserDir(ownerUserId);
+    const fp = privateFilePath(ownerUserId, id);
+    atomicWriteJson(fp, record);
+    return record;
+  }
+
   updateById(molWorldId: string, uploaderUserId: string, body: unknown): MolWorldFile {
     const found = this.findFilePathById(molWorldId);
     if (!found) throw new Error("NOT_FOUND");
-    const { filePath, record } = found;
+    const { filePath, record, isPrivate } = found;
     if (record.uploader.userId !== uploaderUserId) throw new Error("FORBIDDEN");
     const parsed = patchBodySchema.safeParse(body);
     if (!parsed.success) throw new Error("INVALID_PARAMS");
@@ -313,6 +416,18 @@ export class MolWorldService {
       popularityScore: record.popularityScore,
       recommended: record.recommended,
     };
+    if (isPrivate) {
+      const newPath = privateFilePath(uploaderUserId, molWorldId);
+      atomicWriteJson(newPath, next);
+      if (newPath !== filePath) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch {
+          /* ignore */
+        }
+      }
+      return next;
+    }
     const newPath = filePathFor(next.primaryCategory, molWorldId);
     if (newPath !== filePath && fs.existsSync(newPath)) {
       throw new Error("INVALID_PARAMS");

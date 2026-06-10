@@ -161,7 +161,14 @@ export async function smsLoginApi(phone: string, code: string): Promise<AuthResu
   return postJson<AuthResult>("/api/auth/sms/login", { phone, code });
 }
 
-export type MeResponse = { userId: string; phone: string; createdAt: string };
+export type MeResponse = {
+  userId: string;
+  phone: string;
+  nickname: string | null;
+  avatarUrl: string | null;
+  avatarUpdatedAt: number | null;
+  createdAt: string;
+};
 
 export async function getMeApi(token?: string): Promise<MeResponse> {
   const t = token ?? getAuthToken().trim();
@@ -169,6 +176,38 @@ export async function getMeApi(token?: string): Promise<MeResponse> {
     throw new Error("未登录");
   }
   return getJson<MeResponse>("/api/auth/me", t);
+}
+
+export async function updateMeNicknameApi(nickname: string | null, token?: string): Promise<MeResponse> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return patchJson<MeResponse>("/api/auth/me", { nickname }, t);
+}
+
+export async function uploadMeAvatarApi(image: string, token?: string): Promise<MeResponse> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return putJson<MeResponse>("/api/auth/me/avatar", { image }, t);
+}
+
+export async function generateMeAvatarApi(phrase: string, token?: string): Promise<MeResponse> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return postJson<MeResponse>("/api/auth/me/avatar/generate", { phrase: phrase.trim() }, t);
+}
+
+export async function deleteMeAvatarApi(token?: string): Promise<MeResponse> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return deleteJson<MeResponse>("/api/auth/me/avatar", t);
 }
 
 export async function deleteAccountApi(code: string, token?: string): Promise<{ ok: true }> {

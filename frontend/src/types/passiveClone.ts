@@ -15,4 +15,6 @@ export type PassiveTopic = {
   id: string;
   question: string;
   hint?: string;
+  sourcePlatform?: "weibo" | "zhihu" | "douyin";
+  sourceTitle?: string;
 };

@@ -3,14 +3,16 @@ import { listContactsApi } from "../../services/api";
 import { listNormalConversationPreviews } from "../../services/normalChatLocalStorage";
 import { listGuardianGroupsApi } from "../../services/guardianApi";
 import { getGuardianGroupLastPreviewInfo } from "../../services/guardianGroupLocalStorage";
+import { wsClient, type WsServerMessage } from "../../services/wsClient";
+import { AppIcon } from "../../components/AppIcons";
 import type { GuardianGroupListItem } from "../../types/guardian";
-import { wsClient } from "../../services/wsClient";
+import { ContactAvatar } from "../../components/ContactAvatar";
+import { contactDisplayName } from "../../lib/contactDisplay";
 import type { ContactItem } from "../../types/contact";
 
 type Props = {
   onOpenChatRoom: (c: ContactItem) => void;
   onOpenGuardianGroup: (groupId: string) => void;
-  onOpenGuardianHall: () => void;
 };
 
 type ConvRow =
@@ -28,26 +30,6 @@ type ConvRow =
       lastText: string;
       contact: ContactItem;
     };
-
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function displayName(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
-
-function avatarLetterFromPhone(phone: string, remark?: string | null): string {
-  const r = remark?.trim();
-  if (r) return r.slice(0, 1).toUpperCase();
-  const d = phone.replace(/\D/g, "");
-  if (d.length >= 1) return d.slice(-1);
-  return "?";
-}
 
 function formatConvTime(ts: number): string {
   if (!ts) return "";
@@ -77,7 +59,7 @@ function guardianGroupTitle(g: GuardianGroupListItem): string {
   return `AI 群聊 · ${count}人`;
 }
 
-export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardianHall }: Props) {
+export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup }: Props) {
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [localConvPeers, setLocalConvPeers] = useState<{ peerUserId: string; lastText: string; lastTs: number }[]>([]);
   const [guardianGroups, setGuardianGroups] = useState<GuardianGroupListItem[]>([]);
@@ -108,7 +90,7 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
   }, []);
 
   useEffect(() => {
-    const unsub = wsClient.subscribe((msg) => {
+    const unsub = wsClient.subscribe((msg: WsServerMessage) => {
       if (msg.type === "message" || msg.type === "guardian_group_message") {
         load();
       }
@@ -141,6 +123,9 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
         contactUserId: c.peerUserId,
         phone: c.peerUserId,
         remark: null,
+        nickname: null,
+        avatarUrl: null,
+        avatarUpdatedAt: null,
         createdAt: c.lastTs,
       };
       rows.push({
@@ -158,11 +143,8 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
 
   return (
     <div className="msg-tab-inner">
-      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar aichat-topbar--plain">
+      <header className="aichat-topbar msg-tab-topbar aichat-topbar--plain">
         <h1>消息</h1>
-        <button type="button" className="aichat-btn-pill guardian-msg-entry" onClick={onOpenGuardianHall}>
-          AI联系人
-        </button>
       </header>
 
       <div className="aichat-main msg-tab-main">
@@ -199,7 +181,7 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
                     onClick={() => onOpenGuardianGroup(row.group.id)}
                   >
                     <span className="msg-conv-avatar msg-conv-avatar--guardian" aria-hidden>
-                      群
+                      <AppIcon name="usersGroup" className="app-icon app-icon--md app-icon--guardian" />
                     </span>
                     <span className="msg-conv-body">
                       <span className="msg-conv-head">
@@ -219,12 +201,10 @@ export function MessagesTab({ onOpenChatRoom, onOpenGuardianGroup, onOpenGuardia
               ) : (
                 <li key={row.key}>
                   <button type="button" className="msg-conv-row" onClick={() => onOpenChatRoom(row.contact)}>
-                    <span className="msg-conv-avatar msg-conv-avatar--user" aria-hidden>
-                      {avatarLetterFromPhone(row.contact.phone, row.contact.remark)}
-                    </span>
+                    <ContactAvatar contact={row.contact} className="msg-conv-avatar msg-conv-avatar--user" />
                     <span className="msg-conv-body">
                       <span className="msg-conv-head">
-                        <span className="msg-conv-title">{displayName(row.contact)}</span>
+                        <span className="msg-conv-title">{contactDisplayName(row.contact)}</span>
                         <span className="msg-conv-time">{formatConvTime(row.lastTs)}</span>
                       </span>
                       <span className="msg-conv-preview">{row.lastText}</span>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { PRIMARY_SCENES } from "../data/molWorldTaxonomy";
 import {
-  createMyMol,
+  createMyMolPrivate,
   getMyMolDetailForEdit,
   updateMyMol,
   type MolInMyCollection,
@@ -154,7 +154,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
     setSaving(true);
     try {
       if (isNew) {
-        await createMyMol({
+        await createMyMolPrivate({
           name: n,
           summary: s,
           primaryCategory: c,

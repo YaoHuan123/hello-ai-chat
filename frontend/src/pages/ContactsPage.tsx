@@ -2,6 +2,9 @@ import { type FormEvent, useEffect, useState } from "react";
 import { listContactsApi, removeContactApi } from "../services/api";
 import { createFriendRequestApi } from "../services/friendRequestsApi";
 import { wsClient } from "../services/wsClient";
+import { AppIcon } from "../components/AppIcons";
+import { ContactAvatar } from "../components/ContactAvatar";
+import { contactDisplayName, maskPhoneDisplay } from "../lib/contactDisplay";
 import type { ContactItem } from "../types/contact";
 
 type Props = {
@@ -14,30 +17,10 @@ type Props = {
   onOpenChat?: (c: ContactItem) => void;
 };
 
-function maskPhoneDisplay(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 11) return `${d.slice(0, 3)}****${d.slice(-4)}`;
-  return phone;
-}
-
-function displayName(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r;
-  return maskPhoneDisplay(c.phone);
-}
-
 function subtitleLine(c: ContactItem): string {
   const r = c.remark?.trim();
   if (r) return maskPhoneDisplay(c.phone);
   return `添加于 ${formatAddedAt(c.createdAt)}`;
-}
-
-function avatarLetter(c: ContactItem): string {
-  const r = c.remark?.trim();
-  if (r) return r.slice(0, 1).toUpperCase();
-  const d = c.phone.replace(/\D/g, "");
-  if (d.length >= 1) return d.slice(-1);
-  return "?";
 }
 
 function formatAddedAt(ts: number): string {
@@ -181,12 +164,11 @@ export function ContactsPage({
 
         {onOpenFriendRequests ? (
           <button type="button" className="contacts-entry-card" onClick={onOpenFriendRequests}>
-            <span className="contacts-entry-card__icon contacts-entry-card__icon--requests" aria-hidden>
-              ✉
+            <span className="contacts-entry-card__icon" aria-hidden>
+              <AppIcon name="mail" className="app-icon app-icon--warm" />
             </span>
             <span className="contacts-entry-card__body">
               <span className="contacts-entry-card__title">好友请求</span>
-              <span className="contacts-entry-card__hint">查看待处理的好友申请</span>
             </span>
             {pending > 0 ? (
               <span className="contacts-entry-card__badge">{pending > 99 ? "99+" : pending}</span>
@@ -214,7 +196,7 @@ export function ContactsPage({
         ) : items.length === 0 ? (
           <div className="contacts-empty">
             <span className="contacts-empty__icon" aria-hidden>
-              👥
+              <AppIcon name="usersEmpty" className="app-icon app-icon--lg app-icon--muted" />
             </span>
             <p className="contacts-empty__title">还没有联系人</p>
             <p className="contacts-empty__hint">发送好友申请，对方同意后双方将出现在列表中</p>
@@ -231,13 +213,11 @@ export function ContactsPage({
                     type="button"
                     className="contacts-row__main"
                     onClick={() => onOpenChat?.(c)}
-                    aria-label={`与${displayName(c)}聊天`}
+                    aria-label={`与${contactDisplayName(c)}聊天`}
                   >
-                    <span className="contacts-avatar" aria-hidden>
-                      {avatarLetter(c)}
-                    </span>
+                    <ContactAvatar contact={c} className="contacts-avatar" alt="" />
                     <span className="contacts-body">
-                      <span className="contacts-name">{displayName(c)}</span>
+                      <span className="contacts-name">{contactDisplayName(c)}</span>
                       <span className="contacts-sub">{subtitleLine(c)}</span>
                     </span>
                   </button>

@@ -43,12 +43,19 @@ export class UserMolsService {
   }
 
   importToMine(ownerUserId: string, molWorldId: string): void {
+    if (molWorldId.startsWith("mp-")) throw new Error("NOT_FOUND");
     const rec = this.molWorld.getById(molWorldId);
     if (!rec) throw new Error("NOT_FOUND");
     const exists = this.existsStmt!.get(ownerUserId, molWorldId) as { 1?: number } | undefined;
     if (exists) throw new Error("ALREADY_OWNED");
     const source = rec.uploader.userId === ownerUserId ? "created" : "store";
     this.insertStmt!.run(ownerUserId, molWorldId, source, Date.now());
+  }
+
+  createPrivateMol(ownerUserId: string, ownerPhone: string, body: unknown): MolWorldFile {
+    const rec = this.molWorld.createPrivate(ownerUserId, ownerPhone, body);
+    this.insertStmt!.run(ownerUserId, rec.id, "created", Date.now());
+    return rec;
   }
 
   removeFromMine(ownerUserId: string, molWorldId: string): void {
