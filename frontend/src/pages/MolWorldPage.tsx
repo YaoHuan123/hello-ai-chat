@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { SUYAN, formatSuyanDisplayName } from "../constants/suyanCopy";
 import { POPULAR_TASK_SHORTCUTS, PRIMARY_SCENES, SEARCH_SUGGESTION_CHIPS } from "../data/molWorldTaxonomy";
 import { getSearchFallbackSuggestions, searchAndRankMols } from "../lib/molWorldSearch";
 import { getMolCatalog, purchaseMol, type MolCatalogItem } from "../services/stageApi";
@@ -22,7 +23,7 @@ function MolCard({
   return (
     <article className="mol-world-a-card">
       <div className="mol-world-a-card__head">
-        <h3 className="mol-world-a-card__name">{m.name}</h3>
+        <h3 className="mol-world-a-card__name">{formatSuyanDisplayName(m.name)}</h3>
         {m.owned ? <span className="mol-world-a-card__owned">已加入</span> : null}
       </div>
       <p className="mol-world-a-card__cat">{m.primaryCategory}</p>
@@ -40,7 +41,7 @@ function MolCard({
         <div className="mol-world-a-card__foot">
           <span className="mol-world-a-card__price">{m.price > 0 ? `¥${m.price}` : "免费"}</span>
           <button type="button" className="mol-world-a-card__join" onClick={() => onBuy(m.id)} disabled={buying}>
-            加入我的 Mol
+            {SUYAN.joinMine}
           </button>
         </div>
       ) : null}
@@ -54,7 +55,7 @@ function MolWorldTopBar({ onBack }: { onBack: () => void }) {
       <button className="mol-world-a-topbar__back" type="button" onClick={onBack}>
         返回
       </button>
-      <h1 className="mol-world-a-topbar__title">Mol 世界</h1>
+      <h1 className="mol-world-a-topbar__title">{SUYAN.world}</h1>
       <span className="aichat-topbar-spacer" aria-hidden />
     </header>
   );
@@ -156,7 +157,7 @@ export function MolWorldPage({ onBack }: Props) {
       <div className="aichat-shell aichat-molworld aichat-molworld-a">
         <MolWorldTopBar onBack={onBack} />
         <div className="aichat-main aichat-page-main aichat-molworld-main">
-          <div className="mol-world-a-loading">正在加载 Mol…</div>
+          <div className="mol-world-a-loading">正在加载{SUYAN.name}…</div>
         </div>
       </div>
     );
@@ -176,7 +177,7 @@ export function MolWorldPage({ onBack }: Props) {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="搜场景、关系或任务"
           enterKeyHint="search"
-          aria-label="搜索 Mol"
+          aria-label={`搜索${SUYAN.name}`}
         />
         {search.trim() ? (
           <div className="aichat-suggest-row" role="list">
@@ -196,7 +197,7 @@ export function MolWorldPage({ onBack }: Props) {
             <div className="mol-world-a-shelf" role="list">
               {recommended.map((m) => (
                 <div key={m.id} className="mol-world-a-shelf-item" role="listitem">
-                  <strong className="mol-world-a-shelf-item__name">{m.name}</strong>
+                  <strong className="mol-world-a-shelf-item__name">{formatSuyanDisplayName(m.name)}</strong>
                   <span className="mol-world-a-shelf-item__cat">{m.primaryCategory}</span>
                   {m.owned ? (
                     <button type="button" className="mol-world-a-shelf-item__cta mol-world-a-shelf-item__cta--owned" disabled>
@@ -294,7 +295,7 @@ export function MolWorldPage({ onBack }: Props) {
 
         {emptySearch ? (
           <div className="mol-world-a-empty">
-            <p className="mol-world-a-empty__t">没有匹配的 Mol</p>
+            <p className="mol-world-a-empty__t">没有匹配的{SUYAN.name}</p>
             <p className="mol-world-a-empty__d">可尝试调整场景或换关键词</p>
             <div className="aichat-suggest-row">
               {fallbackSugs.map((c) => (
@@ -319,7 +320,7 @@ export function MolWorldPage({ onBack }: Props) {
           </div>
         ) : null}
 
-        <div className="mol-world-a-list" aria-label="Mol 列表">
+        <div className="mol-world-a-list" aria-label={`${SUYAN.name}列表`}>
           {filteredList.map((m) => (
             <MolCard key={m.id} m={m} buying={!!buyingId} onBuy={onBuy} />
           ))}

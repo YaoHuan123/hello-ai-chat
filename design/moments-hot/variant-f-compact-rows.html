@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 F · 紧凑行</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone { background: var(--surface); }
+    .rows { list-style: none; }
+    .row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 0;
+      border-bottom: 0.5px solid var(--border);
+      width: 100%;
+      text-align: left;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      background: none;
+      font: inherit;
+      cursor: pointer;
+    }
+    .row--static { cursor: default; opacity: 0.65; }
+    .row-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    .row-dot--done { background: var(--ok); }
+    .row-main { flex: 1; }
+    .row-main .topic-q { font-size: 15px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 F · 紧凑行</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <ul class="rows">
+          <li>
+            <button type="button" class="row">
+              <span class="row-dot"></span>
+              <div class="row-main">
+                <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+                <p class="topic-hint">关联近期职场讨论</p>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="row">
+              <span class="row-dot"></span>
+              <div class="row-main">
+                <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+              </div>
+            </button>
+          </li>
+          <li>
+            <div class="row row--static">
+              <span class="row-dot row-dot--done"></span>
+              <div class="row-main">
+                <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+                <span class="tag-ok">已收录</span>
+              </div>
+            </div>
+          </li>
+          <li>
+            <button type="button" class="row">
+              <span class="row-dot"></span>
+              <div class="row-main">
+                <p class="topic-q">夏季出行你更优先性价比还是体验？</p>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="row">
+              <span class="row-dot"></span>
+              <div class="row-main">
+                <p class="topic-q">如果遇到加班和准时下班的冲突，你通常怎么处理？</p>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">白底 + 分隔线，一屏可展示更多问题，适合 8～12 题批量浏览。</p>
+  </div>
+</body>
+</html>

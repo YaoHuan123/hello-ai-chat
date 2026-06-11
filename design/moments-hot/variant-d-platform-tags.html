@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 D · 平台来源</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .tag-platform--weibo { color: #e03e3e; background: rgba(224, 62, 62, 0.1); }
+    .tag-platform--zhihu { color: #0066ff; background: rgba(0, 102, 255, 0.1); }
+    .tag-platform--douyin { color: #14171a; background: rgba(20, 23, 26, 0.06); }
+    .card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .source-title {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 0.5px dashed var(--border);
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 D · 平台来源标签</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <button type="button" class="card">
+          <div class="card-head">
+            <span class="tag-platform tag-platform--weibo">微博</span>
+          </div>
+          <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+          <p class="topic-hint">谈谈你的实际选择与原因</p>
+          <p class="source-title">来源：多地讨论重返办公室政策</p>
+        </button>
+        <button type="button" class="card">
+          <div class="card-head">
+            <span class="tag-platform tag-platform--zhihu">知乎</span>
+          </div>
+          <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+          <p class="topic-hint">分享近期在看的内容</p>
+        </button>
+        <div class="card card--done">
+          <div class="card-head">
+            <span class="tag-platform tag-platform--douyin">抖音</span>
+            <span class="tag-ok">已收录</span>
+          </div>
+          <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+          <p class="source-title">来源：年轻人消费观相关讨论</p>
+        </div>
+        <button type="button" class="card">
+          <div class="card-head">
+            <span class="tag-platform tag-platform--weibo">微博</span>
+          </div>
+          <p class="topic-q">夏季出行你更优先性价比还是体验？</p>
+        </button>
+      </div>
+    </div>
+    <p class="pm-tag">对应后端 sourcePlatform / sourceTitle 字段，透明展示问题与热搜的关联。</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>聊天输入区 · Mol 方案索引</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #14171a;
+      --muted: #6b7280;
+      --accent: #007aff;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 20px 40px;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 24px; font-size: 15px; }
+    .note {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+    }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    a {
+      display: block;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      text-decoration: none;
+      color: inherit;
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.04);
+      transition: transform 0.15s ease;
+    }
+    a:active { transform: scale(0.99); }
+    a strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--accent); }
+    a span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>普通聊天 · Mol 输入区方案</h1>
+  <p class="lead">目标：把 Mol 从消息流里移到底部编辑/发送区，消息区只保留真人对话。</p>
+  <div class="note">
+    当前线上版：Mol 以「伪消息气泡」出现在列表底部。以下方案均为可点击原型（手机宽度 390px），建议用浏览器开发者工具切换移动端预览。
+  </div>
+  <ul>
+    <li>
+      <a href="send-icons/index.html" style="border-color: rgba(123, 97, 255, 0.25);">
+        <strong style="color: #7b61ff;">发送 & Mol 图标 · 28 款</strong>
+        <span>独立探索发送按钮、Mol 入口、Mol 建议发送与配对组合，含多态预览。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-a-dock-expand.html">
+        <strong>方案 A · 底栏 Mol 胶囊 + 上拉建议</strong>
+        <span>左下角切换 Mol，建议卡片在输入框上方展开，结构清晰、改动适中。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-inline-chips.html">
+        <strong>方案 B · 输入框内 Mol 按钮 + 横向建议（初版）</strong>
+        <span>Mol 入口在输入框左侧，建议以横向卡片滑出，占用高度小。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-mol-panel.html">
+        <strong>方案 B+ · 点击 Mol 后的完整面板</strong>
+        <span>横滑快捷条 + 编辑/发送双按钮 + 切换与状态演示（信息较多）。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-mol-lite.html">
+        <strong>方案 B 精简 · 推荐</strong>
+        <span>在 B+ 上收敛：一行 Mol 条、三条可点建议、换一批；点建议填入输入框后收起。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-c-compose-stack.html">
+        <strong>方案 C · 一体化输入栈</strong>
+        <span>底部整块白色区域：Mol 条 + 建议列表 + 输入行，视觉统一。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-d-dual-mode.html">
+        <strong>方案 D · 双模式切换（输入 / Mol）</strong>
+        <span>底部 Segmented 切换；Mol 模式下全屏宽展示建议，适合重度使用 Mol 的用户。</span>
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

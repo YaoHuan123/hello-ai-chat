@@ -37,6 +37,18 @@ const SCENE_RULES: Record<GuardianScene, Rule[]> = {
     { pattern: /断供|赶出去|没收/i, label: "控制威胁", hint: "以经济或居住威胁施压时，先稳住边界再沟通。", level: "high" },
     ...COMMON_HIGH,
   ],
+  亲子沟通: [
+    { pattern: /为你好|白养|不孝|断绝/i, label: "愧疚施压", hint: "亲情不等于服从，你的感受也需要被尊重。", level: "high" },
+    { pattern: /相亲|结婚|生孩子|工作必须/i, label: "人生干涉", hint: "职业与婚恋节奏可以由你自己决定。", level: "medium" },
+    { pattern: /断供|赶出去|没收|查手机/i, label: "控制威胁", hint: "以控制或监控施压时，先稳住边界再沟通。", level: "high" },
+    ...COMMON_HIGH,
+  ],
+  科学育儿: [
+    { pattern: /别人都会|就你家|落后|不像话/i, label: "横向比较", hint: "孩子阶段不同，不必用别人家标准压自己。", level: "medium" },
+    { pattern: /必须立刻|再不改就晚了|耽误一辈子/i, label: "育儿恐吓", hint: "焦虑话术常见，可以慢下来看具体行为再调整。", level: "high" },
+    { pattern: /不听医生|偏方|停药/i, label: "健康风险", hint: "涉及健康与用药，建议走正规渠道核实。", level: "high" },
+    ...COMMON_HIGH,
+  ],
   居家装修: [
     { pattern: /今天必须|马上签|最后优惠|错过就没了/i, label: "签约催促", hint: "装修合同不必当天签，明细看清再决定。", level: "high" },
     { pattern: /增项|另算|到时候再说|口头答应/i, label: "增项风险", hint: "增项和材料变更建议写进书面确认。", level: "medium" },

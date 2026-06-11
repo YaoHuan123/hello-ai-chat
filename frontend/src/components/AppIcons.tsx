@@ -1,11 +1,15 @@
 export type AppIconName =
   | "mail"
   | "mol"
+  | "molComposer"
+  | "send"
+  | "sendPlane"
   | "aiContact"
   | "usersGroup"
   | "user"
   | "usersEmpty"
   | "molSpark"
+  | "suyanHorn"
   | "explore"
   | "mine"
   | "hot";
@@ -31,6 +35,23 @@ function IconPaths({ name }: { name: AppIconName }) {
           <path d="M12 11v10M4 7l8 4 8-4" />
         </>
       );
+    case "molComposer":
+      return (
+        <>
+          <path d="M12 5l.9 2.8 2.8.9-2.8.9L12 12l-.9-2.8-2.8-.9 2.8-.9z" />
+          <path d="M8 15.5h8" />
+          <path d="M9.5 18.5h5" />
+        </>
+      );
+    case "send":
+      return (
+        <>
+          <path d="M5 13.5 18.5 5.5" />
+          <path d="M11.5 5.5H18.5V12.5" />
+        </>
+      );
+    case "sendPlane":
+      return <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" stroke="none" />;
     case "aiContact":
       return (
         <>
@@ -60,6 +81,14 @@ function IconPaths({ name }: { name: AppIconName }) {
       );
     case "molSpark":
       return <path d="M12 3l1.2 4.2L17 8l-3.8 1.2L12 14l-1.2-4.8L7 8l3.8-0.8z" />;
+    case "suyanHorn":
+      return (
+        <>
+          <path d="M8.5 8 18.5 6v12l-10-2V8z" fill="currentColor" stroke="none" />
+          <path d="M6.5 10.5v3" />
+          <path d="M4.5 9.5v5" />
+        </>
+      );
     case "explore":
       return (
         <>

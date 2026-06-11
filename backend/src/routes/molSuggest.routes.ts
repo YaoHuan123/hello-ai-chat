@@ -68,7 +68,7 @@ function mapError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "NO_USER_MOLS") {
-    res.status(409).json({ code, message: "尚未添加 Mol，无法生成建议" });
+    res.status(409).json({ code, message: "尚未添加素颜，无法生成建议" });
     return true;
   }
   if (code === "INVALID_PARAMS") {
@@ -124,16 +124,16 @@ export const createMolSuggestRouter = (
     }
 
     if (molId && !userMols.owns(user.userId, molId)) {
-      res.status(404).json({ code: "MOL_NOT_FOUND", message: "未找到该 Mol" });
+      res.status(404).json({ code: "MOL_NOT_FOUND", message: "未找到该素颜" });
       return;
     }
 
     const personaBlock = buildPersonaBlock(userMols, user.userId, molId);
     if (!personaBlock.trim()) {
       if (molId) {
-        res.status(409).json({ code: "MOL_PERSONA_EMPTY", message: "该 Mol 资料为空，无法生成建议" });
+        res.status(409).json({ code: "MOL_PERSONA_EMPTY", message: "该素颜资料为空，无法生成建议" });
       } else {
-        res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加 Mol，无法生成建议" });
+        res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加素颜，无法生成建议" });
       }
       return;
     }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { SUYAN, formatSuyanDisplayName, normalizeLegacySuyanName } from "../constants/suyanCopy";
 import { PRIMARY_SCENES } from "../data/molWorldTaxonomy";
 import {
   createMyMolPrivate,
@@ -110,7 +111,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
     setLoading(true);
     getMyMolDetailForEdit(molId)
       .then(({ item, info }) => {
-        setName(item.name);
+        setName(formatSuyanDisplayName(item.name));
         setSummary(item.summary);
         setCategory(item.primaryCategory);
         setSource(item.source);
@@ -140,7 +141,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
   }
 
   async function saveAll() {
-    const n = name.trim();
+    const n = normalizeLegacySuyanName(name.trim());
     const s = summary.trim();
     const c = category.trim();
     if (!n || !s || !c) {
@@ -206,7 +207,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
         <button type="button" className="aichat-moldt-back" onClick={onBack} disabled={saving} aria-label="返回">
           ←
         </button>
-        <div className="aichat-moldt-navbar-title">Mol 信息管理</div>
+        <div className="aichat-moldt-navbar-title">{SUYAN.infoManage}</div>
         {!readOnly && (
           <button type="button" className="aichat-moldt-save" onClick={saveAll} disabled={saving}>
             {saving ? "保存中…" : "保存"}
@@ -219,9 +220,9 @@ export function MolDetailPage({ molId, onBack }: Props) {
 
       <div className="aichat-moldt-body">
         {readOnly && <p className="aichat-moldt-banner-ro">仅上传者可编辑名称、场景、简介与信息条目。</p>}
-        <section className="aichat-moldt-molhead" aria-label="Mol 概览">
+        <section className="aichat-moldt-molhead" aria-label={SUYAN.overview}>
           <div className="aichat-moldt-avatar" aria-hidden>
-            {name.trim() ? <span className="aichat-moldt-avatar__txt">{name.trim().slice(0, 1)}</span> : <span className="aichat-moldt-avatar__txt">Mol</span>}
+            {name.trim() ? <span className="aichat-moldt-avatar__txt">{name.trim().slice(0, 1)}</span> : <span className="aichat-moldt-avatar__txt">{SUYAN.defaultBadge}</span>}
           </div>
           <div className="aichat-moldt-molhead__main">
             <input
@@ -229,16 +230,16 @@ export function MolDetailPage({ molId, onBack }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={80}
-              placeholder="职业形象或 Mol 名称"
+              placeholder={SUYAN.namePlaceholder}
               aria-label="名称"
               readOnly={readOnly}
               disabled={readOnly}
             />
             <p className="aichat-moldt-name-hint">
               {readOnly
-                ? "来自 Mol 世界 · 只读"
+                ? SUYAN.fromWorldReadonly
                 : source === "store"
-                  ? "来自 Mol 世界 · 可编辑本页内容"
+                  ? SUYAN.fromWorldEditable
                   : "自己创建 · 可编辑本页内容"}
             </p>
             <div className="aichat-moldt-scenewrap">

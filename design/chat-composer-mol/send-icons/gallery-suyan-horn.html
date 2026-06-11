@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>素颜 · 喇叭图标</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    :root {
+      --suyan: var(--mol);
+      --suyan-soft: var(--mol-soft);
+      --suyan-grad: var(--mol-grad);
+      --suyan-inner: linear-gradient(135deg, #e8e0ff, #d4e8ff);
+    }
+
+    .horn-svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: block;
+    }
+    .horn-body { fill: currentColor; stroke: none; }
+
+    .send-p6 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(145deg, #34c759, #007aff);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+      flex-shrink: 0;
+    }
+    .send-p6 svg { width: 16px; height: 16px; fill: currentColor; margin-left: 1px; }
+    .send-p6:disabled { opacity: 0.38; box-shadow: none; }
+
+    /* H1 · 渐变环 + 喇叭 — 当前推荐 / 已落地 */
+    .horn-h1 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    .horn-h1-ring {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--suyan-grad);
+      padding: 2px;
+    }
+    .horn-h1-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--suyan-inner);
+      display: grid;
+      place-items: center;
+      color: var(--suyan);
+    }
+    .horn-h1-inner .horn-svg { width: 18px; height: 18px; }
+    .horn-h1[aria-pressed="true"] .horn-h1-inner {
+      background: var(--suyan-grad);
+      color: #fff;
+    }
+    .horn-h1[aria-pressed="true"] .horn-h1-ring {
+      box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.14);
+    }
+
+    /* H2 · 浅底圆 + 线框喇叭 */
+    .horn-h2 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--suyan-soft);
+      color: var(--suyan);
+    }
+    .horn-h2[aria-pressed="true"] {
+      background: var(--suyan-grad);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(123, 97, 255, 0.35);
+    }
+
+    /* H3 · 方角底 + 实心喇叭 */
+    .horn-h3 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .horn-h3[aria-pressed="true"] {
+      background: var(--suyan-soft);
+      color: #6b4fe0;
+    }
+
+    /* H4 · 喇叭 + 声波 */
+    .horn-h4 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .horn-h4[aria-pressed="true"] {
+      background: var(--suyan-grad);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(123, 97, 255, 0.35);
+    }
+    .horn-h4 .horn-svg { width: 20px; height: 20px; }
+
+    .featured {
+      max-width: 960px;
+      margin: 0 auto 28px;
+      background: linear-gradient(135deg, rgba(123, 97, 255, 0.08), rgba(0, 122, 255, 0.06));
+      border: 0.5px solid rgba(123, 97, 255, 0.2);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+    .featured-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--suyan);
+      margin-bottom: 8px;
+    }
+    .featured p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>素颜 · 喇叭形图标</h1>
+    <p>喇叭象征「大声说、不遮掩」——与素颜「卸下伪装、放肆表达」一致。布局：输入框 → 素颜 → 发送。</p>
+  </div>
+
+  <div class="featured">
+    <div class="featured-label">已落地 · H3</div>
+    <p>方角底 + 线框喇叭：默认透明底；展开建议面板时浅紫底。与圆形发送按钮形成形状对比。</p>
+    <div class="compose-strip" style="max-width:360px">
+      <input class="compose-input compose-input--filled" value="今晚可能来不了" readonly />
+      <button type="button" class="icon-btn horn-h3" aria-pressed="true" aria-label="素颜">
+        <svg class="horn-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/>
+          <path d="M6.5 10.5v3"/>
+          <path d="M4.5 9.5v5"/>
+        </svg>
+      </button>
+      <button type="button" class="icon-btn send-p6" aria-label="发送">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">4 款喇叭方案</h2>
+    <p class="section-desc">共用同一喇叭造型；差异在容器与展开态。</p>
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">H1 · 渐变环喇叭</div>
+          <div class="card-ref">推荐 · 与发送圆钮呼应</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn horn-h1" aria-pressed="false" aria-label="素颜">
+              <span class="horn-h1-ring"><span class="horn-h1-inner">
+                <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg>
+              </span></span>
+            </button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn horn-h1" aria-pressed="false"><span class="horn-h1-ring"><span class="horn-h1-inner"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></span></span></button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn horn-h1" aria-pressed="true"><span class="horn-h1-ring"><span class="horn-h1-inner"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></span></span></button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn horn-h1" disabled><span class="horn-h1-ring"><span class="horn-h1-inner"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></span></span></button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">H2 · 浅底圆喇叭</div>
+          <div class="card-ref">更轻 · 少一层环</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="直说了" readonly />
+            <button type="button" class="icon-btn horn-h2" aria-pressed="true" aria-label="素颜">
+              <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span><button type="button" class="icon-btn horn-h2" aria-pressed="false" aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+            <div class="state-chip"><span>open</span><button type="button" class="icon-btn horn-h2" aria-pressed="true" aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+            <div class="state-chip"><span>disabled</span><button type="button" class="icon-btn horn-h2" disabled aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">H3 · 方角线框喇叭</div>
+          <div class="card-ref">已落地 · 与发送圆形成形状对比</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn horn-h3" aria-pressed="false" aria-label="素颜">
+              <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span><button type="button" class="icon-btn horn-h3" aria-pressed="false" aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+            <div class="state-chip"><span>open</span><button type="button" class="icon-btn horn-h3" aria-pressed="true" aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+            <div class="state-chip"><span>disabled</span><button type="button" class="icon-btn horn-h3" disabled aria-label="素颜"><svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M8.5 8 18.5 6v12l-10-2V8z"/><path d="M6.5 10.5v3"/><path d="M4.5 9.5v5"/></svg></button></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">H4 · 喇叭 + 声波</div>
+          <div class="card-ref">强调「说出来」</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="帮我说" readonly />
+            <button type="button" class="icon-btn horn-h4" aria-pressed="true" aria-label="素颜">
+              <svg class="horn-svg" viewBox="0 0 24 24">
+                <path class="horn-body" d="M7.5 8.5 16 6.5v11l-8.5-2V8.5z"/>
+                <path d="M5.5 10.5v3"/>
+                <path d="M18.5 10.5c.6.6.6 1.6 0 2.2"/>
+                <path d="M20.5 8.5c1.2 1.2 1.2 3.8 0 5"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn horn-h4" aria-pressed="false" aria-label="素颜">
+                <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M7.5 8.5 16 6.5v11l-8.5-2V8.5z"/><path d="M5.5 10.5v3"/><path d="M18.5 10.5c.6.6.6 1.6 0 2.2"/><path d="M20.5 8.5c1.2 1.2 1.2 3.8 0 5"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn horn-h4" aria-pressed="true" aria-label="素颜">
+                <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M7.5 8.5 16 6.5v11l-8.5-2V8.5z"/><path d="M5.5 10.5v3"/><path d="M18.5 10.5c.6.6.6 1.6 0 2.2"/><path d="M20.5 8.5c1.2 1.2 1.2 3.8 0 5"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn horn-h4" disabled aria-label="素颜">
+                <svg class="horn-svg" viewBox="0 0 24 24"><path class="horn-body" d="M7.5 8.5 16 6.5v11l-8.5-2V8.5z"/><path d="M5.5 10.5v3"/><path d="M18.5 10.5c.6.6.6 1.6 0 2.2"/><path d="M20.5 8.5c1.2 1.2 1.2 3.8 0 5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</body>
+</html>

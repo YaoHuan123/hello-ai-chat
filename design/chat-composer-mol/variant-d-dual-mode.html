@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 D · 双模式（输入 / Mol）</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      padding-bottom: calc(10px + var(--safe-bottom));
+    }
+    .seg {
+      display: flex;
+      margin: 10px 12px 8px;
+      padding: 3px;
+      background: #eceef4;
+      border-radius: 10px;
+    }
+    .seg button {
+      flex: 1;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .seg button[aria-selected="true"] {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(20, 23, 26, 0.08);
+    }
+    .mode-input {
+      display: flex;
+      gap: 8px;
+      padding: 0 12px 4px;
+    }
+    .mode-mol {
+      padding: 0 12px 8px;
+    }
+    .mode-mol-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .mode-mol-head select {
+      border: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+    .mol-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mol-action {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .mol-action:active { background: var(--accent-soft); }
+    .mol-action-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .mol-action-text { font-size: 14px; line-height: 1.45; flex: 1; }
+    .mol-action-send {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .pm-tag { margin-top: 12px; width: min(100%, var(--phone-w)); font-size: 12px; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <p class="mock-label">方案 D · Segmented 切换：输入模式 / Mol 模式</p>
+  <div class="phone">
+    <header class="topbar">
+      <button type="button" class="topbar-back">‹</button>
+      <div class="topbar-av"></div>
+      <div class="topbar-meta">
+        <div class="topbar-name">张小北</div>
+        <div class="topbar-sub">在线</div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="row">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--other">那今晚前能定稿吗？领导催得比较紧。</div>
+          <span class="time">14:06</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="dock">
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" id="tabInput" aria-selected="true">输入</button>
+        <button type="button" role="tab" id="tabMol" aria-selected="false">Mol</button>
+      </div>
+
+      <div id="panelInput" class="mode-input">
+        <input class="composer-input" type="text" placeholder="输入消息" />
+        <button type="button" class="composer-send">发送</button>
+      </div>
+
+      <div id="panelMol" class="mode-mol hidden">
+        <div class="mode-mol-head">
+          <span>基于最近对话</span>
+          <select aria-label="选择 Mol">
+            <option>职场沟通</option>
+            <option>温和拒绝</option>
+            <option>高效汇报</option>
+          </select>
+        </div>
+        <div class="mol-actions">
+          <button type="button" class="mol-action">
+            <span class="mol-action-num">1</span>
+            <span class="mol-action-text">收到，我今晚 8 点前发你终稿，有变动提前说。</span>
+            <span class="mol-action-send">发送</span>
+          </button>
+          <button type="button" class="mol-action">
+            <span class="mol-action-num">2</span>
+            <span class="mol-action-text">可以，我优先收尾这版，明早 9 点前同步一版给你确认。</span>
+            <span class="mol-action-send">发送</span>
+          </button>
+          <button type="button" class="mol-action">
+            <span class="mol-action-num">3</span>
+            <span class="mol-action-text">今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？</span>
+            <span class="mol-action-send">发送</span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <p class="pm-tag">产品要点：Mol 模式占满底栏，每条建议右侧「发送」一键发出；切回输入模式即恢复普通聊天。适合 Mol 使用频率高的用户。</p>
+
+  <script>
+    const tabInput = document.getElementById("tabInput");
+    const tabMol = document.getElementById("tabMol");
+    const panelInput = document.getElementById("panelInput");
+    const panelMol = document.getElementById("panelMol");
+
+    function setMode(mode) {
+      const mol = mode === "mol";
+      tabInput.setAttribute("aria-selected", String(!mol));
+      tabMol.setAttribute("aria-selected", String(mol));
+      panelInput.classList.toggle("hidden", mol);
+      panelMol.classList.toggle("hidden", !mol);
+    }
+    tabInput.addEventListener("click", () => setMode("input"));
+    tabMol.addEventListener("click", () => setMode("mol"));
+  </script>
+</body>
+</html>

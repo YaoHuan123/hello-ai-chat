@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mol 入口 · 8 款方案</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    /* M1 · 渐变 M 字母 */
+    .mol-m1 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--mol-grad);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .mol-m1[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--mol);
+    }
+
+    /* M2 · 透明 sparkle */
+    .mol-m2 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--mol);
+    }
+    .mol-m2 svg { width: 22px; height: 22px; }
+    .mol-m2[aria-pressed="true"] {
+      background: var(--mol-soft);
+    }
+
+    /* M3 · 圆点 + Mol 胶囊 */
+    .mol-m3 {
+      height: 32px;
+      padding: 0 12px 0 8px;
+      border-radius: 16px;
+      background: var(--mol-soft);
+      color: var(--mol);
+      font-size: 13px;
+      font-weight: 600;
+      gap: 6px;
+    }
+    .mol-m3-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--mol-grad);
+    }
+    .mol-m3[aria-pressed="true"] {
+      background: var(--mol);
+      color: #fff;
+    }
+    .mol-m3[aria-pressed="true"] .mol-m3-dot {
+      background: #fff;
+    }
+
+    /* M4 · 魔杖 */
+    .mol-m4 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--mol);
+    }
+    .mol-m4 svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; }
+    .mol-m4[aria-pressed="true"] {
+      background: var(--mol-soft);
+      color: #6b4fe0;
+    }
+
+    /* M5 · 头像环 */
+    .mol-m5 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      position: relative;
+    }
+    .mol-m5-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--mol-grad);
+      padding: 2px;
+    }
+    .mol-m5-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8e0ff, #d4e8ff);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mol);
+    }
+    .mol-m5[aria-pressed="true"] .mol-m5-ring {
+      box-shadow: 0 0 0 2px var(--mol-soft);
+    }
+
+    /* M6 · Orb 光晕 */
+    .mol-m6 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--mol-grad);
+      box-shadow: 0 0 0 0 rgba(123, 97, 255, 0.4);
+    }
+    .mol-m6 svg { width: 18px; height: 18px; color: #fff; }
+    .mol-m6[aria-pressed="true"] {
+      box-shadow: 0 0 0 4px var(--mol-soft), 0 4px 16px rgba(123, 97, 255, 0.35);
+    }
+
+    /* M7 · 双层方角（线上接近） */
+    .mol-m7 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+    }
+    .mol-m7 svg { width: 22px; height: 22px; }
+    .mol-m7[aria-pressed="true"] {
+      color: var(--mol);
+    }
+
+    /* M8 · 填充胶囊 sparkle */
+    .mol-m8 {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 16px;
+      background: var(--mol-grad);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      gap: 5px;
+    }
+    .mol-m8 svg { width: 16px; height: 16px; }
+    .mol-m8[aria-pressed="true"] {
+      filter: brightness(1.08);
+      box-shadow: 0 4px 14px rgba(123, 97, 255, 0.4);
+    }
+
+    .mol-sparkle-path { fill: currentColor; }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>Mol 入口 · 8 款</h1>
+    <p>输入栏左侧 Mol 切换按钮。含默认 / 展开（aria-pressed）/ 禁用三态。</p>
+  </div>
+
+  <div class="section">
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M1 · 渐变 M</div>
+          <div class="card-ref">参考：方案 B 精简原型</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m1" aria-pressed="false" aria-label="Mol">M</button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m1" aria-pressed="false">M</button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m1" aria-pressed="true">M</button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn mol-m1" disabled>M</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M2 · Sparkle 图标</div>
+          <div class="card-ref">参考：ChatGPT / Copilot 助手入口</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m2" aria-pressed="true" aria-label="Mol">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="mol-sparkle-path" d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/>
+                <path class="mol-sparkle-path" d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"/>
+                <path class="mol-sparkle-path" d="M5 15l.5 1.7L7.2 17l-1.7.5L5 19.2l-.5-1.7L2.8 17l1.7-.5L5 15z"/>
+              </svg>
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m2" aria-pressed="false" aria-label="Mol">
+                <svg viewBox="0 0 24 24"><path class="mol-sparkle-path" d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/><path class="mol-sparkle-path" d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m2" aria-pressed="true" aria-label="Mol">
+                <svg viewBox="0 0 24 24"><path class="mol-sparkle-path" d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/><path class="mol-sparkle-path" d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M3 · 圆点胶囊</div>
+          <div class="card-ref">参考：Mol 面板顶栏标签</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m3" aria-pressed="false" aria-label="Mol">
+              <span class="mol-m3-dot"></span> Mol
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly style="flex:1" />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m3" aria-pressed="false"><span class="mol-m3-dot"></span> Mol</button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m3" aria-pressed="true"><span class="mol-m3-dot"></span> Mol</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M4 · 魔杖</div>
+          <div class="card-ref">参考：写作辅助 / 智能润色入口</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m4" aria-pressed="true" aria-label="Mol">
+              <svg viewBox="0 0 24 24"><path d="M15 4l5 5M4 20l7-7"/><path d="M9.5 6.5L3 13l8 8 6.5-6.5"/><path d="M14 3l7 7"/><circle cx="18" cy="6" r="1.5" fill="currentColor" stroke="none"/></svg>
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m4" aria-pressed="false" aria-label="Mol">
+                <svg viewBox="0 0 24 24"><path d="M15 4l5 5M4 20l7-7"/><path d="M9.5 6.5L3 13l8 8 6.5-6.5"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m4" aria-pressed="true" aria-label="Mol">
+                <svg viewBox="0 0 24 24"><path d="M15 4l5 5M4 20l7-7"/><path d="M9.5 6.5L3 13l8 8 6.5-6.5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M5 · 头像环</div>
+          <div class="card-ref">参考：人格化 Mol / 角色切换</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m5" aria-pressed="false" aria-label="Mol">
+              <span class="mol-m5-ring"><span class="mol-m5-inner">M</span></span>
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m5" aria-pressed="false" aria-label="Mol">
+                <span class="mol-m5-ring"><span class="mol-m5-inner">M</span></span>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m5" aria-pressed="true" aria-label="Mol">
+                <span class="mol-m5-ring"><span class="mol-m5-inner">M</span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M6 · Orb 光晕</div>
+          <div class="card-ref">参考：AI 功能高亮 / 品牌强调</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m6" aria-pressed="true" aria-label="Mol">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m6" aria-pressed="false" aria-label="Mol">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m6" aria-pressed="true" aria-label="Mol">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M7 · 线框 Mol 标</div>
+          <div class="card-ref">参考：当前线上 msg-chat-c1-mol-btn</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m7" aria-pressed="true" aria-label="Mol">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a4 4 0 0 1 4 4v1.5a3 3 0 0 1-3 3h-.5a3 3 0 0 0-3 3V17"/>
+                <circle cx="12" cy="19.5" r="1.5" fill="currentColor" stroke="none"/>
+                <path d="M8 7h8M10 10h4"/>
+              </svg>
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m7" aria-pressed="false" aria-label="Mol">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><path d="M12 3a4 4 0 0 1 4 4v1.5a3 3 0 0 1-3 3h-.5a3 3 0 0 0-3 3V17"/><circle cx="12" cy="19.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m7" aria-pressed="true" aria-label="Mol">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><path d="M12 3a4 4 0 0 1 4 4v1.5a3 3 0 0 1-3 3h-.5a3 3 0 0 0-3 3V17"/><circle cx="12" cy="19.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">M8 · 渐变胶囊</div>
+          <div class="card-ref">参考：功能入口强引导</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <button type="button" class="icon-btn mol-m8" aria-pressed="false" aria-label="Mol">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+              Mol
+            </button>
+            <input class="compose-input" placeholder="输入消息" readonly style="flex:1" />
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn mol-m8" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg> Mol</button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn mol-m8" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg> Mol</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</body>
+</html>

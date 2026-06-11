@@ -20,7 +20,7 @@ function mapError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "NOT_FOUND") {
-    res.status(404).json({ code, message: "未找到该 Mol" });
+    res.status(404).json({ code, message: "未找到该素颜" });
     return true;
   }
   if (code === "ALREADY_OWNED") {
@@ -28,7 +28,7 @@ function mapError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "NOT_OWNED") {
-    res.status(404).json({ code, message: "未在列表中找到该 Mol" });
+    res.status(404).json({ code, message: "未在列表中找到该素颜" });
     return true;
   }
   if (code === "INVALID_CATEGORY") {
@@ -36,7 +36,7 @@ function mapError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "MOL_PRIVATE_LIMIT_EXCEEDED") {
-    res.status(429).json({ code, message: "自建 Mol 数量已达上限" });
+    res.status(429).json({ code, message: "自建素颜数量已达上限" });
     return true;
   }
   if (code === "FORBIDDEN") {
@@ -168,7 +168,7 @@ export const createMyMolsRouter = (molWorld: MolWorldService, userMols: UserMols
     try {
       const detail = userMols.getDetailForOwner(user.userId, molWorldId);
       if (!detail) {
-        res.status(404).json({ code: "NOT_FOUND", message: "未找到该 Mol" });
+        res.status(404).json({ code: "NOT_FOUND", message: "未找到该素颜" });
         return;
       }
       const { record, source } = detail;

@@ -1,3 +1,4 @@
+import { SUYAN, formatSuyanDisplayName } from "../../constants/suyanCopy";
 import type { InferredContext, MolProfile } from "../../data/molMock";
 import { POLISH_TONES, type PolishTone } from "../../data/polishMock";
 
@@ -83,10 +84,10 @@ export function MolAssistPanel({
         <div className="aichat-mol-header aichat-mol-header--simple">
           <div className="aichat-mol-current">
             <img src={mol.avatar} width={24} height={24} className="aichat-mol-avatar-s" alt="" />
-            <span>{mol.name}</span>
+            <span>{formatSuyanDisplayName(mol.name)}</span>
           </div>
           <button type="button" className="aichat-mol-link" onClick={onSwitch}>
-            换 Mol
+            换{SUYAN.name}
           </button>
         </div>
 

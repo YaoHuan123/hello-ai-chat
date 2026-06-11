@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 G · 悬浮添加</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone { background: linear-gradient(180deg, #f8f9fc 0%, #eceef4 160px); }
+    .topbar--fab { grid-template-columns: 64px 1fr 16px; }
+    .feed { list-style: none; display: flex; flex-direction: column; gap: 12px; padding-bottom: 72px; }
+    .feed-item {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.06);
+    }
+    .feed-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .swipe-hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 8px 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 G · 底部悬浮添加（FAB）</p>
+  <div class="phone-wrap">
+    <div class="phone phone--fab">
+      <header class="topbar topbar--fab">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+      </header>
+      <div class="feed-scroll">
+        <ul class="feed">
+          <li class="feed-item">
+            <div class="feed-head">
+              <time class="item-time">3小时前</time>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+            <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+          </li>
+          <li class="feed-item">
+            <div class="feed-head">
+              <time class="item-time">昨天</time>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+            <p class="qa-q">你平时几点起床？</p>
+            <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+          </li>
+          <li class="feed-item">
+            <div class="feed-head">
+              <time class="item-time">6月8日</time>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+            <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+          </li>
+        </ul>
+        <p class="swipe-hint">左滑条目可快捷编辑或删除</p>
+      </div>
+      <button type="button" class="fab" aria-label="添加">+</button>
+    </div>
+    <p class="pm-tag">顶栏去掉「添加」，改为右下角 FAB。列表区留出底部空间，适合单手操作。</p>
+  </div>
+</body>
+</html>

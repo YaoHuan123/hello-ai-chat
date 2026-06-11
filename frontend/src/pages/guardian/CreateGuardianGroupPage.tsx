@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { listContactsApi } from "../../services/api";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { createGuardianGroupApi, listGuardianRolesApi } from "../../services/guardianApi";
@@ -6,8 +6,13 @@ import type { ContactItem } from "../../types/contact";
 import type { GuardianRole } from "../../types/guardian";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { ContactAvatar } from "../../components/ContactAvatar";
+import {
+  guardianSceneForFeature,
+  type GuardianCreateFeature,
+} from "../../constants/guardianCreateFeatures";
 
 type Props = {
+  feature: GuardianCreateFeature | null;
   onBack: () => void;
   onCreated: (groupId: string) => void;
 };
@@ -15,7 +20,8 @@ type Props = {
 const MAX_PICK = 3;
 const MAX_INVITE = 19;
 
-export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
+export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
+  const featureScene = feature ? guardianSceneForFeature(feature) : null;
   const [groupName, setGroupName] = useState("");
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [roles, setRoles] = useState<GuardianRole[]>([]);
@@ -31,7 +37,10 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
       setLoading(true);
       setErr("");
       try {
-        const [{ items: cs }, { items: rs }] = await Promise.all([listContactsApi(), listGuardianRolesApi()]);
+        const [{ items: cs }, { items: rs }] = await Promise.all([
+          listContactsApi(),
+          listGuardianRolesApi(featureScene ?? undefined),
+        ]);
         if (!cancelled) {
           setContacts(cs);
           setRoles(rs);
@@ -46,7 +55,9 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [featureScene]);
+
+  const visibleRoles = useMemo(() => roles, [roles]);
 
   function toggleContact(id: string) {
     setSelectedIds((prev) => {
@@ -193,11 +204,11 @@ export function CreateGuardianGroupPage({ onBack, onCreated }: Props) {
           </div>
           {loading ? (
             <p className="aichat-muted-line guardian-create-section__empty">加载中…</p>
-          ) : roles.length === 0 ? (
+          ) : visibleRoles.length === 0 ? (
             <p className="aichat-muted-line guardian-create-section__empty">暂无搭子</p>
           ) : (
             <ul className="guardian-create-role-list">
-              {roles.map((r) => {
+              {visibleRoles.map((r) => {
                 const on = picked.includes(r.id);
                 return (
                   <li key={r.id}>

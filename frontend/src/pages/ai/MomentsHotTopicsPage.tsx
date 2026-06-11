@@ -69,7 +69,7 @@ export function MomentsHotTopicsPage({ onBack }: Props) {
         {loading ? <p className="moments-hot-page__status">加载中…</p> : null}
         {!loading && error ? <p className="moments-hot-page__status moments-hot-page__status--error">{error}</p> : null}
         {!loading && !error && topics.length > 0 ? (
-          <MomentsTopicSection key={epoch} title="" topics={topics} onCollected={onCollected} variant="layered" />
+          <MomentsTopicSection key={epoch} title="" topics={topics} onCollected={onCollected} variant="ranked" />
         ) : null}
         {!loading && !error && topics.length === 0 ? <p className="moments-hot-page__status">暂无热点问题</p> : null}
       </div>

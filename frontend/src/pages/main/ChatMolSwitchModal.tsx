@@ -1,3 +1,4 @@
+import { SUYAN, formatSuyanDisplayName } from "../../constants/suyanCopy";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { MolInMyCollection } from "../../services/stageApi";
@@ -23,7 +24,7 @@ export function ChatMolSwitchModal({ mols, currentId, onClose, onConfirm, onEdit
     >
       <div className="aichat-modal-box aichat-modal-box--chat-mol" onClick={(e) => e.stopPropagation()}>
         <h2 id="chat-mol-switch-title" className="aichat-modal-t">
-          选择 Mol
+          {SUYAN.select}
         </h2>
         <ul className="aichat-mol-pick">
           {mols.map((m) => {
@@ -40,10 +41,10 @@ export function ChatMolSwitchModal({ mols, currentId, onClose, onConfirm, onEdit
                   }}
                 >
                   <span className="msg-mol-pick-avatar" aria-hidden>
-                    {m.name.trim().slice(0, 1) || "M"}
+                    {formatSuyanDisplayName(m.name).trim().slice(0, 1) || SUYAN.defaultBadge}
                   </span>
                   <span className="aichat-mol-name">
-                    <span className="msg-mol-pick-name">{m.name}</span>
+                    <span className="msg-mol-pick-name">{formatSuyanDisplayName(m.name)}</span>
                     <span className="msg-mol-pick-sub">{m.primaryCategory}</span>
                   </span>
                   <span className="aichat-mol-check" aria-hidden>

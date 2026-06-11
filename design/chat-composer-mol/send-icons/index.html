@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>发送 & 素颜 图标方案索引</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #14171a;
+      --muted: #6b7280;
+      --accent: #007aff;
+      --mol: #7b61ff;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 20px 40px;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 8px; font-size: 15px; }
+    .back {
+      display: inline-block;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .note {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+    }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    a {
+      display: block;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      text-decoration: none;
+      color: inherit;
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.04);
+    }
+    a strong { display: block; font-size: 16px; margin-bottom: 4px; }
+    a[data-type="send"] strong { color: var(--accent); }
+    a[data-type="mol"] strong { color: var(--mol); }
+    a[data-type="combo"] strong { color: #14171a; }
+    a span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← 返回输入区方案</a>
+  <h1>发送按钮 & 素颜按钮 · 图标方案</h1>
+  <p class="lead">独立探索底部栏两个核心控件的视觉形态，含默认 / 激活 / 禁用三态。</p>
+  <div class="note">
+    参考来源：iMessage 内嵌圆形发送、Telegram 椭圆发送，以及「卸下伪装、真实表达」语义下的面具、真我、星芒等隐喻。每页可在浏览器直接打开对比。
+  </div>
+  <ul>
+    <li>
+      <a href="gallery-suyan-horn.html" data-type="mol">
+        <strong>素颜 · 喇叭图标 · 4 款</strong>
+        <span>H1 渐变环喇叭、H3 方角线框（已落地）等。</span>
+      </a>
+    </li>
+    <li>
+      <a href="gallery-suyan.html" data-type="mol">
+        <strong>素颜入口 · 8 款（综合）</strong>
+        <span>头像环、揭面、星芒等历史方案。</span>
+      </a>
+    </li>
+    <li>
+      <a href="gallery-send.html" data-type="send">
+        <strong>发送按钮 · 8 款</strong>
+        <span>文字胶囊、圆形纸飞机、Telegram 椭圆、内嵌输入框、渐变实心等。</span>
+      </a>
+    </li>
+    <li>
+      <a href="gallery-mol.html" data-type="mol">
+        <strong>Mol 入口 · 8 款（旧）</strong>
+        <span>历史方案，已由素颜入口替代。</span>
+      </a>
+    </li>
+    <li>
+      <a href="gallery-mol-send.html" data-type="combo">
+        <strong>建议发送 · 6 款（旧 Mol）</strong>
+        <span>建议卡片上的编辑/发送、图标组合等。</span>
+      </a>
+    </li>
+    <li>
+      <a href="gallery-pairs.html" data-type="combo">
+        <strong>配对组合 · 6 组</strong>
+        <span>发送 + 入口成对展示，便于选定整体风格。</span>
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

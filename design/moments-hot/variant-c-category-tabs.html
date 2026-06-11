@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 C · 分类 Tab</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      border: none;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 0.5px solid var(--border);
+    }
+    .tab--active {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    .group-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+    .mini-card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border: 0.5px solid var(--border);
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .mini-card .topic-q { font-size: 15px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 C · 分类 Tab</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <div class="tabs" role="tablist">
+          <button type="button" class="tab tab--active" role="tab" aria-selected="true">全部</button>
+          <button type="button" class="tab" role="tab">职场</button>
+          <button type="button" class="tab" role="tab">生活</button>
+          <button type="button" class="tab" role="tab">文娱</button>
+          <button type="button" class="tab" role="tab">消费</button>
+        </div>
+        <p class="group-title">职场</p>
+        <button type="button" class="mini-card">
+          <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+          <p class="topic-hint">关联近期职场讨论</p>
+        </button>
+        <button type="button" class="mini-card">
+          <p class="topic-q">如果遇到加班和准时下班的冲突，你通常怎么处理？</p>
+        </button>
+        <p class="group-title" style="margin-top:16px">文娱</p>
+        <button type="button" class="mini-card">
+          <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+          <p class="topic-hint">便于好友了解你的偏好</p>
+        </button>
+        <p class="group-title" style="margin-top:16px">消费</p>
+        <div class="mini-card" style="opacity:0.72">
+          <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+          <span class="tag-ok">已收录</span>
+        </div>
+      </div>
+    </div>
+    <p class="pm-tag">按领域 Tab 筛选 + 组内小卡片。适合问题量大、需要分域浏览。</p>
+  </div>
+</body>
+</html>

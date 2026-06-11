@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { getGuardianRoleApi } from "../../services/guardianApi";
 import type { GuardianRole } from "../../types/guardian";
+import { GUARDIAN_STANCE_LABEL } from "../../types/guardian";
 
 type Props = {
   roleId: string;
@@ -83,6 +84,7 @@ export function GuardianRoleDetailPage({ roleId, onBack }: Props) {
                 <h1 className="guardian-role-detail__name">{role.name}</h1>
                 <div className="guardian-role-detail__meta">
                   <span className="guardian-role-detail__scene">{role.scene}</span>
+                  <span className="guardian-role-detail__stance">{GUARDIAN_STANCE_LABEL[role.stance]}</span>
                 </div>
               </div>
             </section>
@@ -95,6 +97,9 @@ export function GuardianRoleDetailPage({ roleId, onBack }: Props) {
                   </span>
                   {role.userMessage}
                 </blockquote>
+              ) : null}
+              {role.stanceNote.trim() ? (
+                <p className="guardian-role-detail__stance-note">{role.stanceNote}</p>
               ) : null}
             </section>
 

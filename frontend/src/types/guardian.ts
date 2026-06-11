@@ -1,4 +1,20 @@
-export type GuardianScene = "恋爱暧昧" | "校园师生" | "家庭亲子" | "居家装修" | "大件采购" | "店铺经营";
+export type GuardianScene =
+  | "恋爱暧昧"
+  | "校园师生"
+  | "家庭亲子"
+  | "亲子沟通"
+  | "科学育儿"
+  | "居家装修"
+  | "大件采购"
+  | "店铺经营";
+
+export type GuardianStance = "neutral" | "facilitator" | "sided";
+
+export const GUARDIAN_STANCE_LABEL: Record<GuardianStance, string> = {
+  neutral: "中立",
+  facilitator: "协调",
+  sided: "有倾向",
+};
 
 export type GuardianRole = {
   id: string;
@@ -7,6 +23,8 @@ export type GuardianRole = {
   title: string;
   tagline: string;
   userMessage: string;
+  stance: GuardianStance;
+  stanceNote: string;
   speechStyle: string;
   triggers: string[];
   guardActions: string[];

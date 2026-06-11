@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 A · 卡片流</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone { background: linear-gradient(180deg, #f8f9fc 0%, #eceef4 160px); }
+    .feed { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .feed-item { display: flex; flex-direction: column; gap: 6px; }
+    .card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 8px 28px rgba(20, 23, 26, 0.1);
+    }
+    .card-top { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 A · 卡片流（当前线上）</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll">
+        <ul class="feed">
+          <li class="feed-item">
+            <time class="item-time">3小时前</time>
+            <article class="card">
+              <div class="card-top"><button type="button" class="more-btn" aria-label="更多">⋯</button></div>
+              <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+            </article>
+          </li>
+          <li class="feed-item">
+            <time class="item-time">昨天</time>
+            <article class="card">
+              <div class="card-top"><button type="button" class="more-btn" aria-label="更多">⋯</button></div>
+              <p class="qa-q">你平时几点起床？</p>
+              <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+            </article>
+          </li>
+          <li class="feed-item">
+            <time class="item-time">6月8日</time>
+            <article class="card">
+              <div class="card-top"><button type="button" class="more-btn" aria-label="更多">⋯</button></div>
+              <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">与线上一致：时间在卡片外、圆角白卡片、右上角 ⋯ 菜单（编辑 / 删除）。</p>
+  </div>
+</body>
+</html>

@@ -2,6 +2,7 @@ import type { AuthResult } from "../types/auth";
 import type { ContactItem } from "../types/contact";
 import { getAuthToken } from "./storage";
 import { isApiMock } from "./mock";
+import { suyanApiErrorLabel } from "../constants/suyanCopy";
 
 /** 生产环境可在 `.env` 中改 `VITE_API_BASE` */
 export const API_BASE = (import.meta.env.VITE_API_BASE ?? "http://localhost:4000").replace(/\/$/, "");
@@ -34,6 +35,8 @@ function readApiErrorMessage(data: ApiErrorShape, status: number): string {
   if (code === "NOT_FOUND" || status === 404) {
     return "接口不存在，请确认 backend 已启动（npm run dev）且包含朋友圈模块";
   }
+  const suyanLabel = code ? suyanApiErrorLabel(code) : undefined;
+  if (suyanLabel) return suyanLabel;
   if (code) return `${code}（HTTP ${status}）`;
   return `请求失败（HTTP ${status}）`;
 }

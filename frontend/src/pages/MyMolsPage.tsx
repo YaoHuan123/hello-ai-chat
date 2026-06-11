@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { SUYAN, formatSuyanDisplayName } from "../constants/suyanCopy";
 import { getMyMols, removeMyMol, type MolInMyCollection } from "../services/stageApi";
 
 type Props = {
@@ -22,10 +23,10 @@ function MolItemCard({
     <div className="aichat-card aichat-page-card aichat-mol-tile aichat-mymols-tile">
       <div className="aichat-mymols-tile__row">
         <div className="aichat-mymols-tile__main">
-          <h2 className="aichat-panel-title">{m.name}</h2>
+          <h2 className="aichat-panel-title">{formatSuyanDisplayName(m.name)}</h2>
           <div className="aichat-mymols-badges" aria-label="来源与状态">
             {m.source === "store" ? (
-              <span className="aichat-mymols-badge aichat-mymols-badge--store">来自 Mol 世界</span>
+              <span className="aichat-mymols-badge aichat-mymols-badge--store">{SUYAN.fromWorldBadge}</span>
             ) : (
               <span className="aichat-mymols-badge aichat-mymols-badge--own">自己创建</span>
             )}
@@ -84,10 +85,10 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
 
   async function handleDelete(m: MolInMyCollection) {
     const isUploader = m.uploaderIsMe === true || (m.uploaderIsMe !== false && m.source === "created");
-    if (!window.confirm(`确定从「我的」移除「${m.name}」？`)) return;
+    if (!window.confirm(`确定从「我的」移除「${formatSuyanDisplayName(m.name)}」？`)) return;
     let deleteFromWorld: boolean | undefined;
     if (isUploader) {
-      deleteFromWorld = window.confirm("该条目为你发布。是否从 Mol 世界同时删除（他人将无法再加入）？");
+      deleteFromWorld = window.confirm(SUYAN.deleteFromWorldConfirm);
     }
     setSaving(true);
     setErr("");
@@ -109,7 +110,7 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
             返回
           </button>
           <div className="aichat-stage-head">
-            <h1>我的 Mol</h1>
+            <h1>{SUYAN.my}</h1>
             <p>已解锁能力</p>
           </div>
           <div className="aichat-topbar-spacer" aria-hidden />
@@ -128,11 +129,11 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>我的 Mol</h1>
+          <h1>{SUYAN.my}</h1>
           <p>共 {items.length} 个</p>
         </div>
         <button className="aichat-btn-ghost" type="button" onClick={onOpenWorld} disabled={saving}>
-          Mol 世界
+          {SUYAN.world}
         </button>
       </header>
 
@@ -140,22 +141,22 @@ export function MyMolsPage({ onBack, onOpenWorld, onOpenDetail }: Props) {
         {err && <p className="aichat-form-msg err">{err}</p>}
 
         <div className="aichat-mymols-toolbar">
-          <p className="aichat-mymols-hint">来源：自己创建，或从 Mol 世界加入。新建与详情在「Mol 信息管理」中维护。</p>
+          <p className="aichat-mymols-hint">{SUYAN.mineHint}</p>
           <button type="button" className="aichat-btn-primary aichat-mymols-btn-new" onClick={openNew} disabled={saving}>
-            新建 Mol
+            {SUYAN.create}
           </button>
         </div>
 
         {items.length === 0 ? (
           <div className="aichat-card aichat-page-card aichat-mymols-empty">
-            <p className="aichat-mymols-empty__t">这里还没有 Mol</p>
-            <p className="aichat-mymols-empty__d">可新建，或前往 Mol 世界浏览并加入。创建后在详情页维护信息条目。</p>
+            <p className="aichat-mymols-empty__t">{SUYAN.mineEmpty}</p>
+            <p className="aichat-mymols-empty__d">{SUYAN.mineEmptyDetail}</p>
             <div className="aichat-mymols-empty__row">
               <button type="button" className="aichat-btn-primary aichat-mymols-empty__cta" onClick={openNew} disabled={saving}>
-                创建 Mol
+                {SUYAN.createQuick}
               </button>
               <button type="button" className="aichat-btn-ghost aichat-mymols-empty__cta" onClick={onOpenWorld} disabled={saving}>
-                打开 Mol 世界
+                {SUYAN.openWorld}
               </button>
             </div>
           </div>

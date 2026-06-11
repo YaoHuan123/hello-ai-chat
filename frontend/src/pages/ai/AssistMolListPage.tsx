@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { SUYAN, formatSuyanDisplayName } from "../../constants/suyanCopy";
 import { getAssistMolItems } from "../../services/molDataLocalStorage";
 import { createMyMolAuto, getMyMols, type MolInMyCollection } from "../../services/stageApi";
 
@@ -25,7 +26,7 @@ function MolCard({ m, onOpen }: { m: MolInMyCollection; onOpen: () => void }) {
   return (
     <button type="button" className="assist-mol-a-card" onClick={onOpen}>
       <div className="assist-mol-a-card__head">
-        <h2 className="assist-mol-a-card__name">{m.name}</h2>
+        <h2 className="assist-mol-a-card__name">{formatSuyanDisplayName(m.name)}</h2>
         <span className="assist-mol-a-card__chev" aria-hidden>
           ›
         </span>
@@ -91,7 +92,7 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData }: Props) {
           返回
         </button>
         <div className="assist-mol-a-topbar__mid">
-          <h1>我的 Mol</h1>
+          <h1>{SUYAN.my}</h1>
         </div>
         <span className="aichat-topbar-spacer" aria-hidden />
       </header>
@@ -112,11 +113,11 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData }: Props) {
 
         {loading ? null : displayItems.length === 0 ? (
           <div className="assist-mol-a-empty">
-            <p className="assist-mol-a-empty__t">暂无 Mol</p>
-            <p className="assist-mol-a-empty__d">点击下方「新建 Mol」将自动创建 MOL-1、MOL-2…，点击进入后可修改名称并添加内容。</p>
+            <p className="assist-mol-a-empty__t">暂无{SUYAN.name}</p>
+            <p className="assist-mol-a-empty__d">{SUYAN.emptyAutoCreateHint}</p>
           </div>
         ) : (
-          <div className="assist-mol-a-list" aria-label="Mol 列表">
+          <div className="assist-mol-a-list" aria-label={`${SUYAN.name}列表`}>
             {displayItems.map((m) => (
               <MolCard key={m.id} m={m} onOpen={() => onOpenData(m.id)} />
             ))}
@@ -126,10 +127,10 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData }: Props) {
 
       <div className="assist-mol-a-dock">
         <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--sec" onClick={onOpenWorld} disabled={loading || atCap || creating}>
-          从 Mol 世界添加
+          {SUYAN.addFromWorld}
         </button>
         <button type="button" className="assist-mol-a-dock__btn assist-mol-a-dock__btn--pri" onClick={handleCreate} disabled={loading || atCap || creating}>
-          {creating ? "创建中…" : "新建 Mol"}
+          {creating ? "创建中…" : SUYAN.create}
         </button>
       </div>
     </div>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 B · 输入框内 Mol + 横向建议</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      padding: 10px 12px calc(12px + var(--safe-bottom));
+    }
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 78%;
+      max-width: 280px;
+      scroll-snap-align: start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #f8f9fc;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .chip:active { background: var(--accent-soft); }
+    .chip-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .compose-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mol-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, #7b61ff, #007aff);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+    }
+    .mol-btn[aria-pressed="true"] {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .pm-tag { margin-top: 12px; width: min(100%, var(--phone-w)); font-size: 12px; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <p class="mock-label">方案 B · 紧凑：Mol 按钮在输入框左侧，建议横向滑动</p>
+  <div class="phone">
+    <header class="topbar">
+      <button type="button" class="topbar-back">‹</button>
+      <div class="topbar-av"></div>
+      <div class="topbar-meta">
+        <div class="topbar-name">张小北</div>
+        <div class="topbar-sub">在线</div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="row">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--other">那今晚前能定稿吗？领导催得比较紧。</div>
+          <span class="time">14:06</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="dock">
+      <div id="chips" class="chips hidden">
+        <button type="button" class="chip" data-fill="收到，我今晚 8 点前发你终稿。">
+          <span class="chip-label">建议 1</span>
+          收到，我今晚 8 点前发你终稿，有变动提前说。
+        </button>
+        <button type="button" class="chip" data-fill="明早 9 点前同步一版给你确认。">
+          <span class="chip-label">建议 2</span>
+          可以，我优先收尾这版，明早 9 点前同步一版给你确认。
+        </button>
+        <button type="button" class="chip" data-fill="今晚先定核心页，其余明天上午补。">
+          <span class="chip-label">建议 3</span>
+          今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？
+        </button>
+      </div>
+      <div class="compose-row">
+        <button type="button" class="mol-btn" id="btnMol" aria-pressed="false" title="Mol · 职场沟通">M</button>
+        <input id="input" class="composer-input" type="text" placeholder="输入消息" />
+        <button type="button" class="composer-send">发送</button>
+      </div>
+    </footer>
+  </div>
+  <p class="pm-tag">产品要点：Mol 按钮像「语音按钮」一样固定在输入区；建议不占纵向空间过多，适合消息较长的场景。长按 M 可切换 Mol（原型未做）。</p>
+
+  <script>
+    const chips = document.getElementById("chips");
+    const btnMol = document.getElementById("btnMol");
+    const input = document.getElementById("input");
+    btnMol.addEventListener("click", () => {
+      const show = chips.classList.toggle("hidden");
+      btnMol.setAttribute("aria-pressed", String(!show));
+    });
+    document.querySelectorAll(".chip").forEach((el) => {
+      el.addEventListener("click", () => {
+        input.value = el.dataset.fill || "";
+        chips.classList.add("hidden");
+        btnMol.setAttribute("aria-pressed", "false");
+      });
+    });
+  </script>
+</body>
+</html>

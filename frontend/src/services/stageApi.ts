@@ -1,4 +1,5 @@
 import { deleteJson, getJson, patchJson, postJson } from "./api";
+import { SUYAN, normalizeLegacySuyanName } from "../constants/suyanCopy";
 import { isApiMock } from "./mock";
 import { getAuthToken } from "./storage";
 
@@ -411,7 +412,7 @@ export async function putMolInfoItems(_molId: string, _items: MolInfoItem[]): Pr
     molInfoById[_molId] = _items.map((x) => ({ ...x }));
     return;
   }
-  throw new Error("请使用保存：信息项已合并到 MOL 世界文件更新接口。");
+  throw new Error("请使用保存：信息项已合并到素颜世界文件更新接口。");
 }
 
 export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolInMyCollection; info: MolInfoItem[] }> {
@@ -420,7 +421,7 @@ export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolI
     const list = mergeMyMolsListMock();
     const item = list.find((m) => m.id === molId);
     if (!item) {
-      throw new Error("未找到该 Mol，可能已移除。请从「我的 Mol」重试。");
+      throw new Error(`未找到该${SUYAN.name}，可能已移除。请从「${SUYAN.my}」重试。`);
     }
     const info = await getMolInfoItems(molId);
     return { item, info };
@@ -430,7 +431,7 @@ export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolI
 
 /** 自建 Mol（私有）：仅出现在「我的 Mol」，不上架 Mol 世界。 */
 export async function createMyMolPrivate(input: CreateMyMolInput): Promise<MolCatalogItem> {
-  const name = input.name.trim();
+  const name = normalizeLegacySuyanName(input.name.trim());
   const summary = input.summary.trim();
   const primaryCategory = input.primaryCategory.trim();
   if (!name || !summary || !primaryCategory) {
@@ -478,7 +479,7 @@ export async function createMyMolPrivate(input: CreateMyMolInput): Promise<MolCa
 export async function createMyMolQuick(name: string): Promise<MolCatalogItem> {
   const trimmed = name.trim();
   if (!trimmed) {
-    throw new Error("请输入 Mol 名称。");
+    throw new Error(`请输入${SUYAN.name}名称。`);
   }
   return createMyMolPrivate({
     name: trimmed,
@@ -487,19 +488,19 @@ export async function createMyMolQuick(name: string): Promise<MolCatalogItem> {
   });
 }
 
-const MOL_AUTO_NAME_RE = /^MOL-(\d+)$/i;
+const MOL_AUTO_NAME_RE = /^(?:素颜|MOL)-(\d+)$/i;
 
-/** 根据已有 Mol 名称生成下一个 MOL-N 序号名。 */
+/** 根据已有名称生成下一个 素颜-N 序号名（兼容旧 MOL-N）。 */
 export function nextAutoMolName(existingNames: string[]): string {
   let max = 0;
   for (const raw of existingNames) {
     const m = raw.trim().match(MOL_AUTO_NAME_RE);
     if (m) max = Math.max(max, Number.parseInt(m[1]!, 10));
   }
-  return `MOL-${max + 1}`;
+  return `${SUYAN.autoPrefix}-${max + 1}`;
 }
 
-/** 自动命名为 MOL-1、MOL-2… 并创建。 */
+/** 自动命名为 素颜-1、素颜-2… 并创建。 */
 export async function createMyMolAuto(existingNames?: string[]): Promise<MolCatalogItem> {
   const names = existingNames ?? (await getMyMols()).map((m) => m.name);
   return createMyMolQuick(nextAutoMolName(names));
@@ -507,7 +508,7 @@ export async function createMyMolAuto(existingNames?: string[]): Promise<MolCata
 
 export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promise<void> {
   const p = { ...patch };
-  if (p.name !== undefined) p.name = p.name.trim();
+  if (p.name !== undefined) p.name = normalizeLegacySuyanName(p.name.trim());
   if (p.summary !== undefined) p.summary = p.summary.trim();
   if (p.primaryCategory !== undefined) p.primaryCategory = p.primaryCategory.trim();
   if (isApiMock()) {
@@ -545,7 +546,7 @@ export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promi
       }
       return;
     }
-    throw new Error("该 Mol 不存在或不可编辑。");
+    throw new Error(`该${SUYAN.name}不存在或不可编辑。`);
   }
   await patchJson<unknown>(`/api/mol-world/${encodeURIComponent(molId)}`, p, authT());
 }
@@ -574,7 +575,7 @@ export async function removeMyMol(molId: string, options?: { deleteFromWorld?: b
       }
       return;
     }
-    throw new Error("该 Mol 不存在或已移除。");
+    throw new Error(`该${SUYAN.name}不存在或已移除。`);
   }
   if (options?.deleteFromWorld) {
     await deleteJson<unknown>(`/api/mol-world/${encodeURIComponent(molId)}`, authT());

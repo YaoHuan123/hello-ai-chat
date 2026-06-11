@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 A · 底栏 Mol 胶囊 + 上拉建议</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      padding-bottom: calc(10px + var(--safe-bottom));
+    }
+    .dock-suggest {
+      padding: 10px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .dock-suggest-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dock-suggest-head button {
+      border: none;
+      background: none;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .dock-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+    }
+    .pm-tag {
+      margin-top: 12px;
+      width: min(100%, var(--phone-w));
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <p class="mock-label">方案 A · 推荐：Mol 与输入同一底栏，消息区纯净</p>
+  <div class="phone">
+    <header class="topbar">
+      <button type="button" class="topbar-back" aria-label="返回">‹</button>
+      <div class="topbar-av"></div>
+      <div class="topbar-meta">
+        <div class="topbar-name">张小北</div>
+        <div class="topbar-sub">在线</div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="row">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--other">明天下午三点开会，材料记得带上。</div>
+          <span class="time">14:02</span>
+        </div>
+      </div>
+      <div class="row row--me">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--me">好的，我这边还在改最后一版。</div>
+          <span class="time">14:05</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--other">那今晚前能定稿吗？领导催得比较紧。</div>
+          <span class="time">14:06</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="dock">
+      <div id="suggestPanel" class="dock-suggest hidden">
+        <div class="dock-suggest-head">
+          <span>Mol 建议 · 职场沟通</span>
+          <button type="button" id="btnSwitch">切换</button>
+        </div>
+        <button type="button" class="suggest-card" data-fill="收到，我今晚 8 点前发你终稿，有变动提前说。">
+          收到，我今晚 8 点前发你终稿，有变动提前说。
+        </button>
+        <button type="button" class="suggest-card" data-fill="可以，我优先收尾这版，明早 9 点前同步一版给你确认。">
+          可以，我优先收尾这版，明早 9 点前同步一版给你确认。
+        </button>
+        <button type="button" class="suggest-card" data-fill="今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？">
+          今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？
+        </button>
+      </div>
+      <div class="dock-row">
+        <button type="button" class="mol-pill" id="btnMol" aria-expanded="false">
+          <span class="mol-pill__icon">M</span>
+          职场沟通
+        </button>
+        <input id="input" class="composer-input" type="text" placeholder="输入消息" />
+        <button type="button" class="composer-send" id="btnSend">发送</button>
+      </div>
+    </footer>
+  </div>
+  <p class="pm-tag">产品要点：点击 Mol 胶囊展开/收起建议；点建议填入输入框（或长按直接发送）。消息列表不再出现 Mol 占位气泡。</p>
+
+  <script>
+    const panel = document.getElementById("suggestPanel");
+    const btnMol = document.getElementById("btnMol");
+    const input = document.getElementById("input");
+    const btnSend = document.getElementById("btnSend");
+
+    btnMol.addEventListener("click", () => {
+      const open = panel.classList.toggle("hidden");
+      btnMol.setAttribute("aria-expanded", String(!open));
+    });
+
+    document.querySelectorAll(".suggest-card").forEach((el) => {
+      el.addEventListener("click", () => {
+        input.value = el.dataset.fill || "";
+        input.focus();
+        panel.classList.add("hidden");
+        btnMol.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    btnSend.addEventListener("click", () => {
+      if (!input.value.trim()) return;
+      input.value = "";
+    });
+  </script>
+</body>
+</html>

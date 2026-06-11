@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>状态页 · 加载 / 空 / 错误</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    body { padding-bottom: 40px; }
+    .page-head { max-width: 960px; margin: 0 auto; padding: 16px 12px 20px; }
+    .page-head h1 { font-size: 20px; margin-bottom: 6px; }
+    .page-head p { font-size: 14px; color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+    .card-label { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; padding: 0 4px; }
+    .phone--mini { height: 380px; }
+    .status {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 0 20px;
+    }
+    .status--err { color: #c0392b; }
+    .status-spinner {
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 12px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-btn {
+      margin-top: 16px;
+      border: none;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .status-empty-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <div class="page-head">
+    <h1>状态页 · 4 款</h1>
+    <p>加载中、无数据、请求失败、刷新引导。</p>
+  </div>
+  <div class="grid">
+    <div>
+      <p class="card-label">S1 · 加载中</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <div class="topbar-head"><h1 class="topbar-title">热点</h1></div>
+          </header>
+          <div class="status">
+            <div class="status-spinner" aria-hidden></div>
+            <p>加载中…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">S2 · 暂无问题（线上）</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <div class="topbar-head">
+              <h1 class="topbar-title">热点</h1>
+              <p class="topbar-updated">更新于 6月10日 09:30</p>
+            </div>
+          </header>
+          <div class="status"><p>暂无热点问题</p></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">S3 · 加载失败</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <div class="topbar-head"><h1 class="topbar-title">热点</h1></div>
+          </header>
+          <div class="status">
+            <p class="status--err">网络异常，请稍后重试</p>
+            <button type="button" class="status-btn">重新加载</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">S4 · 空状态 + 说明</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <div class="topbar-head"><h1 class="topbar-title">热点</h1></div>
+          </header>
+          <div class="status">
+            <div class="status-empty-icon" aria-hidden></div>
+            <p>今日热点尚未生成</p>
+            <p style="margin-top:8px;font-size:13px">系统会根据热搜定期更新问题，请稍后再来。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { SUYAN } from "../../constants/suyanCopy";
 import { listContactsApi } from "../../services/api";
 import { createFriendRequestApi } from "../../services/friendRequestsApi";
 import { wsClient } from "../../services/wsClient";
@@ -71,7 +72,7 @@ export function PersonaTab({
     });
   }, [contacts, q]);
 
-  const showMolEntry = !q || "mol".includes(q) || q.includes("mol") || q.includes("我的");
+  const showMolEntry = !q || q.includes("素颜") || q.includes("我的") || q.includes("mol");
   const showAiEntry = !q || q.includes("搭") || q.includes("搭子") || q.includes("ai");
 
   async function onAddSubmit(e: FormEvent) {
@@ -141,7 +142,7 @@ export function PersonaTab({
                 <AppIcon name="mol" className="app-icon app-icon--mol" />
               </span>
               <span className="contacts-entry-card__body">
-                <span className="contacts-entry-card__title">我的 Mol</span>
+                <span className="contacts-entry-card__title">{SUYAN.my}</span>
               </span>
               <span className="contacts-entry-card__arrow" aria-hidden>
                 ›

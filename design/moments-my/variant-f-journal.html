@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 F · 日记本</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone {
+      background: #faf6ef;
+      background-image:
+        linear-gradient(rgba(176, 122, 26, 0.04) 1px, transparent 1px);
+      background-size: 100% 28px;
+    }
+    .journal { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+    .journal-item { display: flex; gap: 14px; align-items: flex-start; }
+    .journal-date {
+      flex-shrink: 0;
+      width: 48px;
+      text-align: center;
+      padding-top: 2px;
+    }
+    .journal-date__day {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-strong);
+      line-height: 1.1;
+    }
+    .journal-date__mon {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .journal-body {
+      flex: 1;
+      min-width: 0;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed rgba(176, 122, 26, 0.2);
+    }
+    .journal-body .item-body {
+      font-size: 16px;
+      line-height: 1.65;
+      font-family: "PingFang SC", "Songti SC", serif;
+    }
+    .journal-body .qa-q {
+      font-size: 14px;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .journal-meta {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .journal-meta button {
+      border: none;
+      background: none;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 F · 日记本</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar" style="background:rgba(250,246,239,0.95)">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll">
+        <ul class="journal">
+          <li class="journal-item">
+            <div class="journal-date">
+              <span class="journal-date__day">10</span>
+              <span class="journal-date__mon">6月</span>
+            </div>
+            <div class="journal-body">
+              <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+              <div class="journal-meta"><time>09:20</time><button type="button">编辑</button></div>
+            </div>
+          </li>
+          <li class="journal-item">
+            <div class="journal-date">
+              <span class="journal-date__day">9</span>
+              <span class="journal-date__mon">6月</span>
+            </div>
+            <div class="journal-body">
+              <p class="qa-q">你平时几点起床？</p>
+              <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+              <div class="journal-meta"><time>21:05</time><button type="button">编辑</button></div>
+            </div>
+          </li>
+          <li class="journal-item">
+            <div class="journal-date">
+              <span class="journal-date__day">8</span>
+              <span class="journal-date__mon">6月</span>
+            </div>
+            <div class="journal-body">
+              <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+              <div class="journal-meta"><time>18:30</time><button type="button">编辑</button></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">参考 Day One 纸感日记：横线背景、左侧日期块、略大的衬线正文，偏私人记录气质。</p>
+  </div>
+</body>
+</html>

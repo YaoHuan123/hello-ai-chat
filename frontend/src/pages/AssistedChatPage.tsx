@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { SUYAN } from "../constants/suyanCopy";
 import { getMolById, MOL_LIST, type MolProfile } from "../data/molMock";
 import {
   mockPolishVariants,
@@ -256,7 +257,7 @@ export function AssistedChatPage({ onBack }: Props) {
           <h1 id={titleId} className="aichat-assist-name">
             张三
           </h1>
-          <p className="aichat-assist-sub">与真人聊天 · Mol 仅辅助成稿</p>
+          <p className="aichat-assist-sub">{SUYAN.assistChatSub}</p>
         </div>
         <div className="aichat-assist-nav-pad" aria-hidden />
       </header>
@@ -296,8 +297,8 @@ export function AssistedChatPage({ onBack }: Props) {
           className="aichat-input-polish"
           onClick={onPolishClick}
           disabled={!input.trim()}
-          title={input.trim() ? "润色（Ctrl/Cmd + J）" : "先写一句，再让 Mol 润色"}
-          aria-label="让 Mol 润色这段话"
+          title={input.trim() ? "润色（Ctrl/Cmd + J）" : `先写一句，再让${SUYAN.name}润色`}
+          aria-label={SUYAN.polishFor}
         >
           ✨
         </button>
@@ -315,9 +316,9 @@ export function AssistedChatPage({ onBack }: Props) {
         type="button"
         className="aichat-mol-float"
         onClick={onOpenAssistPanel}
-        title="打开 Mol 推荐"
+        title={SUYAN.openSuggest}
         aria-pressed={panelOpen}
-        aria-label="打开或关闭 Mol 推荐面板"
+        aria-label={`打开或关闭${SUYAN.name}推荐面板`}
       >
         <img src={mol.avatar} className="aichat-mol-float-img" alt="" width={50} height={50} />
       </button>

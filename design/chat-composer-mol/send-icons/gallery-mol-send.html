@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mol 建议发送 · 6 款方案</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .suggest-card {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f4f5f9;
+      font-size: 14px;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    /* MS1 · 编辑 + 发送双按钮 */
+    .ms1-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .ms1-btn {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .ms1-edit { background: #eef0f4; color: var(--text); }
+    .ms1-send { background: var(--accent); color: #fff; }
+
+    /* MS2 · 整卡点击 + 右侧发送图标 */
+    .ms2-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f4f5f9;
+      cursor: pointer;
+    }
+    .ms2-text { flex: 1; font-size: 14px; line-height: 1.45; }
+    .ms2-send {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--mol-grad);
+      color: #fff;
+      border: none;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+    .ms2-send svg { width: 14px; height: 14px; margin-left: 1px; }
+
+    /* MS3 · 单行右滑发送 */
+    .ms3-row {
+      display: flex;
+      align-items: stretch;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f4f5f9;
+    }
+    .ms3-text {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .ms3-send {
+      width: 56px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* MS4 · Mol 色发送（区分普通发送） */
+    .ms4-send {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--mol-grad);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ms4-send svg { width: 14px; height: 14px; }
+
+    /* MS5 · 图标-only 发送条 */
+    .ms5-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 0.5px solid var(--border);
+    }
+    .ms5-text { flex: 1; font-size: 13px; line-height: 1.4; color: var(--text); }
+    .ms5-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-family: inherit;
+    }
+    .ms5-edit { background: #eef0f4; color: var(--muted); }
+    .ms5-send { background: var(--mol-soft); color: var(--mol); }
+    .ms5-send svg { width: 18px; height: 18px; }
+
+    /* MS6 · 底部固定 Mol 发送栏 */
+    .ms6-dock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--mol-soft);
+      border-radius: 14px;
+      border: 0.5px solid rgba(123, 97, 255, 0.2);
+    }
+    .ms6-preview {
+      flex: 1;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ms6-send {
+      height: 34px;
+      padding: 0 16px;
+      border-radius: 17px;
+      border: none;
+      background: var(--mol);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>Mol 建议发送 · 6 款</h1>
+    <p>Mol 面板内选中建议后的发送交互。区分「填入输入框」与「直接发送」。</p>
+  </div>
+
+  <div class="section">
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS1 · 编辑 + 发送</div>
+          <div class="card-ref">参考：方案 B+ 双按钮</div>
+        </div>
+        <div class="card-body">
+          <div class="suggest-card">今天下班前我把修改版发你，有问题随时说。</div>
+          <div class="ms1-actions">
+            <button type="button" class="ms1-btn ms1-edit">编辑</button>
+            <button type="button" class="ms1-btn ms1-send">发送</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS2 · 卡片 + 圆形发送</div>
+          <div class="card-ref">参考：快捷回复一键发出</div>
+        </div>
+        <div class="card-body">
+          <div class="ms2-row">
+            <p class="ms2-text">收到，我这边今天内给你反馈。</p>
+            <button type="button" class="ms2-send" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS3 · 侧栏发送</div>
+          <div class="card-ref">参考：邮件列表滑动操作</div>
+        </div>
+        <div class="card-body">
+          <div class="ms3-row">
+            <p class="ms3-text">可以的，我们三点线上对齐一下细节。</p>
+            <button type="button" class="ms3-send">发送</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS4 · Mol 色发送</div>
+          <div class="card-ref">参考：区分 AI 建议与普通消息</div>
+        </div>
+        <div class="card-body">
+          <div class="suggest-card">我先整理一版要点，稍后同步给你确认。</div>
+          <div style="text-align:right;margin-top:8px">
+            <button type="button" class="ms4-send">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+              发送
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS5 · 图标双键</div>
+          <div class="card-ref">参考：紧凑工具栏</div>
+        </div>
+        <div class="card-body">
+          <div class="ms5-bar">
+            <p class="ms5-text">没问题，我下午把最终稿发你。</p>
+            <button type="button" class="ms5-icon ms5-edit" aria-label="编辑">✎</button>
+            <button type="button" class="ms5-icon ms5-send" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">MS6 · 底部预览发送栏</div>
+          <div class="card-ref">参考：选中建议后固定底栏</div>
+        </div>
+        <div class="card-body">
+          <div class="ms6-dock">
+            <p class="ms6-preview">好的，我今天下班前更新文档并发你。</p>
+            <button type="button" class="ms6-send">发送</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</body>
+</html>

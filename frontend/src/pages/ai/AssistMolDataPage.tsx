@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SUYAN, formatSuyanDisplayName, normalizeLegacySuyanName } from "../../constants/suyanCopy";
 import { getMyMolDetailForEdit, updateMyMol } from "../../services/stageApi";
 import {
   addAssistMolItem,
@@ -119,7 +120,7 @@ function RenameMolModal({
       <div className="aichat-moldt-info-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <h4 className="aichat-moldt-info-form__h">修改名称</h4>
         <label className="aichat-moldt-info-form__lab" htmlFor="assist-mol-rename">
-          Mol 名称
+          {SUYAN.name}
         </label>
         <input
           id="assist-mol-rename"
@@ -169,7 +170,7 @@ export function AssistMolDataPage({ molId, onBack }: Props) {
     getMyMolDetailForEdit(molId)
       .then(({ item }) => {
         if (!cancelled) {
-          setMolName(item.name);
+          setMolName(formatSuyanDisplayName(item.name));
           setCanRename(item.uploaderIsMe !== false && item.source === "created");
           setLoadErr("");
         }
@@ -198,9 +199,9 @@ export function AssistMolDataPage({ molId, onBack }: Props) {
   }
 
   async function saveRename(name: string) {
-    const trimmed = name.trim();
+    const trimmed = normalizeLegacySuyanName(name.trim());
     if (!trimmed) {
-      setRenameErr("请输入 Mol 名称。");
+      setRenameErr(`请输入${SUYAN.name}名称。`);
       return;
     }
     if (trimmed === molName) {
@@ -250,7 +251,7 @@ export function AssistMolDataPage({ molId, onBack }: Props) {
           返回
         </button>
         <div className="assist-mol-a-topbar__mid">
-          <h1>{molName || "Mol 数据"}</h1>
+          <h1>{formatSuyanDisplayName(molName) || SUYAN.data}</h1>
           <p>对话样例与约束</p>
         </div>
         {canRename ? (

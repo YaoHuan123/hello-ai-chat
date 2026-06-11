@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 B · 热搜榜排名</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .rank-list { list-style: none; background: var(--surface); border-radius: 16px; overflow: hidden; border: 0.5px solid var(--border); }
+    .rank-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 14px 14px 12px;
+      border-bottom: 0.5px solid var(--border);
+      cursor: pointer;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+    .rank-item:last-child { border-bottom: none; }
+    .rank-item--done { opacity: 0.65; cursor: default; }
+    .rank-num {
+      flex-shrink: 0;
+      width: 22px;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+    .rank-num--hot { color: #e03e3e; }
+    .rank-num--warm { color: var(--accent); }
+    .rank-main { flex: 1; min-width: 0; }
+    .rank-main .topic-q { font-size: 15px; margin-bottom: 4px; }
+    .rank-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; padding-top: 2px; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 B · 热搜榜排名</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <ul class="rank-list">
+          <li>
+            <button type="button" class="rank-item">
+              <span class="rank-num rank-num--hot">1</span>
+              <div class="rank-main">
+                <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+                <p class="topic-hint">关联近期职场讨论</p>
+              </div>
+              <span class="rank-arrow">›</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rank-item">
+              <span class="rank-num rank-num--hot">2</span>
+              <div class="rank-main">
+                <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+                <p class="topic-hint">文娱日常</p>
+              </div>
+              <span class="rank-arrow">›</span>
+            </button>
+          </li>
+          <li>
+            <div class="rank-item rank-item--done">
+              <span class="rank-num rank-num--warm">3</span>
+              <div class="rank-main">
+                <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+                <span class="tag-ok">已收录</span>
+              </div>
+            </div>
+          </li>
+          <li>
+            <button type="button" class="rank-item">
+              <span class="rank-num">4</span>
+              <div class="rank-main">
+                <p class="topic-q">夏季出行你更优先性价比还是体验？</p>
+              </div>
+              <span class="rank-arrow">›</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rank-item">
+              <span class="rank-num">5</span>
+              <div class="rank-main">
+                <p class="topic-q">如果遇到加班和准时下班的冲突，你通常怎么处理？</p>
+              </div>
+              <span class="rank-arrow">›</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">参考微博 / 知乎热榜：序号强调排序，前三高亮，整页一张白卡片。</p>
+  </div>
+</body>
+</html>

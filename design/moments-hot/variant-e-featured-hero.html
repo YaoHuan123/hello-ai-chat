@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 E · 头条 + 列表</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .hero {
+      background: linear-gradient(145deg, #f5a962, #e8783a);
+      border-radius: 20px;
+      padding: 20px 18px;
+      color: #fff;
+      margin-bottom: 16px;
+      box-shadow: 0 12px 32px rgba(232, 120, 58, 0.35);
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      border: none;
+      cursor: pointer;
+    }
+    .hero-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+    .hero .topic-q { color: #fff; font-size: 18px; margin-bottom: 8px; }
+    .hero .topic-hint { color: rgba(255,255,255,0.85); }
+    .hero-cta {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.22);
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    .list-compact { list-style: none; }
+    .list-compact li {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .list-compact button {
+      flex: 1;
+      border: none;
+      background: none;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+    .list-compact .topic-q { font-size: 14px; margin: 0; }
+    .list-compact .chev { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 E · 头条 + 列表</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <button type="button" class="hero">
+          <p class="hero-label">今日推荐</p>
+          <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+          <p class="topic-hint">关联近期职场讨论，点击作答</p>
+          <span class="hero-cta">去回答</span>
+        </button>
+        <ul class="list-compact">
+          <li>
+            <button type="button">
+              <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+            </button>
+            <span class="chev">›</span>
+          </li>
+          <li style="opacity:0.65">
+            <div style="flex:1">
+              <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+              <span class="tag-ok">已收录</span>
+            </div>
+          </li>
+          <li>
+            <button type="button">
+              <p class="topic-q">夏季出行你更优先性价比还是体验？</p>
+            </button>
+            <span class="chev">›</span>
+          </li>
+          <li>
+            <button type="button">
+              <p class="topic-q">如果遇到加班和准时下班的冲突，你通常怎么处理？</p>
+            </button>
+            <span class="chev">›</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">首条渐变头条卡片吸引注意，其余问题紧凑列表，适合每日主推 1 题。</p>
+  </div>
+</body>
+</html>

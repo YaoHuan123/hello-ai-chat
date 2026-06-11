@@ -8,6 +8,7 @@ import type { ContactItem } from "../../types/contact";
 import type { ChatLocalMessage } from "../../types/chat";
 import { MOMENTS_EXPLORE_ERROR_REPLY, MOMENTS_EXPLORE_FALLBACK_REPLY } from "../../types/momentsExplore";
 import { contactDisplayName } from "../../lib/contactDisplay";
+import { ChatComposeBar } from "../../components/ChatComposeBar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { AppIcon } from "../../components/AppIcons";
 import { getMyAvatarContact } from "../../services/storage";
@@ -159,20 +160,15 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
         )}
       </div>
 
-      <div className="msg-chat-composer msg-chat-c1-composer">
-        <input
-          className="msg-chat-c1-input"
-          placeholder="探索 TA 的日常…"
+      <div className="msg-chat-composer msg-chat-c1-composer msg-chat-c1-dock">
+        <ChatComposeBar
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") void onSend();
-          }}
+          onChange={setInput}
+          onSend={() => void onSend()}
+          placeholder="探索 TA 的日常…"
           disabled={sending}
+          sendDisabled={sending}
         />
-        <button type="button" className="msg-chat-c1-send" onClick={() => void onSend()} disabled={sending}>
-          发送
-        </button>
       </div>
     </div>
   );

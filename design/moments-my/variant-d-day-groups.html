@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 D · 按日分组</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .day-group { margin-bottom: 20px; }
+    .day-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 4px 2px 10px;
+    }
+    .day-rows { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .day-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-radius: 14px;
+      border: 0.5px solid var(--border);
+    }
+    .day-row-time {
+      flex-shrink: 0;
+      width: 42px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      padding-top: 2px;
+    }
+    .day-row-main { flex: 1; min-width: 0; }
+    .day-row-main .item-body { font-size: 14px; }
+    .day-row-more { flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 D · 按日分组</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll">
+        <section class="day-group">
+          <h2 class="day-title">今天</h2>
+          <ul class="day-rows">
+            <li class="day-row">
+              <time class="day-row-time">09:20</time>
+              <div class="day-row-main">
+                <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+              </div>
+              <button type="button" class="more-btn day-row-more" aria-label="更多">⋯</button>
+            </li>
+          </ul>
+        </section>
+        <section class="day-group">
+          <h2 class="day-title">昨天</h2>
+          <ul class="day-rows">
+            <li class="day-row">
+              <time class="day-row-time">21:05</time>
+              <div class="day-row-main">
+                <p class="qa-q">你平时几点起床？</p>
+                <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+              </div>
+              <button type="button" class="more-btn day-row-more" aria-label="更多">⋯</button>
+            </li>
+          </ul>
+        </section>
+        <section class="day-group">
+          <h2 class="day-title">6月8日</h2>
+          <ul class="day-rows">
+            <li class="day-row">
+              <time class="day-row-time">18:30</time>
+              <div class="day-row-main">
+                <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+              </div>
+              <button type="button" class="more-btn day-row-more" aria-label="更多">⋯</button>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+    <p class="pm-tag">与朋友圈「探索记录」分组一致：今天 / 昨天 / 日期标题，行内显示具体时间。</p>
+  </div>
+</body>
+</html>

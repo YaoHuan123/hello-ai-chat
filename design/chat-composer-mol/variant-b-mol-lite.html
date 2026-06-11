@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 B 精简 · Mol 面板</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      padding-bottom: calc(6px + var(--safe-bottom));
+    }
+
+    .mol-panel {
+      padding: 0 12px 8px;
+      animation: fadeUp 0.18s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mol-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 2px 10px;
+    }
+    .mol-bar-pick {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      cursor: pointer;
+      min-width: 0;
+    }
+    .mol-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7b61ff, #007aff);
+      flex-shrink: 0;
+    }
+    .mol-bar-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mol-bar-chev {
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .mol-bar-close {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 14px;
+      background: #f2f2f7;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .mol-suggest {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+    }
+    .mol-suggest button {
+      width: 100%;
+      padding: 11px 12px;
+      border: none;
+      border-radius: 12px;
+      background: #f4f5f9;
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: left;
+      font-family: inherit;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .mol-suggest button:active {
+      background: var(--accent-soft);
+    }
+    .mol-suggest button:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .mol-foot {
+      padding: 8px 2px 4px;
+      text-align: center;
+    }
+    .mol-foot button {
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .mol-foot button:active { color: var(--accent); }
+
+    .mol-hint {
+      padding: 16px 4px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .mol-hint a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .compose-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px 10px;
+    }
+    .mol-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, #7b61ff, #007aff);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .mol-btn[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+    }
+    .sheet {
+      width: 100%;
+      background: var(--surface);
+      border-radius: 16px 16px 0 0;
+      padding: 12px 12px calc(16px + var(--safe-bottom));
+    }
+    .sheet-title {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--muted);
+    }
+    .sheet-list { list-style: none; margin: 0; padding: 0; }
+    .sheet-item {
+      width: 100%;
+      padding: 14px 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      font-size: 16px;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sheet-item[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .phone { position: relative; }
+
+    .pm-tag {
+      margin-top: 12px;
+      width: min(100%, var(--phone-w));
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-wrap">
+    <p class="mock-label">方案 B 精简 · 点 M 后只保留：Mol 条 + 三条建议 + 输入</p>
+
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-back">‹</button>
+        <div class="topbar-av"></div>
+        <div class="topbar-meta">
+          <div class="topbar-name">张小北</div>
+          <div class="topbar-sub">在线</div>
+        </div>
+      </header>
+
+      <div class="messages">
+        <div class="row">
+          <div class="av"></div>
+          <div class="col">
+            <div class="bubble bubble--other">那今晚前能定稿吗？领导催得比较紧。</div>
+            <span class="time">14:06</span>
+          </div>
+        </div>
+      </div>
+
+      <footer class="dock">
+        <div id="molPanel" class="mol-panel hidden">
+          <div class="mol-bar">
+            <button type="button" class="mol-bar-pick" id="btnPick">
+              <span class="mol-dot" aria-hidden></span>
+              <span class="mol-bar-label" id="molLabel">Mol · 职场沟通</span>
+              <span class="mol-bar-chev">▾</span>
+            </button>
+            <button type="button" class="mol-bar-close" id="btnClose" aria-label="收起">×</button>
+          </div>
+
+          <ul class="mol-suggest" id="suggestList" aria-label="回复建议"></ul>
+
+          <div class="mol-foot">
+            <button type="button" id="btnRefresh">换一批</button>
+          </div>
+
+          <div id="viewEmpty" class="mol-hint hidden">
+            还没有 Mol，<a href="#">去添加</a>
+          </div>
+        </div>
+
+        <div class="compose-row">
+          <button type="button" class="mol-btn" id="btnMol" aria-pressed="false" aria-label="Mol">M</button>
+          <input id="input" class="composer-input" type="text" placeholder="输入消息" />
+          <button type="button" class="composer-send" id="btnSend">发送</button>
+        </div>
+      </footer>
+
+      <div id="sheet" class="overlay hidden" role="presentation">
+        <div class="sheet" onclick="event.stopPropagation()">
+          <p class="sheet-title">选择 Mol</p>
+          <ul class="sheet-list" id="molOptions"></ul>
+        </div>
+      </div>
+    </div>
+
+    <p class="pm-tag">
+      精简原则：去掉横滑快捷条与「编辑/发送」双按钮；点建议即填入输入框并收起面板，用户确认后点发送。切换 Mol 合并为顶栏一行，「换一批」改为文字链。
+    </p>
+  </div>
+
+  <script>
+    const ITEMS = [
+      "收到，我今晚 8 点前发你终稿，有变动提前说。",
+      "可以，我优先收尾这版，明早 9 点前同步一版给你确认。",
+      "今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？",
+    ];
+    const MOLS = ["职场沟通", "温和拒绝", "高效汇报"];
+
+    let mol = MOLS[0];
+    let open = false;
+
+    const panel = document.getElementById("molPanel");
+    const suggestList = document.getElementById("suggestList");
+    const btnMol = document.getElementById("btnMol");
+    const btnClose = document.getElementById("btnClose");
+    const btnPick = document.getElementById("btnPick");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const molLabel = document.getElementById("molLabel");
+    const input = document.getElementById("input");
+    const sheet = document.getElementById("sheet");
+    const molOptions = document.getElementById("molOptions");
+    const viewEmpty = document.getElementById("viewEmpty");
+
+    function renderSuggest() {
+      suggestList.innerHTML = "";
+      ITEMS.forEach((text) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = text;
+        btn.addEventListener("click", () => {
+          input.value = text;
+          closePanel();
+          input.focus();
+        });
+        li.appendChild(btn);
+        suggestList.appendChild(li);
+      });
+    }
+
+    function renderMolOptions() {
+      molOptions.innerHTML = "";
+      MOLS.forEach((name) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sheet-item";
+        btn.setAttribute("aria-selected", String(name === mol));
+        btn.innerHTML = `<span>${name}</span>${name === mol ? "<span>✓</span>" : ""}`;
+        btn.addEventListener("click", () => {
+          mol = name;
+          molLabel.textContent = "Mol · " + mol;
+          sheet.classList.add("hidden");
+          renderMolOptions();
+          refresh();
+        });
+        li.appendChild(btn);
+        molOptions.appendChild(li);
+      });
+    }
+
+    function openPanel() {
+      open = true;
+      panel.classList.remove("hidden");
+      btnMol.setAttribute("aria-pressed", "true");
+      viewEmpty.classList.add("hidden");
+      suggestList.classList.remove("hidden");
+      document.querySelector(".mol-foot").classList.remove("hidden");
+      renderSuggest();
+    }
+
+    function closePanel() {
+      open = false;
+      panel.classList.add("hidden");
+      btnMol.setAttribute("aria-pressed", "false");
+      sheet.classList.add("hidden");
+    }
+
+    function refresh() {
+      suggestList.querySelectorAll("button").forEach((b) => {
+        b.disabled = true;
+      });
+      btnRefresh.disabled = true;
+      setTimeout(() => {
+        renderSuggest();
+        btnRefresh.disabled = false;
+      }, 500);
+    }
+
+    btnMol.addEventListener("click", () => (open ? closePanel() : openPanel()));
+    btnClose.addEventListener("click", closePanel);
+    btnPick.addEventListener("click", () => {
+      renderMolOptions();
+      sheet.classList.remove("hidden");
+    });
+    sheet.addEventListener("click", () => sheet.classList.add("hidden"));
+    btnRefresh.addEventListener("click", refresh);
+
+    document.getElementById("btnSend").addEventListener("click", () => {
+      input.value = "";
+    });
+
+    renderSuggest();
+    renderMolOptions();
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>配对组合 · 6 组方案</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .pair-card .card-body { padding: 0; }
+
+    .phone-mini {
+      background: var(--bg);
+      padding: 12px;
+    }
+
+    .phone-mini-dock {
+      background: var(--surface);
+      border-radius: 14px 14px 0 0;
+      border-top: 0.5px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .mol-panel-mini {
+      padding: 10px 12px 6px;
+    }
+    .mol-panel-mini p {
+      font-size: 13px;
+      line-height: 1.4;
+      padding: 10px 12px;
+      background: #f4f5f9;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+
+    .compose-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .input-pill {
+      flex: 1;
+      height: 36px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 0 14px;
+      font-size: 15px;
+      font-family: inherit;
+      background: #fafbfc;
+    }
+
+    /* Reusable icon classes */
+    .ib { border: none; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ib svg { display: block; }
+
+    .mol-grad-m { width:36px;height:36px;border-radius:10px;background:var(--mol-grad);color:#fff;font-size:15px;font-weight:800; }
+    .mol-spark { width:36px;height:36px;border-radius:10px;background:transparent;color:var(--mol); }
+    .mol-spark svg { width:22px;height:22px; }
+    .mol-pill { height:32px;padding:0 12px 0 8px;border-radius:16px;background:var(--mol-soft);color:var(--mol);font-size:13px;font-weight:600;gap:6px; }
+    .mol-pill-dot { width:8px;height:8px;border-radius:50%;background:var(--mol-grad); }
+
+    .send-text { height:36px;padding:0 16px;border-radius:18px;background:var(--accent);color:#fff;font-size:15px;font-weight:600; }
+    .send-circle { width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff; }
+    .send-circle svg { width:17px;height:17px;margin-left:1px; }
+    .send-ghost { width:36px;height:36px;border-radius:10px;background:transparent;color:var(--accent); }
+    .send-ghost svg { width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+    .send-square { width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff; }
+    .send-square svg { width:18px;height:18px; }
+
+    .pair-tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      background: #eef0f4;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .recommend {
+      border: 2px solid rgba(123, 97, 255, 0.35);
+    }
+    .recommend .card-head::after {
+      content: "推荐";
+      float: right;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--mol);
+      background: var(--mol-soft);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>配对组合 · 6 组</h1>
+    <p>Mol 入口 + 普通发送在同一输入栏内的整体观感。含 Mol 面板展开态预览。</p>
+  </div>
+
+  <div class="section">
+    <div class="grid">
+
+      <article class="card pair-card recommend">
+        <div class="card-head">
+          <div class="card-name">P1 · 线框 Mol + 方角发送</div>
+          <div class="card-ref">接近当前线上 · 克制统一</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini">
+                <p>今天下班前我把修改版发你。</p>
+              </div>
+              <div class="compose-row">
+                <button type="button" class="ib mol-spark" aria-pressed="true" aria-label="Mol">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/><path d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"/></svg>
+                </button>
+                <input class="input-pill" value="今天下班前我把修改版发你。" readonly />
+                <button type="button" class="ib send-square" aria-label="发送">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 22 12 3.4 3.6 3 10.8l11.6 1.2L3 13.2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M2 + S5</span></div>
+        </div>
+      </article>
+
+      <article class="card pair-card">
+        <div class="card-head">
+          <div class="card-name">P2 · 渐变 M + 圆形纸飞机</div>
+          <div class="card-ref">Mol 突出 · iOS 经典发送</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini"><p>收到，我这边今天内给你反馈。</p></div>
+              <div class="compose-row">
+                <button type="button" class="ib mol-grad-m" aria-pressed="true">M</button>
+                <input class="input-pill" placeholder="输入消息" readonly />
+                <button type="button" class="ib send-circle" aria-label="发送">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M1 + S2</span></div>
+        </div>
+      </article>
+
+      <article class="card pair-card">
+        <div class="card-head">
+          <div class="card-name">P3 · 圆点胶囊 + 文字发送</div>
+          <div class="card-ref">信息密度高 · 中文用户友好</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini"><p>可以的，我们三点线上对齐。</p></div>
+              <div class="compose-row">
+                <button type="button" class="ib mol-pill" aria-pressed="true"><span class="mol-pill-dot"></span> Mol</button>
+                <input class="input-pill" placeholder="输入消息" readonly style="min-width:0" />
+                <button type="button" class="ib send-text">发送</button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M3 + S1</span></div>
+        </div>
+      </article>
+
+      <article class="card pair-card">
+        <div class="card-head">
+          <div class="card-name">P4 · Orb + 透明箭头</div>
+          <div class="card-ref">双图标 · 极简工具栏</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini"><p>我先整理一版要点，稍后同步。</p></div>
+              <div class="compose-row">
+                <button type="button" class="ib" style="width:36px;height:36px;border-radius:50%;background:var(--mol-grad);color:#fff" aria-pressed="true" aria-label="Mol">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/></svg>
+                </button>
+                <input class="input-pill" placeholder="输入消息" readonly />
+                <button type="button" class="ib send-ghost" aria-label="发送">
+                  <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M6 + S4</span></div>
+        </div>
+      </article>
+
+      <article class="card pair-card recommend">
+        <div class="card-head">
+          <div class="card-name">P5 · Sparkle + Telegram 椭圆</div>
+          <div class="card-ref">AI 感 + 现代发送形态</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini"><p>没问题，我下午把最终稿发你。</p></div>
+              <div class="compose-row">
+                <button type="button" class="ib mol-spark" style="background:var(--mol-soft)" aria-pressed="true" aria-label="Mol">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 4.2L17.5 8 13.2 9.2 12 13.5 10.8 9.2 6.5 8l4.3-1.8L12 2z"/><path d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"/></svg>
+                </button>
+                <input class="input-pill" value="没问题，我下午把最终稿发你。" readonly />
+                <button type="button" class="ib" style="width:38px;height:30px;border-radius:15px;background:var(--accent);color:#fff" aria-label="发送">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M2 + S3</span></div>
+        </div>
+      </article>
+
+      <article class="card pair-card">
+        <div class="card-head">
+          <div class="card-name">P6 · 头像环 + 渐变圆形发送</div>
+          <div class="card-ref">人格化 Mol · 品牌主色发送</div>
+        </div>
+        <div class="card-body">
+          <div class="phone-mini">
+            <div class="phone-mini-dock">
+              <div class="mol-panel-mini"><p>好的，我今天下班前更新文档。</p></div>
+              <div class="compose-row">
+                <button type="button" class="ib" style="width:36px;height:36px;border-radius:50%;background:transparent;padding:0" aria-label="Mol">
+                  <span style="display:block;width:100%;height:100%;border-radius:50%;background:var(--mol-grad);padding:2px">
+                    <span style="display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#e8e0ff,#d4e8ff);font-size:13px;font-weight:700;color:var(--mol)">M</span>
+                  </span>
+                </button>
+                <input class="input-pill" placeholder="输入消息" readonly />
+                <button type="button" class="ib" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(145deg,#34c759,#007aff);color:#fff;box-shadow:0 4px 12px rgba(0,122,255,.35)" aria-label="发送">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 14px"><span class="pair-tag">M5 + S7</span></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 C · 时间轴</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .timeline { list-style: none; position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent) 0%, rgba(176, 122, 26, 0.15) 100%);
+      border-radius: 1px;
+    }
+    .tl-item { position: relative; padding-bottom: 20px; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .tl-time { margin-bottom: 8px; }
+    .tl-card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 0.5px solid var(--border);
+    }
+    .tl-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .tl-type {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 C · 左侧时间轴</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll">
+        <ul class="timeline">
+          <li class="tl-item">
+            <span class="tl-dot" aria-hidden></span>
+            <time class="item-time tl-time">3小时前</time>
+            <article class="tl-card">
+              <div class="tl-card-head">
+                <span class="tl-type">动态</span>
+                <button type="button" class="more-btn" aria-label="更多">⋯</button>
+              </div>
+              <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+            </article>
+          </li>
+          <li class="tl-item">
+            <span class="tl-dot"></span>
+            <time class="item-time tl-time">昨天</time>
+            <article class="tl-card">
+              <div class="tl-card-head">
+                <span class="tl-type">问答</span>
+                <button type="button" class="more-btn" aria-label="更多">⋯</button>
+              </div>
+              <p class="qa-q">你平时几点起床？</p>
+              <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+            </article>
+          </li>
+          <li class="tl-item">
+            <span class="tl-dot"></span>
+            <time class="item-time tl-time">6月8日</time>
+            <article class="tl-card">
+              <div class="tl-card-head">
+                <span class="tl-type">动态</span>
+                <button type="button" class="more-btn" aria-label="更多">⋯</button>
+              </div>
+              <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">参考 Day One / Notion 时间线：左侧节点强调顺序，卡片内区分「动态 / 问答」类型。</p>
+  </div>
+</body>
+</html>

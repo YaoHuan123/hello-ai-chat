@@ -8,7 +8,15 @@ type Props = {
   onOpenRole: (roleId: string) => void;
 };
 
-const SCENES: GuardianScene[] = ["恋爱暧昧", "校园师生", "家庭亲子", "居家装修", "大件采购", "店铺经营"];
+const SCENES: GuardianScene[] = [
+  "恋爱暧昧",
+  "校园师生",
+  "亲子沟通",
+  "科学育儿",
+  "居家装修",
+  "大件采购",
+  "店铺经营",
+];
 
 function roleCardStyle(role: GuardianRole): CSSProperties {
   return {
@@ -57,7 +65,7 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
         <section className="guardian-hall__banner" aria-label="介绍">
           <p className="guardian-hall__banner-kicker">群聊搭子</p>
           <p className="guardian-hall__banner-title">挑几位，进群帮你盯场子</p>
-          <p className="guardian-hall__banner-sub">每人性格不同，会主动接话、帮你解围</p>
+          <p className="guardian-hall__banner-sub">每人性格与立场不同：有的中立疏导，有的协调事务，有的会按人设护一方</p>
         </section>
 
         <div className="guardian-scene-chips guardian-hall__chips" role="tablist" aria-label="场景筛选">

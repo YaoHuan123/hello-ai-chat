@@ -20,6 +20,7 @@ export type RouteName =
   | "friend-requests"
   | "guardian-hall"
   | "guardian-role-detail"
+  | "guardian-create-feature"
   | "guardian-create-group"
   | "guardian-group-chat";
 
@@ -29,18 +30,19 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   home: { title: "主导航", phase: "阶段 1" },
   "delete-account": { title: "注销账号", phase: "账号" },
   contacts: { title: "联系人", phase: "通讯" },
-  "chat-assist": { title: "辅助聊天 + Mol", phase: "阶段 2" },
-  "assist-mol-list": { title: "我的 Mol", phase: "AI" },
-  "assist-mol-data": { title: "Mol 数据", phase: "AI" },
+  "chat-assist": { title: "辅助聊天 + 素颜", phase: "阶段 2" },
+  "assist-mol-list": { title: "我的素颜", phase: "AI" },
+  "assist-mol-data": { title: "素颜资料", phase: "AI" },
   "moments-my": { title: "我的动态", phase: "朋友圈" },
   "moments-hot": { title: "热点", phase: "朋友圈" },
   "moments-friend": { title: "朋友圈探索", phase: "朋友圈" },
-  "mol-world": { title: "Mol 世界", phase: "阶段 5" },
-  "mol-mine": { title: "我的 Mol", phase: "阶段 5" },
-  "mol-detail": { title: "Mol 信息管理", phase: "阶段 5" },
+  "mol-world": { title: "素颜世界", phase: "阶段 5" },
+  "mol-mine": { title: "我的素颜", phase: "阶段 5" },
+  "mol-detail": { title: "素颜信息管理", phase: "阶段 5" },
   "friend-requests": { title: "好友请求", phase: "通讯" },
   "guardian-hall": { title: "搭子", phase: "群聊" },
   "guardian-role-detail": { title: "搭子详情", phase: "群聊" },
+  "guardian-create-feature": { title: "选择用途", phase: "群聊" },
   "guardian-create-group": { title: "发起群聊", phase: "群聊" },
   "guardian-group-chat": { title: "群聊", phase: "群聊" },
 };

@@ -6,8 +6,15 @@ type Props = {
   title: string;
   topics: PassiveTopic[];
   onCollected: () => void;
-  variant?: "default" | "layered";
+  variant?: "default" | "layered" | "ranked";
 };
+
+function rankNumClass(index: number): string {
+  const rank = index + 1;
+  if (rank <= 2) return "moments-hot-rank-num moments-hot-rank-num--hot";
+  if (rank === 3) return "moments-hot-rank-num moments-hot-rank-num--warm";
+  return "moments-hot-rank-num";
+}
 
 export function MomentsTopicSection({ title, topics, onCollected, variant = "default" }: Props) {
   const [answerFor, setAnswerFor] = useState<string | null>(null);
@@ -37,10 +44,45 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
   }
 
   const layered = variant === "layered";
+  const ranked = variant === "ranked";
 
   return (
-    <section className={`moments-add-section${layered ? " moments-add-section--layered" : ""}`}>
+    <section
+      className={`moments-add-section${layered ? " moments-add-section--layered" : ""}${ranked ? " moments-add-section--ranked" : ""}`}
+    >
       {title ? <h2 className="moments-add-section__title">{title}</h2> : null}
+      {ranked ? (
+        <ul className="moments-hot-rank-list" aria-label={title || "热门话题"}>
+          {topics.map((t, index) => {
+            const done = isTopicCollected(t.id);
+            const content = (
+              <>
+                <span className={rankNumClass(index)} aria-hidden>
+                  {index + 1}
+                </span>
+                <div className="moments-hot-rank-main">
+                  <p className="moments-hot-rank-q">{t.question}</p>
+                  {t.hint ? <p className="moments-hot-rank-hint">{t.hint}</p> : null}
+                  {done ? <span className="moments-hot-tag-ok">已收录</span> : null}
+                </div>
+                {!done ? <span className="moments-hot-rank-arrow" aria-hidden>›</span> : null}
+              </>
+            );
+
+            return (
+              <li key={t.id}>
+                {done ? (
+                  <div className="moments-hot-rank-item moments-hot-rank-item--done">{content}</div>
+                ) : (
+                  <button type="button" className="moments-hot-rank-item" onClick={() => openTopic(t.id)}>
+                    {content}
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
       <ul className="aichat-list" aria-label={title || "热门话题"}>
         {topics.map((t) => {
           const done = isTopicCollected(t.id);
@@ -72,6 +114,7 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
           );
         })}
       </ul>
+      )}
 
       {topic && (
         <div

@@ -18,7 +18,7 @@ function mapMolWorldError(res: Response, error: unknown): boolean {
     return true;
   }
   if (code === "NOT_FOUND") {
-    res.status(404).json({ code, message: "未找到该 Mol" });
+    res.status(404).json({ code, message: "未找到该素颜" });
     return true;
   }
   if (code === "FORBIDDEN") {
@@ -89,7 +89,7 @@ export const createMolWorldRouter = (molWorld: MolWorldService, userMols: UserMo
     try {
       const rec = molWorld.getById(id);
       if (!rec || isPrivateMolId(id)) {
-        res.status(404).json({ code: "NOT_FOUND", message: "未找到该 Mol" });
+        res.status(404).json({ code: "NOT_FOUND", message: "未找到该素颜" });
         return;
       }
       const owned = new Set(userMols.listOwnedIds(user.userId).map((x) => x.molWorldId));

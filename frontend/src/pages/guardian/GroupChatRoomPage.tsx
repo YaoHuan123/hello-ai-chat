@@ -15,6 +15,7 @@ import { wsClient, type WsServerMessage } from "../../services/wsClient";
 import type { ContactItem } from "../../types/contact";
 import type { GuardianGroup, GuardianGroupMessage, GuardianOwnerHint, GuardianRole } from "../../types/guardian";
 import { GUARDIAN_RISK_LABEL } from "../../types/guardian";
+import { ChatComposeBar } from "../../components/ChatComposeBar";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { contactDisplayName, maskPhoneDisplay } from "../../lib/contactDisplay";
@@ -300,19 +301,14 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
         )}
       </div>
 
-      <div className="msg-chat-composer msg-chat-c1-composer guardian-group-room__composer">
-        <input
-          className="msg-chat-c1-input"
-          placeholder="输入消息"
+      <div className="msg-chat-composer msg-chat-c1-composer msg-chat-c1-dock">
+        <ChatComposeBar
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") void onSend();
-          }}
+          onChange={setInput}
+          onSend={() => void onSend()}
+          placeholder="输入消息"
+          sendDisabled={sending}
         />
-        <button type="button" className="msg-chat-c1-send" onClick={() => void onSend()} disabled={sending}>
-          发送
-        </button>
       </div>
     </div>
   );

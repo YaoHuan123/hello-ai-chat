@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SUYAN, formatSuyanDisplayName } from "../../constants/suyanCopy";
 import {
   getNormalChatMessages,
   ingestIncomingRemoteMessage,
@@ -16,6 +17,7 @@ import type { RemoteMessage } from "../../types/messages";
 import { MolSuggestPanel } from "./MolSuggestPanel";
 import { ChatMolSwitchModal } from "./ChatMolSwitchModal";
 import { AppIcon } from "../../components/AppIcons";
+import { ChatComposeBar, MolComposeButton } from "../../components/ChatComposeBar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { getMyAvatarContact } from "../../services/storage";
@@ -64,7 +66,7 @@ function MeAvatarMolBadge() {
           <AppIcon name="user" className="app-icon app-icon--xs app-icon--mol" />
         </span>
       )}
-      <span className="msg-chat-c1-mol-badge" title="Mol">
+      <span className="msg-chat-c1-mol-badge" title={SUYAN.name}>
         <AppIcon name="molSpark" className="app-icon app-icon--badge app-icon--brand" />
       </span>
     </div>
@@ -80,12 +82,16 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
   const [myUserId, setMyUserId] = useState("");
   const [loadErr, setLoadErr] = useState("");
   const [molPanelOpen, setMolPanelOpen] = useState(false);
+  const [molDraftText, setMolDraftText] = useState("");
   const [molSwitchOpen, setMolSwitchOpen] = useState(false);
+  const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [myMols, setMyMols] = useState<MolInMyCollection[]>([]);
   const [activeMol, setActiveMol] = useState<{ id: string; name: string } | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
   const messagesRef = useRef<ChatLocalMessage[]>(messages);
-  const molPanelRef = useRef<HTMLLIElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
+  const topbarMenuRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -139,7 +145,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
         if (cancelled) return;
         setMyMols(mols);
         const m = resolveActiveMol(mols, peerId);
-        setActiveMol(m ? { id: m.id, name: m.name } : null);
+        setActiveMol(m ? { id: m.id, name: formatSuyanDisplayName(m.name) } : null);
       })
       .catch(() => {
         if (!cancelled) setActiveMol(null);
@@ -168,17 +174,32 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, myUserId, molPanelOpen]);
 
+  const closeMolPanel = useCallback(() => {
+    setMolPanelOpen(false);
+    setMolDraftText("");
+  }, []);
+
   useEffect(() => {
     if (!molPanelOpen) return;
     const onPointerDown = (e: PointerEvent) => {
       const t = e.target as Node;
-      if (molPanelRef.current?.contains(t)) return;
+      if (composerRef.current?.contains(t)) return;
       if (molSwitchOpen) return;
-      setMolPanelOpen(false);
+      closeMolPanel();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [molPanelOpen, molSwitchOpen]);
+  }, [molPanelOpen, molSwitchOpen, closeMolPanel]);
+
+  useEffect(() => {
+    if (!chatMenuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (topbarMenuRef.current?.contains(e.target as Node)) return;
+      setChatMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [chatMenuOpen]);
 
   const sendText = useCallback(
     async (text: string) => {
@@ -211,12 +232,28 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
     const m = myMols.find((x) => x.id === molId);
     if (!m) return;
     setChatActiveMolId(peerId, molId);
-    setActiveMol({ id: m.id, name: m.name });
+    setActiveMol({ id: m.id, name: formatSuyanDisplayName(m.name) });
   }
 
   function openMolSwitch() {
+    setChatMenuOpen(false);
     if (myMols.length > 0) setMolSwitchOpen(true);
     else onManageMols?.();
+  }
+
+  function toggleMolPanel() {
+    if (molPanelOpen) {
+      closeMolPanel();
+      return;
+    }
+    setMolDraftText(input.trim());
+    setInput("");
+    setMolPanelOpen(true);
+  }
+
+  function pickSuggestion(text: string) {
+    closeMolPanel();
+    void sendText(text);
   }
 
   return (
@@ -231,6 +268,24 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
             <span className="msg-chat-c1-peer-name">{peerTitle}</span>
             <span className="msg-chat-c1-peer-sub">在线</span>
           </div>
+        </div>
+        <div className="msg-chat-c1-topbar-actions" ref={topbarMenuRef}>
+          <button
+            type="button"
+            className="contacts-more-btn"
+            aria-expanded={chatMenuOpen}
+            aria-label="更多"
+            onClick={() => setChatMenuOpen((open) => !open)}
+          >
+            ···
+          </button>
+          {chatMenuOpen ? (
+            <div className="contacts-menu msg-chat-c1-topbar-menu" role="menu">
+              <button type="button" className="contacts-menu__item" role="menuitem" onClick={openMolSwitch}>
+                {SUYAN.switchVerb}
+              </button>
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -261,69 +316,46 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
                 </div>
               </li>
             ))}
-            <li
-              ref={molPanelRef}
-              className={`msg-chat-c1-row msg-chat-c1-row--me msg-chat-c1-mol-row${molPanelOpen ? " msg-chat-c1-mol-row--open" : ""}`}
-            >
-              <MeAvatarMolBadge />
-              <div className="msg-chat-c1-col">
-                {molPanelOpen && activeMol ? (
-                  <MolSuggestPanel
-                    open={molPanelOpen}
-                    peerUserId={peerId}
-                    molId={activeMol.id}
-                    molName={activeMol.name}
-                    getLastMessages={getLastMessagesForSuggest}
-                    onAdopt={(text) => {
-                      setMolPanelOpen(false);
-                      void sendText(text);
-                    }}
-                    onSwitchMol={openMolSwitch}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    className="msg-chat-c1-placeholder"
-                    onClick={() => {
-                      if (activeMol) setMolPanelOpen(true);
-                      else onManageMols?.();
-                    }}
-                    aria-label={activeMol ? "让 Mol 帮你想 3 条回复" : "添加 Mol"}
-                  >
-                    {activeMol ? (
-                      <>
-                        <span className="msg-chat-c1-placeholder__spark" aria-hidden>
-                          ✨
-                        </span>
-                        <span>让 Mol 帮我想 3 条回复</span>
-                      </>
-                    ) : (
-                      <span>添加 Mol 后再使用建议</span>
-                    )}
-                  </button>
-                )}
-              </div>
-            </li>
           </ul>
         ) : (
           <p className="msg-chat-c1-empty msg-chat-c1-empty--load">加载中…</p>
         )}
       </div>
 
-      <div className="msg-chat-composer msg-chat-c1-composer">
-        <input
-          className="msg-chat-c1-input"
-          placeholder="输入消息"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") void onSend();
-          }}
-          disabled={!myUserId}
+      <div ref={composerRef} className="msg-chat-composer msg-chat-c1-composer msg-chat-c1-dock">
+        <MolSuggestPanel
+          open={molPanelOpen}
+          peerUserId={peerId}
+          molId={activeMol?.id ?? null}
+          molName={activeMol?.name ?? null}
+          getLastMessages={getLastMessagesForSuggest}
+          draftText={molDraftText}
+          onPick={pickSuggestion}
+          onClose={closeMolPanel}
+          onManageMols={
+            onManageMols
+              ? () => {
+                  closeMolPanel();
+                  onManageMols();
+                }
+              : undefined
+          }
         />
-        <button type="button" className="msg-chat-c1-send" onClick={() => void onSend()} disabled={!myUserId}>
-          发送
-        </button>
+        <ChatComposeBar
+          inputRef={inputRef}
+          value={input}
+          onChange={setInput}
+          onSend={() => void onSend()}
+          placeholder="输入消息"
+          disabled={!myUserId}
+          mol={
+            <MolComposeButton
+              pressed={molPanelOpen}
+              disabled={!myUserId}
+              onClick={toggleMolPanel}
+            />
+          }
+        />
       </div>
 
       {molSwitchOpen && myMols.length > 0 ? (
@@ -334,13 +366,12 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
           onClose={() => setMolSwitchOpen(false)}
           onConfirm={(id) => {
             selectChatMol(id);
-            if (!molPanelOpen) setMolPanelOpen(true);
           }}
           onEditMol={
             onOpenMolDetail
               ? (id) => {
                   setMolSwitchOpen(false);
-                  setMolPanelOpen(false);
+                  closeMolPanel();
                   onOpenMolDetail(id);
                 }
               : undefined

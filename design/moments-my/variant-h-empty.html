@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>空状态 · 4 款对比</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    body { padding-bottom: 40px; }
+    .page-head {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 12px 20px;
+    }
+    .page-head h1 { font-size: 20px; margin-bottom: 6px; }
+    .page-head p { font-size: 14px; color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+    .card-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+    .phone--mini { height: 420px; }
+
+    /* Empty variants */
+    .empty-a { margin-top: 40px; }
+
+    .empty-b {
+      margin-top: 48px;
+      background: transparent;
+      box-shadow: none;
+      padding: 20px;
+    }
+    .empty-b-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      display: grid;
+      place-items: center;
+    }
+    .empty-b-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .empty-b-btn {
+      margin-top: 20px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 12px 28px;
+      border-radius: 22px;
+      cursor: pointer;
+    }
+
+    .empty-c {
+      margin-top: 32px;
+      text-align: left;
+      padding: 24px;
+    }
+    .empty-c h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .empty-c ul {
+      list-style: none;
+      margin: 16px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .empty-c li {
+      font-size: 14px;
+      color: var(--muted);
+      padding-left: 16px;
+      position: relative;
+    }
+    .empty-c li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .empty-d {
+      margin-top: 60px;
+      background: transparent;
+      box-shadow: none;
+    }
+    .empty-d-illus {
+      height: 100px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(176,122,26,0.08), rgba(52,199,89,0.08));
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .empty-d-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <div class="page-head">
+    <h1>空状态 · 4 款</h1>
+    <p>尚无日常内容时的引导形态，可与任意列表方案组合。</p>
+  </div>
+  <div class="grid">
+    <div>
+      <p class="card-label">ES1 · 居中提示（当前线上）</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <h1 class="topbar-title">我的日常</h1>
+            <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+          </header>
+          <div class="feed-scroll">
+            <div class="empty empty-a">
+              <p>还没有内容。点右上角「添加」写一条。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">ES2 · 图标 + 主按钮</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <h1 class="topbar-title">我的日常</h1>
+            <button type="button" class="topbar-btn topbar-btn--right" style="visibility:hidden">添加</button>
+          </header>
+          <div class="feed-scroll">
+            <div class="empty empty-b">
+              <div class="empty-b-icon" aria-hidden>
+                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </div>
+              <p>记录你的日常，好友探索分身时会引用这些内容。</p>
+              <button type="button" class="empty-b-btn">写第一条</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">ES3 · 说明 + 示例</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <h1 class="topbar-title">我的日常</h1>
+            <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+          </header>
+          <div class="feed-scroll">
+            <div class="empty empty-c">
+              <h2>开始记录</h2>
+              <p>日常会用于分身回答好友的探索问题。</p>
+              <ul>
+                <li>今天的工作安排或状态</li>
+                <li>兴趣爱好与生活习惯</li>
+                <li>热点话题下的问答回复</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="card-label">ES4 · 轻量占位</p>
+      <div class="phone-wrap" style="padding:0">
+        <div class="phone phone--mini">
+          <header class="topbar">
+            <button type="button" class="topbar-btn">返回</button>
+            <h1 class="topbar-title">我的日常</h1>
+            <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+          </header>
+          <div class="feed-scroll">
+            <div class="empty empty-d">
+              <div class="empty-d-illus">暂无日常</div>
+              <p>添加后显示在这里</p>
+              <a href="#" class="empty-d-link">去添加 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

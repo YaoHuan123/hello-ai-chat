@@ -1,6 +1,7 @@
 import { OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, OPENAI_TIMEOUT_MS } from "../config";
 import { logWarn } from "../logger";
 import type { GuardianRoleDef } from "../constants/guardianCatalog";
+import { GUARDIAN_STANCE_LABEL } from "../constants/guardianCatalog";
 import { loadGuardianProactiveSystemTemplate, loadGuardianProactiveUserTemplate } from "./guardianPromptFiles";
 
 export type GuardianChatLine = {
@@ -22,6 +23,7 @@ export class GuardianAiService {
   buildRoleBlock(role: GuardianRoleDef): string {
     const lines = [
       `名称：${role.name}（${role.title}）`,
+      `群聊立场：${GUARDIAN_STANCE_LABEL[role.stance]} — ${role.stanceNote}`,
       `人设：${role.tagline}`,
       `对用户：${role.userMessage}`,
       `话术风格：${role.speechStyle}`,

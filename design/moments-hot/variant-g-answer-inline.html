@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 G · 页内展开作答</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .expand-card {
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--accent);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 16px rgba(232, 120, 58, 0.12);
+    }
+    .expand-card .topic-q { margin-bottom: 12px; }
+    .collapse-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border: 0.5px solid var(--border);
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .inline-input {
+      width: 100%;
+      min-height: 88px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-family: inherit;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+    .inline-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .inline-actions button {
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-ghost { background: #eef0f4; color: var(--text); }
+    .btn-primary { background: var(--accent); color: #fff; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 G · 页内展开作答</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll">
+        <article class="expand-card">
+          <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+          <p class="topic-hint">关联近期职场讨论</p>
+          <label class="sheet-label" for="ans">你的回答</label>
+          <textarea id="ans" class="inline-input" placeholder="写下你的看法…">我目前每周去办公室两天，其余时间在家，效率更高。</textarea>
+          <div class="inline-actions">
+            <button type="button" class="btn-ghost">收起</button>
+            <button type="button" class="btn-primary">添加到我的日常</button>
+          </div>
+        </article>
+        <button type="button" class="collapse-card">
+          <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+        </button>
+        <div class="collapse-card" style="opacity:0.72">
+          <p class="topic-q">你会更倾向存钱还是及时消费？</p>
+          <span class="tag-ok">已收录</span>
+        </div>
+        <button type="button" class="collapse-card">
+          <p class="topic-q">夏季出行你更优先性价比还是体验？</p>
+        </button>
+      </div>
+    </div>
+    <p class="pm-tag">点击后在列表内展开输入区，减少弹层打断；同时仅一题展开。</p>
+  </div>
+</body>
+</html>

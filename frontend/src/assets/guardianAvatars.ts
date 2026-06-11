@@ -5,6 +5,7 @@ import guardFamilyWangyi from "./guardian-avatars/guard-family-wangyi.svg?raw";
 import guardLifeDecorFang from "./guardian-avatars/guard-life-decor-fang.svg?raw";
 import guardLifeProcureCai from "./guardian-avatars/guard-life-procure-cai.svg?raw";
 import guardLifeShopGuizhang from "./guardian-avatars/guard-life-shop-guizhang.svg?raw";
+import guardParentScienceAnxin from "./guardian-avatars/guard-parent-science-anxin.svg?raw";
 import guardRomanceAtiao from "./guardian-avatars/guard-romance-atiao.svg?raw";
 import guardRomanceLinjie from "./guardian-avatars/guard-romance-linjie.svg?raw";
 import guardRomanceZhou from "./guardian-avatars/guard-romance-zhou.svg?raw";
@@ -24,6 +25,7 @@ const GUARDIAN_AVATAR_URLS: Record<string, string> = {
   "guard-life-decor-fang": toSvgDataUrl(guardLifeDecorFang),
   "guard-life-procure-cai": toSvgDataUrl(guardLifeProcureCai),
   "guard-life-shop-guizhang": toSvgDataUrl(guardLifeShopGuizhang),
+  "guard-parent-science-anxin": toSvgDataUrl(guardParentScienceAnxin),
 };
 
 export function getGuardianAvatarUrl(roleId: string): string | undefined {

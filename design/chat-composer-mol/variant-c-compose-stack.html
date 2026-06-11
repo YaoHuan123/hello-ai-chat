@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 C · 一体化输入栈</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 32px rgba(20, 23, 26, 0.08);
+      padding-bottom: var(--safe-bottom);
+    }
+    .dock-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px 8px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .dock-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .dock-bar-left .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34c759;
+    }
+    .dock-bar-actions { display: flex; gap: 12px; }
+    .dock-bar-actions button {
+      border: none;
+      background: none;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .dock-list {
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .dock-list .suggest-card {
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f8f9fc;
+    }
+    .dock-compose {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px 14px;
+    }
+    .pm-tag { margin-top: 12px; width: min(100%, var(--phone-w)); font-size: 12px; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <p class="mock-label">方案 C · 底部整块「输入面板」，Mol 与输入视觉一体</p>
+  <div class="phone">
+    <header class="topbar">
+      <button type="button" class="topbar-back">‹</button>
+      <div class="topbar-av"></div>
+      <div class="topbar-meta">
+        <div class="topbar-name">张小北</div>
+        <div class="topbar-sub">在线</div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="row">
+        <div class="av"></div>
+        <div class="col">
+          <div class="bubble bubble--other">那今晚前能定稿吗？领导催得比较紧。</div>
+          <span class="time">14:06</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="dock">
+      <div class="dock-bar">
+        <div class="dock-bar-left">
+          <span class="dot"></span>
+          <span>Mol · 职场沟通</span>
+        </div>
+        <div class="dock-bar-actions">
+          <button type="button" id="btnRefresh">刷新</button>
+          <button type="button">切换</button>
+          <button type="button" id="btnCollapse">收起</button>
+        </div>
+      </div>
+      <div id="dockList" class="dock-list">
+        <button type="button" class="suggest-card" data-fill="收到，我今晚 8 点前发你终稿。">
+          收到，我今晚 8 点前发你终稿，有变动提前说。
+        </button>
+        <button type="button" class="suggest-card" data-fill="明早 9 点前同步一版给你确认。">
+          可以，我优先收尾这版，明早 9 点前同步一版给你确认。
+        </button>
+        <button type="button" class="suggest-card" data-fill="今晚先定核心页，其余明天上午补。">
+          今晚有点紧，我先把核心页定稿，其余部分明天上午补上行吗？
+        </button>
+      </div>
+      <div class="dock-compose">
+        <input id="input" class="composer-input" type="text" placeholder="输入消息，或点上方建议" />
+        <button type="button" class="composer-send">发送</button>
+      </div>
+    </footer>
+  </div>
+  <p class="pm-tag">产品要点：默认展开 Mol 条（可收起为仅输入行）；适合 Mol 为核心能力的会话。刷新基于最近消息重新生成建议。</p>
+
+  <script>
+    const dockList = document.getElementById("dockList");
+    const btnCollapse = document.getElementById("btnCollapse");
+    const input = document.getElementById("input");
+    let collapsed = false;
+
+    btnCollapse.addEventListener("click", () => {
+      collapsed = !collapsed;
+      dockList.classList.toggle("hidden", collapsed);
+      btnCollapse.textContent = collapsed ? "展开" : "收起";
+    });
+
+    document.querySelectorAll(".suggest-card").forEach((el) => {
+      el.addEventListener("click", () => {
+        input.value = el.dataset.fill || "";
+        input.focus();
+      });
+    });
+
+    document.getElementById("btnRefresh").addEventListener("click", () => {
+      dockList.style.opacity = "0.5";
+      setTimeout(() => { dockList.style.opacity = "1"; }, 400);
+    });
+  </script>
+</body>
+</html>

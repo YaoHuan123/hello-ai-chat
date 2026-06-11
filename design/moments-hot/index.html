@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>热点 · 方案索引</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #14171a;
+      --muted: #6b7280;
+      --accent: #e8783a;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 20px 40px;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 8px; font-size: 15px; }
+    .note {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+    }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    a {
+      display: block;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      text-decoration: none;
+      color: inherit;
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.04);
+    }
+    a strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--accent); }
+    a span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>热点 · 布局方案</h1>
+  <p class="lead">基于热搜生成的问题，点击作答后收录至「我的日常」。手机宽度 390px 原型。</p>
+  <div class="note">
+    功能范围：问题列表、hint 说明、已收录状态、作答弹层、更新时间、加载/空/错误态。参考微博热搜榜、知乎热榜、卡片问答流等形态。
+  </div>
+  <ul>
+    <li>
+      <a href="variant-a-card-list.html">
+        <strong>方案 A · 卡片列表（当前线上）</strong>
+        <span>圆角卡片堆叠，问题 + hint，已收录标签。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-ranked.html">
+        <strong>方案 B · 热搜榜排名</strong>
+        <span>左侧序号 + 问题，强调热度排序。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-c-category-tabs.html">
+        <strong>方案 C · 分类 Tab</strong>
+        <span>生活 / 职场 / 文娱等横向切换，分组展示。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-d-platform-tags.html">
+        <strong>方案 D · 平台来源标签</strong>
+        <span>显式展示微博 / 知乎 / 抖音来源。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-e-featured-hero.html">
+        <strong>方案 E · 头条 + 列表</strong>
+        <span>首条大卡片推荐，其余紧凑排列。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-f-compact-rows.html">
+        <strong>方案 F · 紧凑行</strong>
+        <span>无大阴影，分隔线列表，信息密度高。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-g-answer-inline.html">
+        <strong>方案 G · 页内展开作答</strong>
+        <span>点击后在卡片下方展开输入区，无全屏弹层。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-h-sheet-answer.html">
+        <strong>方案 H · 底部作答 Sheet</strong>
+        <span>当前弹层形态的视觉优化版。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-i-states.html">
+        <strong>状态页 · 加载 / 空 / 错误</strong>
+        <span>4 种非列表态对比。</span>
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 B · 朋友圈式</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone { background: #ededed; }
+    .feed { list-style: none; background: var(--surface); border-radius: 0; }
+    .feed-item {
+      display: flex;
+      gap: 10px;
+      padding: 14px 14px 16px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .feed-item:last-child { border-bottom: none; }
+    .feed-main { flex: 1; min-width: 0; }
+    .feed-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .feed-name { font-size: 15px; font-weight: 700; color: #576b95; }
+    .feed-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .feed-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .feed-actions button {
+      border: none;
+      background: #f3f3f5;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: inherit;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 B · 朋友圈式</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll" style="padding:0">
+        <ul class="feed">
+          <li class="feed-item">
+            <div class="avatar-me" aria-hidden></div>
+            <div class="feed-main">
+              <div class="feed-head">
+                <span class="feed-name">我</span>
+                <span class="feed-meta"><time class="item-time">3小时前</time></span>
+              </div>
+              <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+              <div class="feed-actions"><button type="button">编辑</button></div>
+            </div>
+          </li>
+          <li class="feed-item">
+            <div class="avatar-me"></div>
+            <div class="feed-main">
+              <div class="feed-head">
+                <span class="feed-name">我</span>
+                <span class="feed-meta"><time class="item-time">昨天</time></span>
+              </div>
+              <p class="qa-q">你平时几点起床？</p>
+              <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+              <div class="feed-actions"><button type="button">编辑</button></div>
+            </div>
+          </li>
+          <li class="feed-item">
+            <div class="avatar-me"></div>
+            <div class="feed-main">
+              <div class="feed-head">
+                <span class="feed-name">我</span>
+                <span class="feed-meta"><time class="item-time">6月8日</time></span>
+              </div>
+              <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+              <div class="feed-actions"><button type="button">编辑</button></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">参考微信朋友圈：头像左、正文右、浅灰底、列表分隔。问答以问题 + 回答两段展示。</p>
+  </div>
+</body>
+</html>

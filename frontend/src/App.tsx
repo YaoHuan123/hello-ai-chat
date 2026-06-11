@@ -27,8 +27,10 @@ import { MomentsHotTopicsPage } from "./pages/ai/MomentsHotTopicsPage";
 import { MomentsExploreChatPage } from "./pages/ai/MomentsExploreChatPage";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
+import { CreateGuardianGroupFeaturePage } from "./pages/guardian/CreateGuardianGroupFeaturePage";
 import { CreateGuardianGroupPage } from "./pages/guardian/CreateGuardianGroupPage";
 import { GroupChatRoomPage } from "./pages/guardian/GroupChatRoomPage";
+import type { GuardianCreateFeature } from "./constants/guardianCreateFeatures";
 
 type MolDetailBackTarget = "mol-mine" | "assist-mol-list" | "assist-mol-data" | "chat-room";
 
@@ -43,6 +45,7 @@ function App() {
   const [molWorldBackRoute, setMolWorldBackRoute] = useState<RouteName>("main");
   const [chatRoomContact, setChatRoomContact] = useState<ContactItem | null>(null);
   const [friendPendingCount, setFriendPendingCount] = useState(0);
+  const [guardianCreateFeature, setGuardianCreateFeature] = useState<GuardianCreateFeature | null>(null);
   const [guardianGroupId, setGuardianGroupId] = useState<string | null>(null);
   const [guardianRoleId, setGuardianRoleId] = useState<string | null>(null);
   const [momentsFriendContact, setMomentsFriendContact] = useState<ContactItem | null>(null);
@@ -138,6 +141,11 @@ function App() {
         return true;
       }
       if (route === "guardian-create-group") {
+        setRoute("guardian-create-feature");
+        return true;
+      }
+      if (route === "guardian-create-feature") {
+        setGuardianCreateFeature(null);
         setMainTab("groups");
         setRoute("main");
         return true;
@@ -274,14 +282,29 @@ function App() {
     );
   }
 
-  if (route === "guardian-create-group") {
+  if (route === "guardian-create-feature") {
     return (
-      <CreateGuardianGroupPage
+      <CreateGuardianGroupFeaturePage
         onBack={() => {
+          setGuardianCreateFeature(null);
           setMainTab("groups");
           setRoute("main");
         }}
+        onContinue={(feature) => {
+          setGuardianCreateFeature(feature);
+          setRoute("guardian-create-group");
+        }}
+      />
+    );
+  }
+
+  if (route === "guardian-create-group") {
+    return (
+      <CreateGuardianGroupPage
+        feature={guardianCreateFeature}
+        onBack={() => setRoute("guardian-create-feature")}
         onCreated={(id) => {
+          setGuardianCreateFeature(null);
           setGuardianGroupId(id);
           setMainTab("groups");
           setRoute("guardian-group-chat");
@@ -346,7 +369,10 @@ function App() {
           setGuardianGroupId(groupId);
           setRoute("guardian-group-chat");
         }}
-        onCreateGuardianGroup={() => setRoute("guardian-create-group")}
+        onCreateGuardianGroup={() => {
+          setGuardianCreateFeature(null);
+          setRoute("guardian-create-feature");
+        }}
         onOpenGuardianHall={(fromTab) => {
           setGuardianHallReturnTab(fromTab);
           setRoute("guardian-hall");

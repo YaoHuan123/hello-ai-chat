@@ -1,14 +1,17 @@
+import { SUYAN } from "../../constants/suyanCopy";
 import { useCallback, useEffect, useState } from "react";
 import { suggestRepliesApi, type MolSuggestLastMessage } from "../../services/molSuggestApi";
 
 type Props = {
   open: boolean;
   peerUserId: string;
-  molId: string;
-  molName: string;
+  molId: string | null;
+  molName: string | null;
   getLastMessages: () => MolSuggestLastMessage[];
-  onAdopt: (text: string) => void;
-  onSwitchMol: () => void;
+  draftText?: string;
+  onPick: (text: string) => void;
+  onClose: () => void;
+  onManageMols?: () => void;
 };
 
 export function MolSuggestPanel({
@@ -17,28 +20,37 @@ export function MolSuggestPanel({
   molId,
   molName,
   getLastMessages,
-  onAdopt,
-  onSwitchMol,
+  draftText = "",
+  onPick,
+  onClose,
+  onManageMols,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<string[]>([]);
   const [err, setErr] = useState("");
   const [errCode, setErrCode] = useState("");
 
+  const hasMol = Boolean(molId && molName);
+
   const load = useCallback(async () => {
+    if (!molId) return;
     setLoading(true);
     setErr("");
     setErrCode("");
     setItems([]);
     try {
-      const lastMessages = getLastMessages().slice(-12);
+      let lastMessages = getLastMessages().slice(-12);
+      const draft = draftText.trim();
+      if (draft) {
+        lastMessages = [...lastMessages, { from: "me", text: draft, ts: Date.now() }];
+      }
       const { suggestions } = await suggestRepliesApi(peerUserId, lastMessages, molId);
       setItems(suggestions.slice(0, 3));
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setErr(msg);
       let code = "";
-      if (msg.includes("尚未添加") && msg.includes("Mol")) code = "NO_USER_MOLS";
+      if (msg.includes("尚未添加")) code = "NO_USER_MOLS";
       else if (msg.includes("资料为空")) code = "MOL_PERSONA_EMPTY";
       else if (msg.includes("AI 服务未配置")) code = "AI_NOT_CONFIGURED";
       else if (msg.includes("不是联系人")) code = "NOT_FRIENDS";
@@ -46,53 +58,81 @@ export function MolSuggestPanel({
     } finally {
       setLoading(false);
     }
-  }, [getLastMessages, molId, peerUserId]);
+  }, [draftText, getLastMessages, molId, peerUserId]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !hasMol) return;
     queueMicrotask(() => {
       void load();
     });
-  }, [open, load]);
+  }, [open, hasMol, draftText, load]);
+
+  if (!open) return null;
+
+  const draft = draftText.trim();
 
   return (
-    <div className="msg-suggest-inline" role="region" aria-label="Mol 建议">
-      {loading ? (
-        <p className="msg-suggest-inline__status">生成中…</p>
+    <div className="mol-composer-panel" role="region" aria-label={SUYAN.suggest}>
+      {draft ? (
+        <div className="mol-composer-draft" aria-label="待发送内容">
+          <p className="mol-composer-draft__text">{draft}</p>
+        </div>
+      ) : null}
+
+      {!hasMol ? (
+        <p className="mol-composer-hint">
+          还没有{SUYAN.name}，
+          {onManageMols ? (
+            <button type="button" className="mol-composer-hint-link" onClick={onManageMols}>
+              去添加
+            </button>
+          ) : (
+            "请先添加"
+          )}
+        </p>
+      ) : loading ? (
+        <p className="mol-composer-status">生成中…</p>
       ) : err ? (
-        <div className="msg-suggest-inline__status-block">
-          <p className="aichat-form-msg err" style={{ margin: 0 }}>
-            {err}
-          </p>
+        <div className="mol-composer-status-block">
+          <p className="mol-composer-status mol-composer-status--err">{err}</p>
           {errCode === "NO_USER_MOLS" ? (
-            <p className="msg-suggest-inline__status">请先在「我的 Mol」里添加至少一个。</p>
+            <p className="mol-composer-status">{SUYAN.myListHint}</p>
           ) : null}
           {errCode === "MOL_PERSONA_EMPTY" ? (
-            <p className="msg-suggest-inline__status">请切换 Mol 或补充资料条目后再试。</p>
+            <p className="mol-composer-status">{SUYAN.switchHint}</p>
           ) : null}
           {errCode === "AI_NOT_CONFIGURED" ? (
-            <p className="msg-suggest-inline__status">请在服务端配置 OPENAI_API_KEY 等环境变量。</p>
+            <p className="mol-composer-status">请在服务端配置 OPENAI_API_KEY 等环境变量。</p>
           ) : null}
         </div>
       ) : items.length === 0 ? (
-        <p className="msg-suggest-inline__status">暂无建议</p>
+        <p className="mol-composer-status">暂无建议</p>
       ) : (
-        <div className="msg-suggest-inline__suggestions">
+        <ul className="mol-composer-suggest" aria-label="回复建议">
           {items.map((text, i) => (
-            <button key={`${i}-${text.slice(0, 12)}`} type="button" className="msg-suggest-inline__suggest-item" onClick={() => onAdopt(text)}>
-              {text}
-            </button>
+            <li key={`${i}-${text.slice(0, 12)}`}>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  onPick(text);
+                  onClose();
+                }}
+              >
+                {text}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-      <div className="msg-suggest-inline__footer">
-        <button type="button" className="msg-suggest-inline__mol-pick" onClick={onSwitchMol} aria-label={`重新选择 Mol，当前 ${molName}`}>
-          {molName}
-        </button>
-        <button type="button" className="msg-suggest-inline__refresh" disabled={loading} onClick={() => void load()}>
-          刷新
-        </button>
-      </div>
+
+      {hasMol && !err ? (
+        <div className="mol-composer-foot">
+          <button type="button" disabled={loading} onClick={() => void load()}>
+            换一批
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

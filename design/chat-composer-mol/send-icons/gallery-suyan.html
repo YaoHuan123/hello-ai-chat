@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>素颜入口 · 8 款方案</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    :root {
+      --suyan: var(--mol);
+      --suyan-soft: var(--mol-soft);
+      --suyan-grad: var(--mol-grad);
+      --suyan-inner: linear-gradient(135deg, #e8e0ff, #d4e8ff);
+    }
+
+    /* shared send btn (production P6) */
+    .send-p6 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(145deg, #34c759, #007aff);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+      flex-shrink: 0;
+    }
+    .send-p6 svg { width: 16px; height: 16px; fill: currentColor; margin-left: 1px; }
+    .send-p6:disabled { opacity: 0.38; box-shadow: none; }
+
+    /* S1 · 头像环「素」 — 当前线上 */
+    .suyan-s1 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    .suyan-s1-ring {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--suyan-grad);
+      padding: 2px;
+    }
+    .suyan-s1-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--suyan-inner);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--suyan);
+      line-height: 1;
+    }
+    .suyan-s1[aria-pressed="true"] .suyan-s1-ring {
+      box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.14);
+    }
+
+    /* S2 · 揭面 */
+    .suyan-s2 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .suyan-s2 svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .suyan-s2[aria-pressed="true"] {
+      background: var(--suyan-soft);
+      color: #6b4fe0;
+    }
+
+    /* S3 · 真我轮廓 */
+    .suyan-s3 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--suyan-soft);
+      color: var(--suyan);
+    }
+    .suyan-s3 svg { width: 20px; height: 20px; }
+    .suyan-s3-face { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; }
+    .suyan-s3-spark { fill: currentColor; }
+    .suyan-s3[aria-pressed="true"] {
+      background: var(--suyan-grad);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(123, 97, 255, 0.35);
+    }
+
+    /* S4 · 渐变「素」 */
+    .suyan-s4 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--suyan-grad);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .suyan-s4[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--suyan);
+    }
+
+    /* S5 · 星芒表达 */
+    .suyan-s5 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .suyan-s5 svg { width: 22px; height: 22px; }
+    .suyan-s5-path { fill: currentColor; }
+    .suyan-s5[aria-pressed="true"] { background: var(--suyan-soft); }
+
+    /* S6 · 净颜水滴 */
+    .suyan-s6 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .suyan-s6 svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .suyan-s6-drop { fill: currentColor; stroke: none; opacity: 0.22; }
+    .suyan-s6[aria-pressed="true"] {
+      background: var(--suyan-grad);
+      color: #fff;
+    }
+    .suyan-s6[aria-pressed="true"] .suyan-s6-drop { opacity: 0.35; }
+
+    /* S7 · 言语出口 */
+    .suyan-s7 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--suyan);
+    }
+    .suyan-s7 svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .suyan-s7-dot { fill: currentColor; stroke: none; }
+    .suyan-s7[aria-pressed="true"] {
+      background: var(--suyan);
+      color: #fff;
+    }
+
+    /* S8 · 胶囊「素颜」 */
+    .suyan-s8 {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 16px;
+      background: var(--suyan-soft);
+      color: var(--suyan);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .suyan-s8[aria-pressed="true"] {
+      background: var(--suyan-grad);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(123, 97, 255, 0.35);
+    }
+
+    .concept-tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>素颜入口 · 8 款</h1>
+    <p>聊天输入栏：输入框 → 素颜 → 发送。素颜表示卸下伪装、真实表达；每款含默认 / 展开（aria-pressed）/ 禁用三态，并在完整底栏中与发送按钮并列展示。</p>
+  </div>
+
+  <div class="section">
+    <div class="grid">
+
+      <!-- S1 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S1 · 头像环「素」</div>
+          <div class="card-ref">当前线上 · 方案 P6</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="今晚有空吗" readonly />
+            <button type="button" class="icon-btn suyan-s1" aria-pressed="false" aria-label="素颜">
+              <span class="suyan-s1-ring"><span class="suyan-s1-inner">素</span></span>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">以首字作头像，渐变环暗示「另一张脸」——你的表达人格。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s1" aria-pressed="false"><span class="suyan-s1-ring"><span class="suyan-s1-inner">素</span></span></button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s1" aria-pressed="true"><span class="suyan-s1-ring"><span class="suyan-s1-inner">素</span></span></button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s1" disabled><span class="suyan-s1-ring"><span class="suyan-s1-inner">素</span></span></button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S2 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S2 · 揭面</div>
+          <div class="card-ref">面具半揭 · 卸下伪装</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn suyan-s2" aria-pressed="true" aria-label="素颜">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4c-3 0-5.5 2.2-5.5 5v1.5"/>
+                <path d="M6.5 10.5C6.5 14 9 16.5 12 16.5s5.5-2.5 5.5-6"/>
+                <circle cx="9.5" cy="11" r="0.75" fill="currentColor" stroke="none"/>
+                <circle cx="14.5" cy="11" r="0.75" fill="currentColor" stroke="none"/>
+                <path d="M10 14.5c.8.6 1.7.9 2 .9s1.2-.3 2-.9"/>
+                <path d="M17 6l3-2M17 8l4 1" opacity="0.55"/>
+                <path d="M16.5 5.5c1.2-.8 2.8-.5 3.5.8" stroke-dasharray="2 2"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">虚线面具与真实面孔并置，强调「去掉伪装」的产品语义。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s2" aria-pressed="false" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M12 4c-3 0-5.5 2.2-5.5 5v1.5"/><path d="M6.5 10.5C6.5 14 9 16.5 12 16.5s5.5-2.5 5.5-6"/><circle cx="9.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><path d="M10 14.5c.8.6 1.7.9 2 .9s1.2-.3 2-.9"/><path d="M17 6l3-2M17 8l4 1" opacity="0.55"/><path d="M16.5 5.5c1.2-.8 2.8-.5 3.5.8" stroke-dasharray="2 2"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s2" aria-pressed="true" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M12 4c-3 0-5.5 2.2-5.5 5v1.5"/><path d="M6.5 10.5C6.5 14 9 16.5 12 16.5s5.5-2.5 5.5-6"/><circle cx="9.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><path d="M10 14.5c.8.6 1.7.9 2 .9s1.2-.3 2-.9"/><path d="M17 6l3-2M17 8l4 1" opacity="0.55"/><path d="M16.5 5.5c1.2-.8 2.8-.5 3.5.8" stroke-dasharray="2 2"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s2" disabled aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M12 4c-3 0-5.5 2.2-5.5 5v1.5"/><path d="M6.5 10.5C6.5 14 9 16.5 12 16.5s5.5-2.5 5.5-6"/><circle cx="9.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11" r="0.75" fill="currentColor" stroke="none"/><path d="M10 14.5c.8.6 1.7.9 2 .9s1.2-.3 2-.9"/><path d="M17 6l3-2M17 8l4 1" opacity="0.55"/><path d="M16.5 5.5c1.2-.8 2.8-.5 3.5.8" stroke-dasharray="2 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S3 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S3 · 真我轮廓</div>
+          <div class="card-ref">素颜面孔 + 星芒</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="好的，我直说了" readonly />
+            <button type="button" class="icon-btn suyan-s3" aria-pressed="true" aria-label="素颜">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="suyan-s3-face" cx="12" cy="11" r="5.5"/>
+                <path class="suyan-s3-face" d="M8.5 18.5c1.2 1.2 2.6 1.8 3.5 1.8s2.3-.6 3.5-1.8"/>
+                <path class="suyan-s3-spark" d="M18.5 5.5l.6 2.1 2.1.6-2.1.6-.6 2.1-.6-2.1-2.1-.6 2.1-.6z"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">极简人像 + 表达火花，展开时实心渐变，视觉权重适中。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s3" aria-pressed="false" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><circle class="suyan-s3-face" cx="12" cy="11" r="5.5"/><path class="suyan-s3-face" d="M8.5 18.5c1.2 1.2 2.6 1.8 3.5 1.8s2.3-.6 3.5-1.8"/><path class="suyan-s3-spark" d="M18.5 5.5l.6 2.1 2.1.6-2.1.6-.6 2.1-.6-2.1-2.1-.6 2.1-.6z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s3" aria-pressed="true" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><circle class="suyan-s3-face" cx="12" cy="11" r="5.5"/><path class="suyan-s3-face" d="M8.5 18.5c1.2 1.2 2.6 1.8 3.5 1.8s2.3-.6 3.5-1.8"/><path class="suyan-s3-spark" d="M18.5 5.5l.6 2.1 2.1.6-2.1.6-.6 2.1-.6-2.1-2.1-.6 2.1-.6z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s3" disabled aria-label="素颜">
+                <svg viewBox="0 0 24 24"><circle class="suyan-s3-face" cx="12" cy="11" r="5.5"/><path class="suyan-s3-face" d="M8.5 18.5c1.2 1.2 2.6 1.8 3.5 1.8s2.3-.6 3.5-1.8"/><path class="suyan-s3-spark" d="M18.5 5.5l.6 2.1 2.1.6-2.1.6-.6 2.1-.6-2.1-2.1-.6 2.1-.6z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S4 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S4 · 渐变「素」</div>
+          <div class="card-ref">高识别 · 字标入口</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn suyan-s4" aria-pressed="false" aria-label="素颜">素</button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">单字强品牌，方角圆角与发送圆钮形成形状对比。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span><button type="button" class="icon-btn suyan-s4" aria-pressed="false">素</button></div>
+            <div class="state-chip"><span>open</span><button type="button" class="icon-btn suyan-s4" aria-pressed="true">素</button></div>
+            <div class="state-chip"><span>disabled</span><button type="button" class="icon-btn suyan-s4" disabled>素</button></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S5 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S5 · 星芒表达</div>
+          <div class="card-ref">放肆表达 · AI 助手语感</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="想怎么说" readonly />
+            <button type="button" class="icon-btn suyan-s5" aria-pressed="true" aria-label="素颜">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="suyan-s5-path" d="M12 2.5l1.1 3.9L17 8l-3.9 1.1L12 13l-1.1-3.9L7 8l3.9-1.6L12 2.5z"/>
+                <path class="suyan-s5-path" d="M18.5 13.5l.7 2.4 2.4.7-2.4.7-.7 2.4-.7-2.4-2.4-.7 2.4-.7.7-2.4z" opacity="0.75"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">双星芒暗示灵感与措辞，适合弱化「人格」、强调「帮我说」。 </p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s5" aria-pressed="false" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s5-path" d="M12 2.5l1.1 3.9L17 8l-3.9 1.1L12 13l-1.1-3.9L7 8l3.9-1.6L12 2.5z"/><path class="suyan-s5-path" d="M18.5 13.5l.7 2.4 2.4.7-2.4.7-.7 2.4-.7-2.4-2.4-.7 2.4-.7.7-2.4z" opacity="0.75"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s5" aria-pressed="true" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s5-path" d="M12 2.5l1.1 3.9L17 8l-3.9 1.1L12 13l-1.1-3.9L7 8l3.9-1.6L12 2.5z"/><path class="suyan-s5-path" d="M18.5 13.5l.7 2.4 2.4.7-2.4.7-.7 2.4-.7-2.4-2.4-.7 2.4-.7.7-2.4z" opacity="0.75"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s5" disabled aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s5-path" d="M12 2.5l1.1 3.9L17 8l-3.9 1.1L12 13l-1.1-3.9L7 8l3.9-1.6L12 2.5z"/><path class="suyan-s5-path" d="M18.5 13.5l.7 2.4 2.4.7-2.4.7-.7 2.4-.7-2.4-2.4-.7 2.4-.7.7-2.4z" opacity="0.75"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S6 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S6 · 净颜水滴</div>
+          <div class="card-ref">素面 · 清透</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn suyan-s6" aria-pressed="false" aria-label="素颜">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="suyan-s6-drop" d="M12 3.5c3.5 5.5 6 9 6 12a6 6 0 1 1-12 0c0-3 2.5-6.5 6-12z"/>
+                <path d="M12 8.5v5M9.5 11h5"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">水滴 + 十字，隐喻洗净修饰、回归本真；展开时渐变实心。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s6" aria-pressed="false" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s6-drop" d="M12 3.5c3.5 5.5 6 9 6 12a6 6 0 1 1-12 0c0-3 2.5-6.5 6-12z"/><path d="M12 8.5v5M9.5 11h5"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s6" aria-pressed="true" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s6-drop" d="M12 3.5c3.5 5.5 6 9 6 12a6 6 0 1 1-12 0c0-3 2.5-6.5 6-12z"/><path d="M12 8.5v5M9.5 11h5"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s6" disabled aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path class="suyan-s6-drop" d="M12 3.5c3.5 5.5 6 9 6 12a6 6 0 1 1-12 0c0-3 2.5-6.5 6-12z"/><path d="M12 8.5v5M9.5 11h5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S7 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S7 · 言语出口</div>
+          <div class="card-ref">对话气泡 · 直说</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="帮我组织一下" readonly />
+            <button type="button" class="icon-btn suyan-s7" aria-pressed="true" aria-label="素颜">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 8.5h12a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2H10l-3.5 3v-3H6a2 2 0 0 1-2-2v-4.5a2 2 0 0 1 2-2z"/>
+                <circle class="suyan-s7-dot" cx="10" cy="13" r="1"/>
+                <circle class="suyan-s7-dot" cx="12" cy="13" r="1"/>
+                <circle class="suyan-s7-dot" cx="14" cy="13" r="1"/>
+              </svg>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">三点气泡 = 待组织的话，与右侧发送箭头形成功能分区。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span>
+              <button type="button" class="icon-btn suyan-s7" aria-pressed="false" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M6 8.5h12a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2H10l-3.5 3v-3H6a2 2 0 0 1-2-2v-4.5a2 2 0 0 1 2-2z"/><circle class="suyan-s7-dot" cx="10" cy="13" r="1"/><circle class="suyan-s7-dot" cx="12" cy="13" r="1"/><circle class="suyan-s7-dot" cx="14" cy="13" r="1"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>open</span>
+              <button type="button" class="icon-btn suyan-s7" aria-pressed="true" aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M6 8.5h12a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2H10l-3.5 3v-3H6a2 2 0 0 1-2-2v-4.5a2 2 0 0 1 2-2z"/><circle class="suyan-s7-dot" cx="10" cy="13" r="1"/><circle class="suyan-s7-dot" cx="12" cy="13" r="1"/><circle class="suyan-s7-dot" cx="14" cy="13" r="1"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn suyan-s7" disabled aria-label="素颜">
+                <svg viewBox="0 0 24 24"><path d="M6 8.5h12a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2H10l-3.5 3v-3H6a2 2 0 0 1-2-2v-4.5a2 2 0 0 1 2-2z"/><circle class="suyan-s7-dot" cx="10" cy="13" r="1"/><circle class="suyan-s7-dot" cx="12" cy="13" r="1"/><circle class="suyan-s7-dot" cx="14" cy="13" r="1"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- S8 -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S8 · 胶囊「素颜」</div>
+          <div class="card-ref">文字入口 · 低学习成本</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn suyan-s8" aria-pressed="false" aria-label="素颜">素颜</button>
+            <button type="button" class="icon-btn send-p6" disabled aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <p class="concept-tag">全词标签，新用户零猜测；宽度略大，适合首版引导期。</p>
+          <div class="states">
+            <div class="state-chip"><span>default</span><button type="button" class="icon-btn suyan-s8" aria-pressed="false">素颜</button></div>
+            <div class="state-chip"><span>open</span><button type="button" class="icon-btn suyan-s8" aria-pressed="true">素颜</button></div>
+            <div class="state-chip"><span>disabled</span><button type="button" class="icon-btn suyan-s8" disabled>素颜</button></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">建议面板 · 选中后发送</h2>
+    <p class="section-desc">选中素颜建议后，用户仍点右侧发送；面板内可提供快捷发送样式（与入口图标独立）。</p>
+    <div class="grid">
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">建议条 + 底栏</div>
+          <div class="card-ref">S1 头像环 + 渐变发送</div>
+        </div>
+        <div class="card-body">
+          <div class="mol-action-row">
+            <div class="mol-suggest-preview">「行，我直说：今晚可能来不了，下次再约。」</div>
+          </div>
+          <div class="compose-strip" style="margin-top:10px">
+            <input class="compose-input compose-input--filled" value="行，我直说：今晚可能来不了" readonly />
+            <button type="button" class="icon-btn suyan-s1" aria-pressed="true" aria-label="素颜">
+              <span class="suyan-s1-ring"><span class="suyan-s1-inner">素</span></span>
+            </button>
+            <button type="button" class="icon-btn send-p6" aria-label="发送">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">建议条内发送</div>
+          <div class="card-ref">每条建议右侧小箭头</div>
+        </div>
+        <div class="card-body">
+          <div class="mol-action-row" style="flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border-radius:12px;border:0.5px solid var(--border)">
+              <span style="flex:1;font-size:13px;line-height:1.45">「今晚来不了，改天吧。」</span>
+              <button type="button" class="icon-btn send-p6" style="width:32px;height:32px" aria-label="发送此条">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f4f5f9;border-radius:12px">
+              <span style="flex:1;font-size:13px;line-height:1.45;color:var(--muted)">「不好意思，临时有事…」</span>
+              <button type="button" class="icon-btn send-p6" style="width:32px;height:32px;opacity:0.5" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

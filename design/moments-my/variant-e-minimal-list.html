@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 E · 极简列表</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .phone { background: var(--surface); }
+    .feed { list-style: none; }
+    .feed-item {
+      padding: 16px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .feed-item:last-child { border-bottom: none; }
+    .feed-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .feed-row-main { flex: 1; min-width: 0; }
+    .feed-item .item-time { display: block; margin-bottom: 6px; font-weight: 500; }
+    .feed-row .item-body { font-size: 15px; }
+    .feed-item .qa-q { margin-bottom: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 E · 极简列表</p>
+  <div class="phone-wrap">
+    <div class="phone">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <h1 class="topbar-title">我的日常</h1>
+        <button type="button" class="topbar-btn topbar-btn--right">添加</button>
+      </header>
+      <div class="feed-scroll">
+        <ul class="feed">
+          <li class="feed-item">
+            <div class="feed-row">
+              <div class="feed-row-main">
+                <time class="item-time">3小时前</time>
+                <p class="item-body">今早通勤读了半小时产品文档，记下两个待会和研发的对接点。</p>
+              </div>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+          </li>
+          <li class="feed-item">
+            <div class="feed-row">
+              <div class="feed-row-main">
+                <time class="item-time">昨天</time>
+                <p class="qa-q">你平时几点起床？</p>
+                <p class="item-body">一般七点左右，周末会稍微晚一点。</p>
+              </div>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+          </li>
+          <li class="feed-item">
+            <div class="feed-row">
+              <div class="feed-row-main">
+                <time class="item-time">6月8日</time>
+                <p class="item-body">周末约了朋友去城郊徒步，希望分身被问到时能提到喜欢户外活动。</p>
+              </div>
+              <button type="button" class="more-btn" aria-label="更多">⋯</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="pm-tag">无卡片阴影，白底 + 分隔线。适合条目多、快速扫读。</p>
+  </div>
+</body>
+</html>

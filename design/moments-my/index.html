@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>我的日常 · 方案索引</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #14171a;
+      --muted: #6b7280;
+      --accent: #b07a1a;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 20px 40px;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 8px; font-size: 15px; }
+    .note {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+    }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    a {
+      display: block;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      text-decoration: none;
+      color: inherit;
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.04);
+    }
+    a strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--accent); }
+    a span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>我的日常 · 布局方案</h1>
+  <p class="lead">供好友探索分身时引用的日常内容。以下均为手机宽度 390px 可浏览原型。</p>
+  <div class="note">
+    功能范围：动态列表、问答条目、编辑/删除入口、空状态、添加入口。参考微信朋友圈时间流、Day One 日记、Notion 时间轴等常见形态。
+  </div>
+  <ul>
+    <li>
+      <a href="variant-a-card-feed.html">
+        <strong>方案 A · 卡片流（当前线上）</strong>
+        <span>时间标签 + 圆角卡片，右上角更多菜单。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-wechat-style.html">
+        <strong>方案 B · 朋友圈式</strong>
+        <span>头像 + 正文横排，弱化卡片边框，更接近微信动态。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-c-timeline.html">
+        <strong>方案 C · 左侧时间轴</strong>
+        <span>竖线 + 节点，适合条目较多、强调时间顺序。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-d-day-groups.html">
+        <strong>方案 D · 按日分组</strong>
+        <span>今天 / 昨天 / 日期标题，与探索记录页分组逻辑一致。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-e-minimal-list.html">
+        <strong>方案 E · 极简列表</strong>
+        <span>无卡片阴影，分隔线列表，信息密度高。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-f-journal.html">
+        <strong>方案 F · 日记本</strong>
+        <span>大字号正文、纸感背景、左侧日期块，偏私人记录。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-g-fab-add.html">
+        <strong>方案 G · 底部悬浮添加</strong>
+        <span>顶栏仅返回与标题，添加改为右下角 FAB。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-h-empty.html">
+        <strong>空状态 · 4 款对比</strong>
+        <span>无内容时的引导文案与添加入口形态。</span>
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

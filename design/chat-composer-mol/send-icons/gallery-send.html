@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>发送按钮 · 8 款方案</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    /* S1 · 文字胶囊（当前线上） */
+    .send-s1 {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* S2 · iOS 圆形纸飞机 */
+    .send-s2 {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+    }
+    .send-s2 svg { width: 17px; height: 17px; margin-left: 1px; }
+
+    /* S3 · Telegram 椭圆 */
+    .send-s3 {
+      width: 38px;
+      height: 30px;
+      border-radius: 15px;
+      background: var(--accent);
+      color: #fff;
+    }
+    .send-s3 svg { width: 18px; height: 18px; margin-left: 2px; }
+
+    /* S4 · 透明 + 箭头（Signal 风） */
+    .send-s4 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--accent);
+    }
+    .send-s4 svg { width: 22px; height: 22px; stroke-width: 2; fill: none; stroke: currentColor; }
+
+    /* S5 · 方形圆角实心 */
+    .send-s5 {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+    }
+    .send-s5 svg { width: 18px; height: 18px; }
+
+    /* S6 · 内嵌输入框（iMessage） */
+    .compose-inline {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 0 6px 0 14px;
+      background: #fafbfc;
+    }
+    .compose-inline input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+    .send-s6 {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+    }
+    .send-s6 svg { width: 14px; height: 14px; margin-left: 1px; }
+
+    /* S7 · 渐变圆形 */
+    .send-s7 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #34c759, #007aff);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+    }
+    .send-s7 svg { width: 16px; height: 16px; margin-left: 1px; }
+
+    /* S8 · 描边圆环 */
+    .send-s8 {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+    .send-s8 svg { width: 15px; height: 15px; margin-left: 1px; fill: currentColor; }
+  </style>
+</head>
+<body>
+  <div class="page-head">
+    <a class="back-link" href="index.html">← 图标方案索引</a>
+    <h1>发送按钮 · 8 款</h1>
+    <p>底部输入栏右侧「发送」控件的形态对比。每卡含空输入 / 有内容 / 禁用三态。</p>
+  </div>
+
+  <div class="section">
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S1 · 文字胶囊</div>
+          <div class="card-ref">参考：当前产品 · 微信早期风格</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input" placeholder="输入消息" readonly />
+            <button type="button" class="icon-btn send-s1" disabled>发送</button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>empty</span>
+              <div class="compose-strip" style="width:100%">
+                <input class="compose-input" placeholder="输入消息" readonly />
+                <button type="button" class="icon-btn send-s1" disabled>发送</button>
+              </div>
+            </div>
+            <div class="state-chip"><span>active</span>
+              <div class="compose-strip" style="width:100%">
+                <input class="compose-input compose-input--filled" value="好的，我这边今天下班前给你。" readonly />
+                <button type="button" class="icon-btn send-s1">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S2 · 圆形纸飞机</div>
+          <div class="card-ref">参考：iMessage / CometChat 默认</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="收到，稍后发你。" readonly />
+            <button type="button" class="icon-btn send-s2" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>empty</span>
+              <button type="button" class="icon-btn send-s2" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s2" aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S3 · Telegram 椭圆</div>
+          <div class="card-ref">参考：Telegram iOS 12+ 发送钮</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="文档已更新。" readonly />
+            <button type="button" class="icon-btn send-s3" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s3" aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn send-s3" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S4 · 透明箭头</div>
+          <div class="card-ref">参考：Signal / 极简图标栏</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="明天见。" readonly />
+            <button type="button" class="icon-btn send-s4" aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>empty</span>
+              <button type="button" class="icon-btn send-s4" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s4" aria-label="发送">
+                <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S5 · 方角实心</div>
+          <div class="card-ref">参考：当前产品 icon 栏尺寸</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="可以。" readonly />
+            <button type="button" class="icon-btn send-s5" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 22 12 3.4 3.6 3 10.8l11.6 1.2L3 13.2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s5" aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 22 12 3.4 3.6 3 10.8l11.6 1.2L3 13.2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn send-s5" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 22 12 3.4 3.6 3 10.8l11.6 1.2L3 13.2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S6 · 内嵌输入框</div>
+          <div class="card-ref">参考：iMessage 发送在输入框内</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip" style="background:transparent;border:none;padding:0;gap:0">
+            <div class="compose-inline" style="flex:1">
+              <input value="下午三点可以吗？" readonly />
+              <button type="button" class="icon-btn send-s6" aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>empty</span>
+              <div class="compose-inline">
+                <input placeholder="iMessage" readonly />
+                <button type="button" class="icon-btn send-s6" disabled aria-label="发送">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S7 · 渐变圆形</div>
+          <div class="card-ref">参考：品牌强调 / 主操作突出</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="已确认。" readonly />
+            <button type="button" class="icon-btn send-s7" aria-label="发送">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s7" aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>disabled</span>
+              <button type="button" class="icon-btn send-s7" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div class="card-name">S8 · 描边圆环</div>
+          <div class="card-ref">参考：轻量次级操作 / 暗色主题友好</div>
+        </div>
+        <div class="card-body">
+          <div class="compose-strip">
+            <input class="compose-input compose-input--filled" value="收到。" readonly />
+            <button type="button" class="icon-btn send-s8" aria-label="发送">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="states">
+            <div class="state-chip"><span>empty</span>
+              <button type="button" class="icon-btn send-s8" disabled aria-label="发送">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+            <div class="state-chip"><span>active</span>
+              <button type="button" class="icon-btn send-s8" aria-label="发送">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</body>
+</html>

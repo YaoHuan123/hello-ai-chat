@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>方案 H · 底部 Sheet 作答</title>
+  <link rel="stylesheet" href="_shared.css" />
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <p class="mock-label">方案 H · 底部 Sheet 作答（线上交互优化）</p>
+  <div class="phone-wrap">
+    <div class="phone phone--sheet">
+      <header class="topbar">
+        <button type="button" class="topbar-btn">返回</button>
+        <div class="topbar-head">
+          <h1 class="topbar-title">热点</h1>
+          <p class="topbar-updated">更新于 6月10日 09:30</p>
+        </div>
+      </header>
+      <div class="feed-scroll" style="filter:blur(1px);opacity:0.6">
+        <button type="button" class="card">
+          <p class="topic-q">你怎么看远程办公和回办公室的选择？</p>
+          <p class="topic-hint">关联近期职场讨论</p>
+        </button>
+        <button type="button" class="card">
+          <p class="topic-q">最近有在追什么剧或综艺吗？</p>
+        </button>
+      </div>
+      <div class="sheet-back" role="presentation">
+        <div class="sheet" role="dialog" aria-modal="true">
+          <p class="sheet-q">你怎么看远程办公和回办公室的选择？</p>
+          <label class="sheet-label" for="sheet-ans">你的回答</label>
+          <textarea id="sheet-ans" class="sheet-input" placeholder="写下你的看法…"></textarea>
+          <button type="button" class="sheet-submit">添加到我的日常</button>
+        </div>
+      </div>
+    </div>
+    <p class="pm-tag">保留弹层交互，改为底部 Sheet + 全宽主按钮，与移动端习惯一致。</p>
+  </div>
+</body>
+</html>

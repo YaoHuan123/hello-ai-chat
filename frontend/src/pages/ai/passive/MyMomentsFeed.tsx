@@ -61,26 +61,57 @@ function ItemEditorModal({
   );
 }
 
-function formatPublishedAt(ts: number): string {
-  const now = Date.now();
-  const diffMs = Math.max(0, now - ts);
-  const diffHours = Math.floor(diffMs / 3_600_000);
+function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
 
-  if (diffHours < 1) return "刚刚";
-  if (diffHours < 24) return `${diffHours}小时前`;
-
+function dayKey(ts: number): string {
   const d = new Date(ts);
-  const nowDate = new Date(now);
-  const yesterday = new Date(nowDate);
-  yesterday.setDate(nowDate.getDate() - 1);
-  const isSameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
+function formatDayLabel(ts: number): string {
+  const d = new Date(ts);
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(d, now)) return "今天";
   if (isSameDay(d, yesterday)) return "昨天";
-  if (d.getFullYear() === nowDate.getFullYear()) {
+  if (d.getFullYear() === now.getFullYear()) {
     return `${d.getMonth() + 1}月${d.getDate()}日`;
   }
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function formatRowTime(ts: number): string {
+  const d = new Date(ts);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+type DayGroup = {
+  dayKey: string;
+  dayLabel: string;
+  dayIso: string;
+  items: PassiveCloneItem[];
+};
+
+function groupItemsByDay(items: PassiveCloneItem[]): DayGroup[] {
+  const sorted = [...items].sort((a, b) => b.ts - a.ts);
+  const groups: DayGroup[] = [];
+  for (const item of sorted) {
+    const key = dayKey(item.ts);
+    const last = groups[groups.length - 1];
+    const d = new Date(item.ts);
+    const dayIso = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
+    if (last?.dayKey === key) {
+      last.items.push(item);
+    } else {
+      groups.push({ dayKey: key, dayLabel: formatDayLabel(item.ts), dayIso, items: [item] });
+    }
+  }
+  return groups;
 }
 
 export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
@@ -117,67 +148,80 @@ export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
     );
   }
 
+  const dayGroups = groupItemsByDay(items);
+
   return (
     <>
-      <ul className="moments-my-feed" aria-label="我的动态">
-        {items.map((it) => (
-          <li key={it.id} className="moments-my-feed-item">
-            <time className="moments-my-feed-time" dateTime={new Date(it.ts).toISOString()}>
-              {formatPublishedAt(it.ts)}
-            </time>
-            <article className="moments-my-card">
-              <div className="moments-my-card__top">
-                <div className="moments-feed-more-wrap">
-                  <button
-                    type="button"
-                    className="moments-my-more"
-                    aria-label="更多"
-                    aria-expanded={menuItemId === it.id}
-                    aria-haspopup="menu"
-                    onClick={() => setMenuItemId((id) => (id === it.id ? null : it.id))}
-                  >
-                    ⋯
-                  </button>
-                  {menuItemId === it.id && (
-                    <>
-                      <div className="moments-feed-menu-backdrop" role="presentation" onClick={() => setMenuItemId(null)} />
-                      <div className="moments-feed-menu" role="menu">
-                        <button
-                          type="button"
-                          className="moments-feed-menu__item"
-                          role="menuitem"
-                          onClick={() => {
-                            setMenuItemId(null);
-                            setEditor({ mode: "edit", item: it });
-                          }}
-                        >
-                          编辑
-                        </button>
-                        <button
-                          type="button"
-                          className="moments-feed-menu__item moments-feed-menu__item--danger"
-                          role="menuitem"
-                          onClick={() => {
-                            setMenuItemId(null);
-                            onDelete(it.id);
-                          }}
-                        >
-                          删除
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              {(() => {
-                const text = it.type === "qa" ? it.title.trim() || it.body : it.body;
-                if (!text) return null;
-                return <p className="moments-my-card__body">{text}</p>;
-              })()}
-            </article>
-          </li>
+      <div className="moments-my-day-groups" aria-label="我的动态">
+        {dayGroups.map((group) => (
+          <section key={group.dayKey} className="moments-my-day-group">
+            <h2 className="moments-my-day-group__title">
+              <time dateTime={group.dayIso}>{group.dayLabel}</time>
+            </h2>
+            <ul className="moments-my-day-rows">
+              {group.items.map((it) => {
+                const isQa = it.type === "qa";
+                const question = isQa ? it.title.trim() : "";
+                const body = it.body.trim();
+                if (!question && !body) return null;
+
+                return (
+                  <li key={it.id} className="moments-my-day-row">
+                    <time className="moments-my-day-row__time" dateTime={new Date(it.ts).toISOString()}>
+                      {formatRowTime(it.ts)}
+                    </time>
+                    <div className="moments-my-day-row__main">
+                      {question ? <p className="moments-my-day-row__q">{question}</p> : null}
+                      {body ? <p className="moments-my-day-row__body">{body}</p> : null}
+                    </div>
+                    <div className="moments-feed-more-wrap moments-my-day-row__more">
+                      <button
+                        type="button"
+                        className="moments-my-more"
+                        aria-label="更多"
+                        aria-expanded={menuItemId === it.id}
+                        aria-haspopup="menu"
+                        onClick={() => setMenuItemId((id) => (id === it.id ? null : it.id))}
+                      >
+                        ⋯
+                      </button>
+                      {menuItemId === it.id && (
+                        <>
+                          <div className="moments-feed-menu-backdrop" role="presentation" onClick={() => setMenuItemId(null)} />
+                          <div className="moments-feed-menu" role="menu">
+                            <button
+                              type="button"
+                              className="moments-feed-menu__item"
+                              role="menuitem"
+                              onClick={() => {
+                                setMenuItemId(null);
+                                setEditor({ mode: "edit", item: it });
+                              }}
+                            >
+                              编辑
+                            </button>
+                            <button
+                              type="button"
+                              className="moments-feed-menu__item moments-feed-menu__item--danger"
+                              role="menuitem"
+                              onClick={() => {
+                                setMenuItemId(null);
+                                onDelete(it.id);
+                              }}
+                            >
+                              删除
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         ))}
-      </ul>
+      </div>
       {editor && <ItemEditorModal item={editor.item} onClose={() => setEditor(null)} onSave={handleSave} />}
     </>
   );

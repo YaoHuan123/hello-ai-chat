@@ -1,0 +1,220 @@
+/* Shared tokens · 热点 mockups */
+:root {
+  --bg: #eceef4;
+  --bg-soft: #f8f9fc;
+  --surface: #ffffff;
+  --text: #14171a;
+  --muted: #6b7280;
+  --accent: #e8783a;
+  --accent-soft: rgba(232, 120, 58, 0.12);
+  --accent-strong: #c96228;
+  --ok: #2f9e6f;
+  --ok-soft: rgba(47, 158, 111, 0.12);
+  --border: rgba(20, 23, 26, 0.08);
+  --phone-w: 390px;
+  --phone-h: 844px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: #dfe2ea;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+.mock-label {
+  width: min(100%, var(--phone-w));
+  margin: 0 auto 10px;
+  padding: 16px 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 12px 32px;
+}
+
+.phone {
+  width: min(100%, var(--phone-w));
+  height: min(92vh, var(--phone-h));
+  background: linear-gradient(180deg, #f8f9fc 0%, #eceef4 160px);
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(20, 23, 26, 0.18);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+}
+
+.topbar {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  padding: 12px 10px 10px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.topbar-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--accent-strong);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.topbar-head { text-align: center; }
+.topbar-title { font-size: 17px; font-weight: 700; }
+.topbar-updated { margin-top: 4px; font-size: 12px; color: var(--muted); font-weight: 400; }
+
+.feed-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px calc(20px + var(--safe-bottom));
+}
+
+.topic-q {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.topic-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.tag-ok {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ok);
+  background: var(--ok-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.tag-platform {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 28px rgba(20, 23, 26, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.card:active { transform: scale(0.985); }
+.card--done { opacity: 0.72; cursor: default; }
+
+.back-link {
+  display: inline-block;
+  margin: 16px 12px 0;
+  font-size: 13px;
+  color: #007aff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pm-tag {
+  width: min(100%, var(--phone-w));
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  padding: 0 4px;
+}
+
+.sheet-back {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  z-index: 20;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+}
+
+.sheet-q {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.sheet-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.sheet-input {
+  width: 100%;
+  min-height: 100px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.45;
+  resize: none;
+}
+
+.sheet-submit {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.phone--sheet { position: relative; }
