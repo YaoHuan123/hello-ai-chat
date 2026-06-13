@@ -1,4 +1,5 @@
 import type { DatabaseSync } from "node:sqlite";
+import { type RelationType, isValidRelationType } from "../constants/relationTypes";
 import { normalizePhoneDigits } from "../utils/phone";
 import type { ContactsService } from "./contacts.service";
 
@@ -117,7 +118,14 @@ export class FriendRequestsService {
     return Number(row?.c ?? 0);
   }
 
-  accept(requestId: number, accepterUserId: string): { request: FriendRequestListItem; contactForRequester: { contactUserId: string; phone: string } } {
+  accept(
+    requestId: number,
+    accepterUserId: string,
+    relationType: RelationType,
+  ): { request: FriendRequestListItem; contactForRequester: { contactUserId: string; phone: string } } {
+    if (!isValidRelationType(relationType)) {
+      throw new Error("INVALID_RELATION");
+    }
     const row = this.db
       .prepare(
         `SELECT id, from_user_id AS fromUserId, to_user_id AS toUserId, status FROM friend_requests WHERE id = ?`,
@@ -139,11 +147,20 @@ export class FriendRequestsService {
         throw new Error("INVALID_STATE");
       }
       this.db
-        .prepare("INSERT OR IGNORE INTO contacts (owner_user_id, contact_user_id, remark, created_at) VALUES (?, ?, NULL, ?)")
-        .run(row.fromUserId, row.toUserId, now);
+        .prepare(
+          "INSERT OR IGNORE INTO contacts (owner_user_id, contact_user_id, remark, relation_type, default_mol_id, created_at) VALUES (?, ?, NULL, ?, NULL, ?)",
+        )
+        .run(row.fromUserId, row.toUserId, relationType, now);
       this.db
-        .prepare("INSERT OR IGNORE INTO contacts (owner_user_id, contact_user_id, remark, created_at) VALUES (?, ?, NULL, ?)")
+        .prepare(
+          "INSERT OR IGNORE INTO contacts (owner_user_id, contact_user_id, remark, relation_type, default_mol_id, created_at) VALUES (?, ?, NULL, NULL, NULL, ?)",
+        )
         .run(row.toUserId, row.fromUserId, now);
+      this.db
+        .prepare(
+          "UPDATE contacts SET relation_type = ? WHERE owner_user_id = ? AND contact_user_id = ?",
+        )
+        .run(relationType, row.toUserId, row.fromUserId);
       this.db.exec("COMMIT");
     } catch (e) {
       this.db.exec("ROLLBACK");

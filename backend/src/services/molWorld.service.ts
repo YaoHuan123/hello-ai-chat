@@ -3,7 +3,14 @@ import path from "path";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { MOL_PRIVATE_DIR, MOL_WORLD_DIR } from "../config";
-import { isValidPrimaryCategory, MOL_PRIMARY_CATEGORIES } from "../constants/molWorld";
+import { isValidPrimaryCategory, MOL_PRIMARY_CATEGORIES, type MolPrimaryCategory } from "../constants/molWorld";
+import {
+  PLACEHOLDER_MOL_SUMMARY,
+  applyPersonaDefaults,
+  defaultInfoItemsForMol,
+  defaultSummaryForMol,
+  needsPersonaBackfill,
+} from "../constants/molPersonaDefaults";
 import { logWarn } from "../logger";
 
 const SCHEMA_VERSION = 1;
@@ -128,56 +135,171 @@ function parseMolFile(raw: string, filePath: string): MolWorldFile | null {
   }
 }
 
-const SEED_MOLS: Omit<MolWorldFile, "uploader" | "createdAt" | "updatedAt">[] = [
+const SEED_MOL_DEFS: {
+  id: string;
+  name: string;
+  primaryCategory: MolPrimaryCategory;
+  taskTags: string[];
+  toneTags: string[];
+  relationshipTags: string[];
+  abilityTags: string[];
+  popularityScore: number;
+  recommended: boolean;
+}[] = [
   {
-    id: "mw-seed-pro",
-    schemaVersion: SCHEMA_VERSION,
-    name: "职场沟通专家",
-    summary: "偏正式、强调结构与边界。",
-    primaryCategory: "职场沟通",
-    taskTags: ["谈合作", "催进度", "维护边界", "表达感谢"],
-    toneTags: ["专业", "有边界感"],
-    relationshipTags: ["同事", "客户", "领导"],
-    abilityTags: ["会润色", "会多步引导"],
-    price: 0,
-    popularityScore: 920,
+    id: "mw-seed-age18",
+    name: "我在18岁",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "安慰", "破冰", "表达感谢"],
+    toneTags: ["活泼", "温和"],
+    relationshipTags: ["朋友", "同学"],
+    abilityTags: ["会接话", "擅长安慰"],
+    popularityScore: 810,
     recommended: true,
-    infoItems: [
-      { id: "inf-d1", source: "custom", title: "沟通风格", body: "专业、简洁、高效，避免口语化表达" },
-      { id: "inf-d2", source: "store", title: "常用开场白", body: "您好，关于XX事项，我想和您沟通一下…" },
-    ],
   },
   {
-    id: "mw-seed-social",
-    schemaVersion: SCHEMA_VERSION,
-    name: "朋友社交达人",
-    summary: "偏亲和、延续日常话题。",
+    id: "mw-seed-tsundere",
+    name: "傲娇柔病",
     primaryCategory: "朋友社交",
-    taskTags: ["破冰", "延续聊天", "推进关系", "表达感谢"],
-    toneTags: ["温和", "活泼"],
+    taskTags: ["延续聊天", "邀约", "安慰", "推进关系", "表达感谢"],
+    toneTags: ["嘴硬", "温和"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "会润色"],
+    popularityScore: 795,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-neihan",
+    name: "内涵段子",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "破冰", "表达感谢", "邀约"],
+    toneTags: ["幽默", "轻松"],
     relationshipTags: ["朋友"],
     abilityTags: ["会接话", "会润色"],
-    price: 0,
-    popularityScore: 780,
+    popularityScore: 770,
     recommended: true,
-    infoItems: [],
   },
   {
-    id: "mw-seed-warm",
-    schemaVersion: SCHEMA_VERSION,
-    name: "亲友表达助手",
-    summary: "自然口语，适合家庭与密友。",
-    primaryCategory: "家庭亲友",
-    taskTags: ["安慰", "表达感谢", "邀约", "延续聊天"],
-    toneTags: ["温和", "有边界感"],
-    relationshipTags: ["家人", "朋友"],
-    abilityTags: ["擅长安慰", "会接话"],
-    price: 0,
-    popularityScore: 750,
+    id: "mw-seed-zhihu",
+    name: "之乎者也",
+    primaryCategory: "内容表达",
+    taskTags: ["延续聊天", "表达感谢", "维护边界", "邀约"],
+    toneTags: ["文雅", "克制"],
+    relationshipTags: ["朋友", "同事"],
+    abilityTags: ["会润色"],
+    popularityScore: 760,
     recommended: true,
-    infoItems: [],
+  },
+  {
+    id: "mw-seed-doubao",
+    name: "豆包体",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "表达感谢", "谈合作", "催进度"],
+    toneTags: ["清楚", "温和"],
+    relationshipTags: ["朋友", "同事"],
+    abilityTags: ["会接话", "会润色", "会多步引导"],
+    popularityScore: 785,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-mabao",
+    name: "专业妈宝",
+    primaryCategory: "家庭亲友",
+    taskTags: ["安慰", "延续聊天", "表达感谢", "维护边界"],
+    toneTags: ["软", "幽默"],
+    relationshipTags: ["家人", "朋友"],
+    abilityTags: ["会接话", "擅长安慰"],
+    popularityScore: 755,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-yaoyao",
+    name: "遥遥领先",
+    primaryCategory: "职场沟通",
+    taskTags: ["谈合作", "催进度", "表达感谢", "延续聊天"],
+    toneTags: ["自信", "直接"],
+    relationshipTags: ["同事", "客户", "朋友"],
+    abilityTags: ["会润色", "会接话"],
+    popularityScore: 748,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-kongmen",
+    name: "遁入空门",
+    primaryCategory: "朋友社交",
+    taskTags: ["婉拒", "维护边界", "延续聊天", "安慰"],
+    toneTags: ["淡", "克制"],
+    relationshipTags: ["朋友"],
+    abilityTags: ["擅长拒绝", "会接话"],
+    popularityScore: 742,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-baobao",
+    name: "人家还是宝宝",
+    primaryCategory: "朋友社交",
+    taskTags: ["安慰", "延续聊天", "邀约", "表达感谢"],
+    toneTags: ["软", "活泼"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "擅长安慰"],
+    popularityScore: 738,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-keyan",
+    name: "科研圣体",
+    primaryCategory: "职场沟通",
+    taskTags: ["谈合作", "催进度", "维护边界", "表达感谢"],
+    toneTags: ["专业", "严谨"],
+    relationshipTags: ["同事", "同学", "客户"],
+    abilityTags: ["会润色", "会多步引导"],
+    popularityScore: 732,
+    recommended: true,
   },
 ];
+
+function buildSeedMol(
+  def: (typeof SEED_MOL_DEFS)[number],
+  uploader: { userId: string; phoneMask: string },
+  now: number,
+): MolWorldFile {
+  return {
+    id: def.id,
+    schemaVersion: SCHEMA_VERSION,
+    name: def.name,
+    summary: defaultSummaryForMol(def.id, def.primaryCategory),
+    primaryCategory: def.primaryCategory,
+    taskTags: def.taskTags,
+    toneTags: def.toneTags,
+    relationshipTags: def.relationshipTags,
+    abilityTags: def.abilityTags,
+    price: 0,
+    popularityScore: def.popularityScore,
+    recommended: def.recommended,
+    uploader,
+    createdAt: now,
+    updatedAt: now,
+    infoItems: defaultInfoItemsForMol(def.id, def.primaryCategory, now),
+  };
+}
+
+function resolvePersonaOnCreate(
+  molId: string,
+  category: string,
+  summaryRaw: string,
+  initialInfo: MolWorldInfoItem[],
+  now: number,
+): { summary: string; infoItems: MolWorldInfoItem[] } {
+  let summary = summaryRaw.trim();
+  let infoItems = initialInfo;
+  if (infoItems.length === 0) {
+    infoItems = defaultInfoItemsForMol(molId, category, now);
+  }
+  if (!summary || summary === PLACEHOLDER_MOL_SUMMARY) {
+    summary = defaultSummaryForMol(molId, category);
+  }
+  return { summary, infoItems };
+}
 
 export class MolWorldService {
   private purgeUserRefs: (molWorldId: string) => void = () => {};
@@ -204,17 +326,141 @@ export class MolWorldService {
     if (count > 0) return;
     const now = Date.now();
     const uploader = { userId: "__seed__", phoneMask: "----" };
-    for (const row of SEED_MOLS) {
-      const full: MolWorldFile = {
-        ...row,
-        price: 0,
-        recommended: row.recommended ?? false,
-        uploader,
-        createdAt: now,
-        updatedAt: now,
-      };
+    for (const def of SEED_MOL_DEFS) {
+      const full = buildSeedMol(def, uploader, now);
       const fp = filePathFor(full.primaryCategory, full.id);
       atomicWriteJson(fp, full);
+    }
+  }
+
+  /** 补种 SEED 中尚未存在的素颜（不影响已有条目）。 */
+  seedMissingMols(): void {
+    const now = Date.now();
+    const uploader = { userId: "__seed__", phoneMask: "----" };
+    for (const def of SEED_MOL_DEFS) {
+      if (this.findFilePathById(def.id)) continue;
+      const full = buildSeedMol(def, uploader, now);
+      atomicWriteJson(filePathFor(full.primaryCategory, full.id), full);
+    }
+  }
+
+  /** 删除已下线的系统 seed 文件，并清理 user_mols 引用。 */
+  purgeOrphanSeedFiles(): void {
+    const allowed = new Set(SEED_MOL_DEFS.map((d) => d.id));
+    for (const rec of this.listAllRaw()) {
+      if (rec.uploader.userId !== "__seed__" || allowed.has(rec.id)) continue;
+      const found = this.findFilePathById(rec.id);
+      if (found) {
+        try {
+          fs.unlinkSync(found.filePath);
+        } catch {
+          /* ignore */
+        }
+      }
+      this.purgeUserRefs(rec.id);
+    }
+  }
+
+  /** 将 SEED 定义中的展示名与 catalog 标签同步到已有 seed JSON（不改 infoItems / summary）。 */
+  syncSeedCatalogFromDefs(): void {
+    const now = Date.now();
+    for (const def of SEED_MOL_DEFS) {
+      const found = this.findFilePathById(def.id);
+      if (!found || found.record.uploader.userId !== "__seed__") continue;
+      const rec = found.record;
+      const tagsEq = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
+      const changed =
+        rec.name !== def.name ||
+        rec.primaryCategory !== def.primaryCategory ||
+        !tagsEq(rec.taskTags, def.taskTags) ||
+        !tagsEq(rec.toneTags, def.toneTags) ||
+        !tagsEq(rec.relationshipTags, def.relationshipTags) ||
+        !tagsEq(rec.abilityTags, def.abilityTags) ||
+        rec.popularityScore !== def.popularityScore ||
+        rec.recommended !== def.recommended;
+      if (!changed) continue;
+      const next: MolWorldFile = {
+        ...rec,
+        name: def.name,
+        primaryCategory: def.primaryCategory,
+        taskTags: def.taskTags,
+        toneTags: def.toneTags,
+        relationshipTags: def.relationshipTags,
+        abilityTags: def.abilityTags,
+        popularityScore: def.popularityScore,
+        recommended: def.recommended,
+        updatedAt: now,
+      };
+      const fp = filePathFor(next.primaryCategory, next.id);
+      if (fp !== found.filePath && fs.existsSync(fp)) continue;
+      if (fp !== found.filePath) {
+        atomicWriteJson(fp, next);
+        try {
+          fs.unlinkSync(found.filePath);
+        } catch {
+          /* ignore */
+        }
+      } else {
+        atomicWriteJson(found.filePath, next);
+      }
+    }
+  }
+
+  /** 为资料为空的已有素颜补全默认信息集（仅本地文件）。 */
+  backfillEmptyPersonas(): void {
+    const touch = (filePath: string, record: MolWorldFile) => {
+      const patched = applyPersonaDefaults(record);
+      if (patched.summary === record.summary && patched.infoItems.length === record.infoItems.length) return;
+      atomicWriteJson(filePath, { ...patched, updatedAt: Date.now() });
+    };
+    for (const rec of this.listAllRaw()) {
+      const found = this.findFilePathById(rec.id);
+      if (found) touch(found.filePath, rec);
+    }
+    if (!fs.existsSync(MOL_PRIVATE_DIR)) return;
+    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
+      if (!ent.isDirectory()) continue;
+      const dir = path.join(MOL_PRIVATE_DIR, ent.name);
+      for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (!f.isFile() || !f.name.endsWith(".json")) continue;
+        const fp = path.join(dir, f.name);
+        try {
+          const raw = fs.readFileSync(fp, "utf8");
+          const parsed = parseMolFile(raw, fp);
+          if (parsed) touch(fp, parsed);
+        } catch {
+          /* skip */
+        }
+      }
+    }
+  }
+
+  /** 从所有素颜文件移除标题为「示例」的信息项。 */
+  stripExampleInfoItems(): void {
+    const touch = (filePath: string, record: MolWorldFile) => {
+      const nextItems = record.infoItems.filter((it) => it.title.trim() !== "示例");
+      if (nextItems.length === record.infoItems.length) return;
+      atomicWriteJson(filePath, { ...record, infoItems: nextItems, updatedAt: Date.now() });
+    };
+    for (const rec of this.listAllRaw()) {
+      const found = this.findFilePathById(rec.id);
+      if (found) touch(found.filePath, rec);
+    }
+    if (!fs.existsSync(MOL_PRIVATE_DIR)) return;
+    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
+      if (!ent.isDirectory()) continue;
+      const dir = path.join(MOL_PRIVATE_DIR, ent.name);
+      for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (!f.isFile() || !f.name.endsWith(".json")) continue;
+        const fp = path.join(dir, f.name);
+        try {
+          const raw = fs.readFileSync(fp, "utf8");
+          const parsed = parseMolFile(raw, fp);
+          if (parsed) touch(fp, parsed);
+        } catch {
+          /* skip */
+        }
+      }
     }
   }
 
@@ -297,7 +543,14 @@ export class MolWorldService {
   }
 
   getById(molWorldId: string): MolWorldFile | null {
-    return this.findFilePathById(molWorldId)?.record ?? null;
+    const found = this.findFilePathById(molWorldId);
+    if (!found) return null;
+    if (!needsPersonaBackfill(found.record.summary, found.record.infoItems)) {
+      return found.record;
+    }
+    const patched = applyPersonaDefaults(found.record);
+    atomicWriteJson(found.filePath, { ...patched, updatedAt: Date.now() });
+    return patched;
   }
 
   create(uploaderUserId: string, uploaderPhone: string, body: unknown): MolWorldFile {
@@ -314,18 +567,19 @@ export class MolWorldService {
     }
     const id = `mw-${Date.now()}-${nanoid(8)}`;
     const now = Date.now();
-    const infoItems: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
+    const infoItemsDraft: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
       id: row.id?.trim() || `inf-${now}-${i}-${nanoid(6)}`,
       title: row.title,
       body: row.body,
       source: row.source ?? "custom",
       softRemoved: row.softRemoved,
     }));
+    const { summary, infoItems } = resolvePersonaOnCreate(id, data.primaryCategory, data.summary, infoItemsDraft, now);
     const record: MolWorldFile = {
       id,
       schemaVersion: SCHEMA_VERSION,
       name: data.name.trim(),
-      summary: data.summary.trim(),
+      summary,
       primaryCategory: data.primaryCategory,
       taskTags: data.taskTags ?? [],
       toneTags: data.toneTags ?? [],
@@ -359,18 +613,19 @@ export class MolWorldService {
     }
     const id = `${PRIVATE_ID_PREFIX}${Date.now()}-${nanoid(8)}`;
     const now = Date.now();
-    const infoItems: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
+    const infoItemsDraft: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
       id: row.id?.trim() || `inf-${now}-${i}-${nanoid(6)}`,
       title: row.title,
       body: row.body,
       source: row.source ?? "custom",
       softRemoved: row.softRemoved,
     }));
+    const { summary, infoItems } = resolvePersonaOnCreate(id, data.primaryCategory, data.summary, infoItemsDraft, now);
     const record: MolWorldFile = {
       id,
       schemaVersion: SCHEMA_VERSION,
       name: data.name.trim(),
-      summary: data.summary.trim(),
+      summary,
       primaryCategory: data.primaryCategory,
       taskTags: data.taskTags ?? [],
       toneTags: data.toneTags ?? [],
@@ -405,7 +660,13 @@ export class MolWorldService {
     if (p.toneTags !== undefined) next = { ...next, toneTags: p.toneTags };
     if (p.relationshipTags !== undefined) next = { ...next, relationshipTags: p.relationshipTags };
     if (p.abilityTags !== undefined) next = { ...next, abilityTags: p.abilityTags };
-    if (p.infoItems !== undefined) next = { ...next, infoItems: p.infoItems };
+    if (p.infoItems !== undefined) {
+      const allowedIds = new Set(record.infoItems.map((it) => it.id));
+      if (p.infoItems.some((it) => !allowedIds.has(it.id))) {
+        throw new Error("INFO_ITEM_ADD_FORBIDDEN");
+      }
+      next = { ...next, infoItems: p.infoItems };
+    }
     if (p.primaryCategory !== undefined) {
       if (!isValidPrimaryCategory(p.primaryCategory.trim())) throw new Error("INVALID_CATEGORY");
       next = { ...next, primaryCategory: p.primaryCategory.trim() };

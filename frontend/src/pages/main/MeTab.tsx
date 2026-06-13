@@ -1,5 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { RouteName } from "../../types/routes";
+import { SUYAN } from "../../constants/suyanCopy";
+import { AppIcon } from "../../components/AppIcons";
 import {
   generateMeAvatarApi,
   getMeApi,
@@ -171,6 +173,21 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
         </div>
 
         {err && !sheetOpen && !generateOpen ? <p className="aichat-form-msg err me-tab__err">{err}</p> : null}
+
+        <section className="me-tab__group" aria-label="素颜">
+          <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("assist-mol-list")}>
+            <span className="me-tab__row-icon me-tab__row-icon--mol" aria-hidden>
+              <AppIcon name="mol" className="app-icon app-icon--mol" />
+            </span>
+            <span className="me-tab__row-body">
+              <b>{SUYAN.my}</b>
+              <span>{SUYAN.tagline}</span>
+            </span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
+        </section>
 
         <section className="me-tab__group" aria-label="账号">
           <button type="button" className="me-tab__row" onClick={openNicknameSheet}>

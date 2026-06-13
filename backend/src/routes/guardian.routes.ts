@@ -27,6 +27,10 @@ const addMembersBodySchema = z.object({
   memberUserIds: z.array(z.string().min(1).max(64)).min(1).max(19),
 });
 
+const patchGroupBodySchema = z.object({
+  name: z.string().max(32),
+});
+
 const sendBodySchema = z.object({
   text: z.string().min(1).max(4000),
   /** 客户端本地群聊摘录，供搭子判断；服务端不存聊天内容。 */
@@ -240,6 +244,29 @@ export const createGuardianRouter = (svc: GuardianGroupsService): Router => {
       return;
     }
     res.status(200).json({ group });
+  });
+
+  router.patch("/groups/:groupId", authMiddleware, (req, res) => {
+    const user = req.user;
+    if (!user) {
+      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
+      return;
+    }
+    const groupId = String(req.params.groupId ?? "").trim();
+    const parsed = patchGroupBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
+      return;
+    }
+    try {
+      const group = svc.updateName(groupId, user.userId, parsed.data.name);
+      const members = svc.memberUserIds(groupId);
+      pushGroupUpdated(groupId, group, members);
+      res.status(200).json({ group });
+    } catch (error) {
+      if (mapError(res, error)) return;
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "更新失败" });
+    }
   });
 
   router.post("/groups/:groupId/members", authMiddleware, (req, res) => {

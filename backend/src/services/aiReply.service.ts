@@ -1,4 +1,5 @@
 import { OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, OPENAI_TIMEOUT_MS } from "../config";
+import { RELATION_LABELS, type RelationType } from "../constants/relationTypes";
 import { logWarn } from "../logger";
 import { loadMolSuggestSystemTemplate, loadMolSuggestUserTemplate } from "./molSuggestPromptFiles";
 
@@ -14,7 +15,11 @@ export class AiReplyService {
     return OPENAI_API_KEY.length > 0;
   }
 
-  async suggestReplies(args: { personaBlock: string; lastMessages: SuggestLastMessage[] }): Promise<string[]> {
+  async suggestReplies(args: {
+    personaBlock: string;
+    lastMessages: SuggestLastMessage[];
+    relationType?: RelationType | null;
+  }): Promise<string[]> {
     const persona = truncate(args.personaBlock.trim(), MAX_PERSONA_CHARS);
     const historyLines = args.lastMessages.slice(-12).map((m) => {
       const role = m.from === "me" ? "我" : "对方";
@@ -27,7 +32,11 @@ export class AiReplyService {
 
     const systemTpl = loadMolSuggestSystemTemplate();
     const userTpl = loadMolSuggestUserTemplate();
-    const system = systemTpl.replaceAll("{{PERSONA_BLOCK}}", persona || "（无额外资料）").trimEnd();
+    const relationLine =
+      args.relationType && RELATION_LABELS[args.relationType]
+        ? `【与对方的关系】${RELATION_LABELS[args.relationType]}（请按此关系的语气、边界与亲密度生成回复）\n\n`
+        : "";
+    const system = (relationLine + systemTpl.replaceAll("{{PERSONA_BLOCK}}", persona || "（无额外资料）")).trimEnd();
     const user = userTpl.replaceAll("{{CHAT_HISTORY}}", history || "（尚无消息）").trimEnd();
     if (!system.trim() || !user.trim()) {
       throw new Error("AI_PROMPT_EMPTY");

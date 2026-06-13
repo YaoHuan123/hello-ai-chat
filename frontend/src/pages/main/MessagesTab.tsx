@@ -3,6 +3,7 @@ import { listContactsApi } from "../../services/api";
 import { listNormalConversationPreviews } from "../../services/normalChatLocalStorage";
 import { wsClient, type WsServerMessage } from "../../services/wsClient";
 import { ContactAvatar } from "../../components/ContactAvatar";
+import { RelationTag } from "../../components/RelationTag";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import type { ContactItem } from "../../types/contact";
 
@@ -82,6 +83,8 @@ export function MessagesTab({ onOpenChatRoom }: Props) {
           nickname: null,
           avatarUrl: null,
           avatarUpdatedAt: null,
+          relationType: null,
+          defaultMolId: null,
           createdAt: c.lastTs,
         };
         return {
@@ -136,6 +139,7 @@ export function MessagesTab({ onOpenChatRoom }: Props) {
                     </span>
                     <span className="msg-conv-preview">{row.lastText}</span>
                   </span>
+                  <RelationTag type={row.contact.relationType} className="msg-conv-rel" />
                 </button>
               </li>
             ))}

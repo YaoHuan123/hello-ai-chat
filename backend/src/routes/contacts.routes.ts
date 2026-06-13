@@ -2,11 +2,18 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { RELATION_TYPES } from "../constants/relationTypes";
 import type { ContactsService } from "../services/contacts.service";
 
-const patchBodySchema = z.object({
-  remark: z.union([z.string().max(64), z.null()]),
-});
+const patchBodySchema = z
+  .object({
+    remark: z.union([z.string().max(64), z.null()]).optional(),
+    relationType: z.union([z.enum(RELATION_TYPES), z.null()]).optional(),
+    defaultMolId: z.union([z.string().min(1).max(64), z.null()]).optional(),
+  })
+  .refine((v) => v.remark !== undefined || v.relationType !== undefined || v.defaultMolId !== undefined, {
+    message: "至少提供一项更新字段",
+  });
 
 function mapContactsError(res: Response, error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -39,6 +46,10 @@ function mapContactsError(res: Response, error: unknown): boolean {
   }
   if (code === "CONTACT_CREATE_FAILED") {
     res.status(500).json({ code, message: "添加联系人失败" });
+    return true;
+  }
+  if (code === "INVALID_RELATION") {
+    res.status(400).json({ code, message: "关系类型无效" });
     return true;
   }
   return false;
@@ -101,11 +112,11 @@ export const createContactsRouter = (contactsService: ContactsService): Router =
       return;
     }
     try {
-      const contact = contactsService.updateRemark(user.userId, contactUserId, parsed.data.remark);
+      const contact = contactsService.patch(user.userId, contactUserId, parsed.data);
       res.status(200).json({ contact });
     } catch (error) {
       if (mapContactsError(res, error)) return;
-      res.status(500).json({ code: "INTERNAL_ERROR", message: "更新备注失败" });
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "更新联系人失败" });
     }
   });
 

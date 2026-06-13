@@ -165,13 +165,16 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
               </button>
             </div>
 
-            <section className="moments-tab-section" aria-label="探索记录">
+            <section className="moments-tab-section" aria-label="好友日常">
+              <div className="moments-tab-section-head">
+                <h2>好友日常</h2>
+              </div>
               {exploreRecords.length === 0 ? (
                 <div className="moments-tab-empty-card">
                   <p>暂无记录</p>
                 </div>
               ) : (
-                <ul className="moments-tab-history" aria-label="探索记录列表">
+                <ul className="moments-tab-history" aria-label="好友日常列表">
                   {exploreDayGroups.map((group) => (
                     <li key={group.dayKey} className="moments-tab-history-day">
                       <time className="moments-tab-day-row" dateTime={group.dayIso}>

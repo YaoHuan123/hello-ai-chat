@@ -38,7 +38,7 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [route, setRoute] = useState<RouteName>("main");
-  const [molDetailId, setMolDetailId] = useState<"new" | string | null>(null);
+  const [molDetailId, setMolDetailId] = useState<string | null>(null);
   const [molDetailBackRoute, setMolDetailBackRoute] = useState<MolDetailBackTarget>("mol-mine");
   const [assistMolDataMolId, setAssistMolDataMolId] = useState<string | null>(null);
   const [featureReturnRoute, setFeatureReturnRoute] = useState<RouteName>("main");
@@ -187,13 +187,13 @@ function App() {
         return true;
       }
       if (route === "assist-mol-list") {
-        setMainTab("people");
+        setMainTab("me");
         setRoute("main");
         return true;
       }
       if (route === "assist-mol-data") {
         setAssistMolDataMolId(null);
-        setMainTab("people");
+        setMainTab("me");
         setRoute("main");
         return true;
       }
@@ -336,11 +336,6 @@ function App() {
           setChatRoomContact(null);
           setRoute("main");
         }}
-        onOpenMolDetail={(molId) => {
-          setMolDetailBackRoute("chat-room");
-          setMolDetailId(molId);
-          setRoute("mol-detail");
-        }}
         onManageMols={() => {
           setFeatureReturnRoute("chat-room");
           setRoute("mol-mine");
@@ -377,7 +372,6 @@ function App() {
           setGuardianHallReturnTab(fromTab);
           setRoute("guardian-hall");
         }}
-        onOpenMolList={() => setRoute("assist-mol-list")}
         onNavigateFeature={(r) => {
           setFeatureReturnRoute("main");
           if (r === "home") {
@@ -439,7 +433,7 @@ function App() {
     return (
       <AssistMolListPage
         onBack={() => {
-          setMainTab("people");
+          setMainTab("me");
           setRoute("main");
         }}
         onOpenWorld={() => {
@@ -460,6 +454,10 @@ function App() {
         key={assistMolDataMolId}
         molId={assistMolDataMolId}
         onBack={() => {
+          setAssistMolDataMolId(null);
+          setRoute("assist-mol-list");
+        }}
+        onRemoved={() => {
           setAssistMolDataMolId(null);
           setRoute("assist-mol-list");
         }}

@@ -2,12 +2,17 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { RELATION_TYPES } from "../constants/relationTypes";
 import type { FriendRequestsService } from "../services/friendRequests.service";
 import { pushToUser } from "../ws/wsServer";
 
 const createBodySchema = z.object({
   phone: z.string().min(1).max(32),
   message: z.string().max(200).optional(),
+});
+
+const acceptBodySchema = z.object({
+  relationType: z.enum(RELATION_TYPES),
 });
 
 function maskPhone(phone: string): string {
@@ -50,6 +55,10 @@ function mapError(res: Response, error: unknown): boolean {
   }
   if (code === "INTERNAL_ERROR") {
     res.status(500).json({ code, message: "操作失败" });
+    return true;
+  }
+  if (code === "INVALID_RELATION") {
+    res.status(400).json({ code, message: "请选择关系类型" });
     return true;
   }
   return false;
@@ -137,8 +146,13 @@ export const createFriendRequestsRouter = (svc: FriendRequestsService): Router =
       res.status(400).json({ code: "INVALID_PARAMS", message: "申请无效" });
       return;
     }
+    const parsed = acceptBodySchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ code: "INVALID_PARAMS", message: "请选择关系类型" });
+      return;
+    }
     try {
-      const { request, contactForRequester } = svc.accept(rid, user.userId);
+      const { request, contactForRequester } = svc.accept(rid, user.userId, parsed.data.relationType);
       const fromRow = svc.getById(rid);
       const fromUserId = fromRow?.fromUserId;
       if (fromUserId) {

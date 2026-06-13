@@ -324,6 +324,14 @@ export class GuardianGroupsService {
     return this.getById(groupId, operatorUserId)!;
   }
 
+  updateName(groupId: string, operatorUserId: string, nameRaw: string): GuardianGroupRow {
+    this.assertOwner(groupId, operatorUserId);
+    const raw = String(nameRaw ?? "").trim();
+    const name = raw ? raw.slice(0, MAX_NAME_LEN) : null;
+    this.db.prepare(`UPDATE guardian_groups SET name = ? WHERE id = ?`).run(name, groupId);
+    return this.getById(groupId, operatorUserId)!;
+  }
+
   removeMember(groupId: string, operatorUserId: string, targetUserId: string): GuardianGroupRow {
     const g = this.assertOwner(groupId, operatorUserId);
     const target = targetUserId.trim();

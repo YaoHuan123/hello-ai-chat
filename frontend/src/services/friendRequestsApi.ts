@@ -33,10 +33,14 @@ export async function createFriendRequestApi(
   return postJson<{ request: FriendRequestItem }>("/api/friend-requests", body, token ?? authT());
 }
 
-export async function acceptFriendRequestApi(requestId: number, token?: string): Promise<{ request: FriendRequestItem }> {
+export async function acceptFriendRequestApi(
+  requestId: number,
+  relationType: import("../constants/relationTypes").RelationType,
+  token?: string,
+): Promise<{ request: FriendRequestItem }> {
   return postJson<{ request: FriendRequestItem }>(
     `/api/friend-requests/${encodeURIComponent(String(requestId))}/accept`,
-    {},
+    { relationType },
     token ?? authT(),
   );
 }

@@ -29,6 +29,10 @@ function mapMolWorldError(res: Response, error: unknown): boolean {
     res.status(429).json({ code, message: "上传数量已达上限" });
     return true;
   }
+  if (code === "INFO_ITEM_ADD_FORBIDDEN") {
+    res.status(403).json({ code, message: "不支持添加信息条目" });
+    return true;
+  }
   return false;
 }
 
@@ -42,7 +46,7 @@ function toCatalogItem(
     id: rec.id,
     name: rec.name,
     summary: rec.summary,
-    price: rec.price,
+    price: 0,
     owned: ownedIds.has(rec.id),
     primaryCategory: rec.primaryCategory,
     taskTags: rec.taskTags,

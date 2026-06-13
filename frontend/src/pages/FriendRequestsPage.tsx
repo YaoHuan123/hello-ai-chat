@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import {
+  RELATION_ACCEPT_QUICK_TYPES,
+  relationLabel,
+  type RelationType,
+} from "../constants/relationTypes";
 import { acceptFriendRequestApi, listFriendRequestsApi, rejectFriendRequestApi } from "../services/friendRequestsApi";
 import type { FriendRequestItem } from "../types/friendRequest";
 import type { ContactItem } from "../types/contact";
@@ -25,6 +30,7 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [relationById, setRelationById] = useState<Record<number, RelationType>>({});
 
   const load = useCallback(() => {
     let cancelled = false;
@@ -47,11 +53,20 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
 
   useEffect(() => load(), [load]);
 
+  function pickRelation(id: number): RelationType | null {
+    return relationById[id] ?? null;
+  }
+
   async function accept(id: number) {
+    const relationType = pickRelation(id);
+    if (!relationType) {
+      setErr("请选择关系类型");
+      return;
+    }
     setBusyId(id);
     setErr("");
     try {
-      const { request } = await acceptFriendRequestApi(id);
+      const { request } = await acceptFriendRequestApi(id, relationType);
       onChanged?.();
       setItems((prev) => prev.filter((r) => r.id !== id));
       onOpenChatAfterAccept?.({
@@ -61,6 +76,8 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
         avatarUrl: null,
         avatarUpdatedAt: null,
         remark: null,
+        relationType,
+        defaultMolId: null,
         createdAt: request.decidedAt ?? request.createdAt,
       });
     } catch (e) {
@@ -108,36 +125,52 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
             {items.map((r) => {
               const busy = busyId === r.id;
               const text = r.message?.trim() || "请求添加你为好友";
+              const selected = pickRelation(r.id);
               return (
                 <li key={r.id} className="fr-req-item">
-                  <div className="fr-req-msg">
-                    <span className="fr-req-msg__avatar" aria-hidden>
-                      {phoneInitial(r.fromPhone)}
-                    </span>
-                    <div className="fr-req-msg__body">
-                      <p className="fr-req-msg__from">
+                  <div className="fr-req-card">
+                    <div className="fr-req-card__head">
+                      <span className="fr-req-msg__avatar" aria-hidden>
+                        {phoneInitial(r.fromPhone)}
+                      </span>
+                      <div>
                         <strong>{maskPhone(r.fromPhone)}</strong>
-                        <span> 请求添加你为好友</span>
-                      </p>
-                      <p className="fr-req-msg__text">{text}</p>
-                      <div className="fr-req-msg__actions">
-                        <button
-                          type="button"
-                          className="fr-req-msg__btn fr-req-msg__btn--accept"
-                          disabled={busy}
-                          onClick={() => void accept(r.id)}
-                        >
-                          同意
-                        </button>
-                        <button
-                          type="button"
-                          className="fr-req-msg__btn fr-req-msg__btn--reject"
-                          disabled={busy}
-                          onClick={() => void reject(r.id)}
-                        >
-                          拒绝
-                        </button>
                       </div>
+                    </div>
+                    <p className="fr-req-card__msg">{text}</p>
+                    <p className="fr-req-card__label">接受后，TA 是你的</p>
+                    <div className="rel-grid rel-grid--compact" role="listbox" aria-label="关系类型">
+                      {RELATION_ACCEPT_QUICK_TYPES.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          role="option"
+                          aria-selected={selected === t}
+                          className={`rel-opt ${selected === t ? "selected" : ""}`}
+                          disabled={busy}
+                          onClick={() => setRelationById((prev) => ({ ...prev, [r.id]: t }))}
+                        >
+                          {relationLabel(t)}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="fr-req-card__actions">
+                      <button
+                        type="button"
+                        className="aichat-btn-ghost fr-req-card__btn"
+                        disabled={busy}
+                        onClick={() => void reject(r.id)}
+                      >
+                        拒绝
+                      </button>
+                      <button
+                        type="button"
+                        className="aichat-btn-primary fr-req-card__btn"
+                        disabled={busy || !selected}
+                        onClick={() => void accept(r.id)}
+                      >
+                        接受并保存
+                      </button>
                     </div>
                   </div>
                 </li>

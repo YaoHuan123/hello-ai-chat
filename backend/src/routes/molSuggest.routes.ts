@@ -27,7 +27,7 @@ function appendMolPersonaLines(lines: string[], record: { name: string; summary:
   for (const it of items) {
     const title = it.title.trim();
     const body = it.body.trim();
-    if (!title || !body) continue;
+    if (!title || !body || title === "示例") continue;
     lines.push(`[${record.name}] ${title}: ${body}`);
     addedItem = true;
   }
@@ -118,6 +118,7 @@ export const createMolSuggestRouter = (
       res.status(403).json({ code: "NOT_FRIENDS", message: "双方不是联系人，无法生成建议" });
       return;
     }
+    const relationType = contacts.getRelation(user.userId, peerUserId);
     if (!aiReply.isConfigured()) {
       res.status(503).json({ code: "AI_NOT_CONFIGURED", message: "AI 服务未配置" });
       return;
@@ -141,8 +142,8 @@ export const createMolSuggestRouter = (
     const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
 
     try {
-      const suggestions = await aiReply.suggestReplies({ personaBlock, lastMessages: lm });
-      res.status(200).json({ suggestions });
+      const suggestions = await aiReply.suggestReplies({ personaBlock, lastMessages: lm, relationType });
+      res.status(200).json({ suggestions, relationType });
     } catch (error) {
       if (mapError(res, error)) return;
       res.status(500).json({ code: "INTERNAL_ERROR", message: "生成失败" });

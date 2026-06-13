@@ -237,3 +237,16 @@ export async function removeContactApi(contactUserId: string, token?: string): P
   const id = encodeURIComponent(contactUserId);
   return deleteJson<{ ok: true }>(`/api/contacts/${id}`, t);
 }
+
+export async function patchContactApi(
+  contactUserId: string,
+  patch: import("../types/contact").ContactPatch,
+  token?: string,
+): Promise<{ contact: ContactItem }> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  const id = encodeURIComponent(contactUserId);
+  return patchJson<{ contact: ContactItem }>(`/api/contacts/${id}`, patch, t);
+}

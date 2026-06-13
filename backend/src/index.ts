@@ -48,6 +48,11 @@ const molWorldService = new MolWorldService();
 const userMolsService = new UserMolsService(db, molWorldService);
 molWorldService.attachPurgeHandler((id) => userMolsService.purgeReferences(id));
 molWorldService.seedIfEmpty();
+molWorldService.seedMissingMols();
+molWorldService.purgeOrphanSeedFiles();
+molWorldService.syncSeedCatalogFromDefs();
+molWorldService.backfillEmptyPersonas();
+molWorldService.stripExampleInfoItems();
 
 const aliyunSmsService = new AliyunSmsService();
 const smsRateLimitService = new SmsRateLimitService(db);

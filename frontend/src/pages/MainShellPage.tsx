@@ -22,7 +22,6 @@ type Props = {
   onOpenGuardianGroup: (groupId: string) => void;
   onCreateGuardianGroup: () => void;
   onOpenGuardianHall: (fromTab: "people" | "groups") => void;
-  onOpenMolList: () => void;
 };
 
 const TAB_LABEL: Record<MainTabId, string> = {
@@ -94,7 +93,6 @@ export function MainShellPage({
   onOpenGuardianGroup,
   onCreateGuardianGroup,
   onOpenGuardianHall,
-  onOpenMolList,
 }: Props) {
   const [internalTab, setInternalTab] = useState<MainTabId>("messages");
   const tab = activeTab ?? internalTab;
@@ -143,7 +141,6 @@ export function MainShellPage({
               onOpenFriendRequests={onOpenFriendRequests}
               friendRequestPendingCount={friendRequestPendingCount}
               onFriendRequestSent={onFriendRequestSent}
-              onOpenMolList={onOpenMolList}
               onOpenGuardianHall={() => onOpenGuardianHall("people")}
             />
           )}

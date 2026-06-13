@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SUYAN, formatSuyanDisplayName } from "../../constants/suyanCopy";
+import { relationLabel } from "../../constants/relationTypes";
 import {
   getNormalChatMessages,
   ingestIncomingRemoteMessage,
@@ -8,24 +9,23 @@ import {
 import { getMeApi } from "../../services/api";
 import { sendMessageApi } from "../../services/messagesApi";
 import type { MolSuggestLastMessage } from "../../services/molSuggestApi";
-import { getChatActiveMolId, setChatActiveMolId } from "../../services/chatMolLocalStorage";
 import { getMyMols, type MolInMyCollection } from "../../services/stageApi";
 import { wsClient, type WsServerMessage } from "../../services/wsClient";
 import type { ContactItem } from "../../types/contact";
 import type { ChatLocalMessage } from "../../types/chat";
 import type { RemoteMessage } from "../../types/messages";
 import { MolSuggestPanel } from "./MolSuggestPanel";
-import { ChatMolSwitchModal } from "./ChatMolSwitchModal";
 import { AppIcon } from "../../components/AppIcons";
 import { ChatComposeBar, MolComposeButton } from "../../components/ChatComposeBar";
 import { ContactAvatar } from "../../components/ContactAvatar";
+import { ContactRelationSheet } from "../../components/ContactRelationSheet";
 import { contactDisplayName } from "../../lib/contactDisplay";
+import { pickRecommendedMolId } from "../../lib/contactRelations";
 import { getMyAvatarContact } from "../../services/storage";
 
 type Props = {
   contact: ContactItem;
   onBack: () => void;
-  onOpenMolDetail?: (molId: string) => void;
   onManageMols?: () => void;
 };
 
@@ -43,15 +43,13 @@ function remoteToView(m: RemoteMessage, myUserId: string): ChatLocalMessage {
   };
 }
 
-function resolveActiveMol(mols: MolInMyCollection[], peerUserId: string): MolInMyCollection | null {
-  const stored = getChatActiveMolId(peerUserId);
-  if (stored) {
-    const found = mols.find((m) => m.id === stored);
+function resolveActiveMol(mols: MolInMyCollection[], contact: ContactItem): MolInMyCollection | null {
+  const recId = pickRecommendedMolId(mols, contact.relationType, contact.defaultMolId);
+  if (recId) {
+    const found = mols.find((m) => m.id === recId);
     if (found) return found;
   }
-  const first = mols[0] ?? null;
-  if (first) setChatActiveMolId(peerUserId, first.id);
-  return first;
+  return mols[0] ?? null;
 }
 
 function MeAvatarMolBadge() {
@@ -73,9 +71,11 @@ function MeAvatarMolBadge() {
   );
 }
 
-export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }: Props) {
+export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Props) {
+  const [contact, setContact] = useState(contactProp);
   const peerId = contact.contactUserId;
   const peerTitle = contactDisplayName(contact);
+  const peerRelationLabel = relationLabel(contact.relationType);
   const [messages, setMessages] = useState<ChatLocalMessage[]>(() => getNormalChatMessages(peerId));
   const [input, setInput] = useState("");
   const scRef = useRef<HTMLDivElement>(null);
@@ -83,8 +83,8 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
   const [loadErr, setLoadErr] = useState("");
   const [molPanelOpen, setMolPanelOpen] = useState(false);
   const [molDraftText, setMolDraftText] = useState("");
-  const [molSwitchOpen, setMolSwitchOpen] = useState(false);
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
+  const [relationSheetOpen, setRelationSheetOpen] = useState(false);
   const [myMols, setMyMols] = useState<MolInMyCollection[]>([]);
   const [activeMol, setActiveMol] = useState<{ id: string; name: string } | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
@@ -120,6 +120,10 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
   );
 
   useEffect(() => {
+    setContact(contactProp);
+  }, [contactProp]);
+
+  useEffect(() => {
     let cancelled = false;
     void (async () => {
       try {
@@ -144,7 +148,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
       .then((mols) => {
         if (cancelled) return;
         setMyMols(mols);
-        const m = resolveActiveMol(mols, peerId);
+        const m = resolveActiveMol(mols, contact);
         setActiveMol(m ? { id: m.id, name: formatSuyanDisplayName(m.name) } : null);
       })
       .catch(() => {
@@ -153,7 +157,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
     return () => {
       cancelled = true;
     };
-  }, [peerId]);
+  }, [peerId, contact]);
 
   useEffect(() => {
     if (!myUserId) return;
@@ -184,12 +188,11 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
     const onPointerDown = (e: PointerEvent) => {
       const t = e.target as Node;
       if (composerRef.current?.contains(t)) return;
-      if (molSwitchOpen) return;
       closeMolPanel();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [molPanelOpen, molSwitchOpen, closeMolPanel]);
+  }, [molPanelOpen, closeMolPanel]);
 
   useEffect(() => {
     if (!chatMenuOpen) return;
@@ -228,19 +231,6 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
     await sendText(text);
   }
 
-  function selectChatMol(molId: string) {
-    const m = myMols.find((x) => x.id === molId);
-    if (!m) return;
-    setChatActiveMolId(peerId, molId);
-    setActiveMol({ id: m.id, name: formatSuyanDisplayName(m.name) });
-  }
-
-  function openMolSwitch() {
-    setChatMenuOpen(false);
-    if (myMols.length > 0) setMolSwitchOpen(true);
-    else onManageMols?.();
-  }
-
   function toggleMolPanel() {
     if (molPanelOpen) {
       closeMolPanel();
@@ -266,7 +256,9 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
           <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
           <div className="msg-chat-c1-peer-meta">
             <span className="msg-chat-c1-peer-name">{peerTitle}</span>
-            <span className="msg-chat-c1-peer-sub">在线</span>
+            <span className="msg-chat-c1-peer-sub">
+              {peerRelationLabel ? `${peerRelationLabel} · 在线` : "在线"}
+            </span>
           </div>
         </div>
         <div className="msg-chat-c1-topbar-actions" ref={topbarMenuRef}>
@@ -281,8 +273,16 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
           </button>
           {chatMenuOpen ? (
             <div className="contacts-menu msg-chat-c1-topbar-menu" role="menu">
-              <button type="button" className="contacts-menu__item" role="menuitem" onClick={openMolSwitch}>
-                {SUYAN.switchVerb}
+              <button
+                type="button"
+                className="contacts-menu__item"
+                role="menuitem"
+                onClick={() => {
+                  setChatMenuOpen(false);
+                  setRelationSheetOpen(true);
+                }}
+              >
+                设置关系
               </button>
             </div>
           ) : null}
@@ -328,6 +328,7 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
           peerUserId={peerId}
           molId={activeMol?.id ?? null}
           molName={activeMol?.name ?? null}
+          relationType={contact.relationType}
           getLastMessages={getLastMessagesForSuggest}
           draftText={molDraftText}
           onPick={pickSuggestion}
@@ -358,26 +359,18 @@ export function ChatRoomPage({ contact, onBack, onOpenMolDetail, onManageMols }:
         />
       </div>
 
-      {molSwitchOpen && myMols.length > 0 ? (
-        <ChatMolSwitchModal
-          key={`${activeMol?.id ?? "none"}-${myMols.length}`}
-          mols={myMols}
-          currentId={activeMol?.id ?? myMols[0]?.id ?? ""}
-          onClose={() => setMolSwitchOpen(false)}
-          onConfirm={(id) => {
-            selectChatMol(id);
-          }}
-          onEditMol={
-            onOpenMolDetail
-              ? (id) => {
-                  setMolSwitchOpen(false);
-                  closeMolPanel();
-                  onOpenMolDetail(id);
-                }
-              : undefined
+      <ContactRelationSheet
+        contact={contact}
+        open={relationSheetOpen}
+        onClose={() => setRelationSheetOpen(false)}
+        onSaved={(next) => {
+          setContact(next);
+          const m = resolveActiveMol(myMols, next);
+          if (m) {
+            setActiveMol({ id: m.id, name: formatSuyanDisplayName(m.name) });
           }
-        />
-      ) : null}
+        }}
+      />
     </div>
   );
 }

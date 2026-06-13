@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { SUYAN, formatSuyanDisplayName, normalizeLegacySuyanName } from "../constants/suyanCopy";
 import { PRIMARY_SCENES } from "../data/molWorldTaxonomy";
 import {
-  createMyMolPrivate,
   getMyMolDetailForEdit,
   updateMyMol,
   type MolInMyCollection,
@@ -12,13 +11,10 @@ import {
 const SCENE_OPTIONS = PRIMARY_SCENES.filter((s) => s !== "全部") as [string, ...string[]];
 
 type Props = {
-  molId: "new" | string;
+  molId: string;
   onBack: () => void;
 };
 
-function newLocalInfoId() {
-  return `inf-l-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
 
 function infoTagLabel(item: MolInfoItem): string {
   if (item.source === "store") {
@@ -27,17 +23,15 @@ function infoTagLabel(item: MolInfoItem): string {
   return "自定义";
 }
 
-type InfoFormMode = { kind: "add" } | { kind: "edit"; id: string } | null;
+type InfoFormMode = { kind: "edit"; id: string } | null;
 
 function InfoItemEditor({
-  mode,
   defaultTitle,
   defaultBody,
   onSave,
   onClose,
   saving,
 }: {
-  mode: NonNullable<InfoFormMode>;
   defaultTitle: string;
   defaultBody: string;
   onSave: (title: string, body: string) => void;
@@ -46,7 +40,7 @@ function InfoItemEditor({
 }) {
   const [title, setTitle] = useState(defaultTitle);
   const [body, setBody] = useState(defaultBody);
-  const t = mode.kind === "add" ? "添加信息" : "编辑信息";
+  const t = "编辑信息";
 
   return (
     <div
@@ -80,16 +74,15 @@ function InfoItemEditor({
 }
 
 export function MolDetailPage({ molId, onBack }: Props) {
-  const isNew = molId === "new";
   const [loadErr, setLoadErr] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveErr, setSaveErr] = useState("");
 
   const [name, setName] = useState("");
   const [summary, setSummary] = useState("");
   const [category, setCategory] = useState<string>(SCENE_OPTIONS[0] ?? "职场沟通");
-  const [source, setSource] = useState<MolInMyCollection["source"] | null>(isNew ? "created" : null);
+  const [source, setSource] = useState<MolInMyCollection["source"] | null>(null);
 
   const [infoItems, setInfoItems] = useState<MolInfoItem[]>([]);
   const [infoForm, setInfoForm] = useState<InfoFormMode>(null);
@@ -97,16 +90,6 @@ export function MolDetailPage({ molId, onBack }: Props) {
   const [readOnly, setReadOnly] = useState(false);
 
   const load = useCallback(() => {
-    if (isNew) {
-      setName("");
-      setSummary("");
-      setCategory(SCENE_OPTIONS[0] ?? "职场沟通");
-      setSource("created");
-      setInfoItems([]);
-      setReadOnly(false);
-      setLoading(false);
-      return;
-    }
     setLoadErr("");
     setLoading(true);
     getMyMolDetailForEdit(molId)
@@ -122,7 +105,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
         setLoadErr(e instanceof Error ? e.message : String(e));
       })
       .finally(() => setLoading(false));
-  }, [isNew, molId]);
+  }, [molId]);
 
   useEffect(() => {
     void Promise.resolve().then(() => load());
@@ -154,21 +137,6 @@ export function MolDetailPage({ molId, onBack }: Props) {
     setSaveErr("");
     setSaving(true);
     try {
-      if (isNew) {
-        await createMyMolPrivate({
-          name: n,
-          summary: s,
-          primaryCategory: c,
-          initialInfo: infoItems.map(({ source: src, title, body, softRemoved }) => ({
-            source: src,
-            title,
-            body,
-            softRemoved,
-          })),
-        });
-        onBack();
-        return;
-      }
       await updateMyMol(molId, { name: n, summary: s, primaryCategory: c, infoItems });
       onBack();
     } catch (e: unknown) {
@@ -279,24 +247,11 @@ export function MolDetailPage({ molId, onBack }: Props) {
 
         <div className="aichat-moldt-infohead">
           <h2 className="aichat-moldt-infohead__t">信息集合列表</h2>
-          <button
-            type="button"
-            className="aichat-moldt-addinfo"
-            onClick={() => {
-              setInfoFormKey((k) => k + 1);
-              setInfoForm({ kind: "add" });
-            }}
-            disabled={saving || readOnly}
-          >
-            + 添加信息
-          </button>
         </div>
 
         <ul className="aichat-moldt-infolist" role="list">
           {infoItems.length === 0 && (
-            <li className="aichat-moldt-infolist__empty">
-              {readOnly ? "暂无信息条目。" : "还没有信息。可点击「+ 添加信息」添加自定义条目。"}
-            </li>
+            <li className="aichat-moldt-infolist__empty">暂无信息条目。</li>
           )}
           {infoItems.map((it) => {
             const isSoft = it.softRemoved && it.source === "store";
@@ -382,30 +337,9 @@ export function MolDetailPage({ molId, onBack }: Props) {
         </ul>
       </div>
 
-      {infoForm?.kind === "add" && (
-        <InfoItemEditor
-          key={`a-${infoFormKey}`}
-          mode={infoForm}
-          defaultTitle=""
-          defaultBody=""
-          saving={saving}
-          onClose={() => setInfoForm(null)}
-          onSave={(t, b) => {
-            if (!t || !b) {
-              setSaveErr("请填写信息标题与描述。");
-              return;
-            }
-            setSaveErr("");
-            setInfoItems((list) => list.concat([{ id: newLocalInfoId(), source: "custom", title: t, body: b }]));
-            setInfoForm(null);
-          }}
-        />
-      )}
-
       {infoForm?.kind === "edit" && (
         <InfoItemEditor
           key={`e-${infoForm.id}-${infoFormKey}`}
-          mode={infoForm}
           defaultTitle={infoItems.find((i) => i.id === infoForm.id)?.title ?? ""}
           defaultBody={infoItems.find((i) => i.id === infoForm.id)?.body ?? ""}
           saving={saving}

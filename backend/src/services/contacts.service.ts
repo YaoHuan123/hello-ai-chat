@@ -1,4 +1,5 @@
 import type { DatabaseSync } from "node:sqlite";
+import { isValidRelationType, type RelationType } from "../constants/relationTypes";
 import { normalizePhoneDigits } from "../utils/phone";
 
 export type ContactRow = {
@@ -8,8 +9,21 @@ export type ContactRow = {
   avatarUrl: string | null;
   avatarUpdatedAt: number | null;
   remark: string | null;
+  relationType: RelationType | null;
+  defaultMolId: string | null;
   createdAt: number;
 };
+
+export type ContactPatchInput = {
+  remark?: string | null;
+  relationType?: RelationType | null;
+  defaultMolId?: string | null;
+};
+
+const CONTACT_SELECT = `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
+                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
+                c.remark AS remark, c.relation_type AS relationType, c.default_mol_id AS defaultMolId,
+                c.created_at AS createdAt`;
 
 function isSqliteUniqueConstraint(err: unknown): boolean {
   if (err && typeof err === "object") {
@@ -22,22 +36,33 @@ function isSqliteUniqueConstraint(err: unknown): boolean {
   return false;
 }
 
+function mapContactRow(raw: Record<string, unknown>): ContactRow {
+  const rel = raw.relationType;
+  return {
+    contactUserId: String(raw.contactUserId),
+    phone: String(raw.phone),
+    nickname: raw.nickname == null ? null : String(raw.nickname),
+    avatarUrl: raw.avatarUrl == null ? null : String(raw.avatarUrl),
+    avatarUpdatedAt: raw.avatarUpdatedAt == null ? null : Number(raw.avatarUpdatedAt),
+    remark: raw.remark == null ? null : String(raw.remark),
+    relationType: typeof rel === "string" && isValidRelationType(rel) ? rel : null,
+    defaultMolId: raw.defaultMolId == null || raw.defaultMolId === "" ? null : String(raw.defaultMolId),
+    createdAt: Number(raw.createdAt),
+  };
+}
+
 export class ContactsService {
   constructor(private readonly db: DatabaseSync) {}
 
   list(ownerUserId: string): ContactRow[] {
     const rows = this.db
-      .prepare(
-        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
-                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
-                c.remark AS remark, c.created_at AS createdAt
+      .prepare(`${CONTACT_SELECT}
          FROM contacts c
          INNER JOIN users u ON u.id = c.contact_user_id
          WHERE c.owner_user_id = ?
-         ORDER BY c.created_at DESC`,
-      )
-      .all(ownerUserId) as ContactRow[];
-    return rows;
+         ORDER BY c.created_at DESC`)
+      .all(ownerUserId) as Record<string, unknown>[];
+    return rows.map(mapContactRow);
   }
 
   add(ownerUserId: string, ownerPhone: string, phoneRaw: string, remarkRaw?: string): ContactRow {
@@ -63,7 +88,7 @@ export class ContactsService {
     try {
       this.db
         .prepare(
-          "INSERT INTO contacts (owner_user_id, contact_user_id, remark, created_at) VALUES (?, ?, ?, ?)",
+          "INSERT INTO contacts (owner_user_id, contact_user_id, remark, relation_type, default_mol_id, created_at) VALUES (?, ?, ?, NULL, NULL, ?)",
         )
         .run(ownerUserId, target.id, remark, now);
     } catch (err) {
@@ -97,6 +122,11 @@ export class ContactsService {
     return Boolean(row);
   }
 
+  getRelation(ownerUserId: string, contactUserId: string): RelationType | null {
+    const row = this.getOne(ownerUserId, contactUserId);
+    return row?.relationType ?? null;
+  }
+
   remove(ownerUserId: string, contactUserId: string): void {
     const info = this.db
       .prepare("DELETE FROM contacts WHERE owner_user_id = ? AND contact_user_id = ?")
@@ -107,13 +137,39 @@ export class ContactsService {
   }
 
   updateRemark(ownerUserId: string, contactUserId: string, remarkRaw: string | null): ContactRow {
-    const remark = remarkRaw === null ? null : normalizeRemark(remarkRaw);
+    return this.patch(ownerUserId, contactUserId, { remark: remarkRaw });
+  }
+
+  patch(ownerUserId: string, contactUserId: string, input: ContactPatchInput): ContactRow {
+    const existing = this.getOne(ownerUserId, contactUserId);
+    if (!existing) {
+      throw new Error("CONTACT_NOT_FOUND");
+    }
+
+    const remark = input.remark !== undefined ? (input.remark === null ? null : normalizeRemark(input.remark)) : existing.remark;
+
+    let relationType = existing.relationType;
+    if (input.relationType !== undefined) {
+      if (input.relationType !== null && !isValidRelationType(input.relationType)) {
+        throw new Error("INVALID_RELATION");
+      }
+      relationType = input.relationType;
+    }
+
+    let defaultMolId = existing.defaultMolId;
+    if (input.defaultMolId !== undefined) {
+      defaultMolId = input.defaultMolId === null || input.defaultMolId.trim() === "" ? null : input.defaultMolId.trim();
+    }
+
     const info = this.db
-      .prepare("UPDATE contacts SET remark = ? WHERE owner_user_id = ? AND contact_user_id = ?")
-      .run(remark, ownerUserId, contactUserId);
+      .prepare(
+        "UPDATE contacts SET remark = ?, relation_type = ?, default_mol_id = ? WHERE owner_user_id = ? AND contact_user_id = ?",
+      )
+      .run(remark, relationType, defaultMolId, ownerUserId, contactUserId);
     if (info.changes === 0) {
       throw new Error("CONTACT_NOT_FOUND");
     }
+
     const row = this.getOne(ownerUserId, contactUserId);
     if (!row) {
       throw new Error("CONTACT_NOT_FOUND");
@@ -122,16 +178,13 @@ export class ContactsService {
   }
 
   private getOne(ownerUserId: string, contactUserId: string): ContactRow | undefined {
-    return this.db
-      .prepare(
-        `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
-                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
-                c.remark AS remark, c.created_at AS createdAt
+    const raw = this.db
+      .prepare(`${CONTACT_SELECT}
          FROM contacts c
          INNER JOIN users u ON u.id = c.contact_user_id
-         WHERE c.owner_user_id = ? AND c.contact_user_id = ?`,
-      )
-      .get(ownerUserId, contactUserId) as ContactRow | undefined;
+         WHERE c.owner_user_id = ? AND c.contact_user_id = ?`)
+      .get(ownerUserId, contactUserId) as Record<string, unknown> | undefined;
+    return raw ? mapContactRow(raw) : undefined;
   }
 }
 

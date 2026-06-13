@@ -1,11 +1,12 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { SUYAN } from "../../constants/suyanCopy";
 import { listContactsApi } from "../../services/api";
 import { createFriendRequestApi } from "../../services/friendRequestsApi";
 import { wsClient } from "../../services/wsClient";
 import { AppIcon } from "../../components/AppIcons";
 import { ContactAvatar } from "../../components/ContactAvatar";
+import { ContactRelationSheet } from "../../components/ContactRelationSheet";
 import { contactDisplayName as displayContactName } from "../../lib/contactDisplay";
+import { filterContacts, groupContactsByRelation } from "../../lib/contactRelations";
 import type { ContactItem } from "../../types/contact";
 
 type Props = {
@@ -13,7 +14,6 @@ type Props = {
   onOpenFriendRequests: () => void;
   friendRequestPendingCount: number;
   onFriendRequestSent: () => void;
-  onOpenMolList: () => void;
   onOpenGuardianHall: () => void;
 };
 
@@ -22,7 +22,6 @@ export function PersonaTab({
   onOpenFriendRequests,
   friendRequestPendingCount,
   onFriendRequestSent,
-  onOpenMolList,
   onOpenGuardianHall,
 }: Props) {
   const [contacts, setContacts] = useState<ContactItem[]>([]);
@@ -34,6 +33,7 @@ export function PersonaTab({
   const [addMessage, setAddMessage] = useState("");
   const [addErr, setAddErr] = useState("");
   const [adding, setAdding] = useState(false);
+  const [editContact, setEditContact] = useState<ContactItem | null>(null);
 
   const refresh = useCallback(() => {
     return listContactsApi()
@@ -62,18 +62,10 @@ export function PersonaTab({
   }, [refresh]);
 
   const q = query.trim().toLowerCase();
+  const showGuardianSection = !q || q.includes("搭") || q.includes("搭子") || q.includes("ai");
 
-  const filteredContacts = useMemo(() => {
-    if (!q) return contacts;
-    return contacts.filter((c) => {
-      const name = displayContactName(c).toLowerCase();
-      const phone = c.phone.toLowerCase();
-      return name.includes(q) || phone.includes(q);
-    });
-  }, [contacts, q]);
-
-  const showMolEntry = !q || q.includes("素颜") || q.includes("我的") || q.includes("mol");
-  const showAiEntry = !q || q.includes("搭") || q.includes("搭子") || q.includes("ai");
+  const filteredContacts = useMemo(() => filterContacts(contacts, query, "all"), [contacts, query]);
+  const contactGroups = useMemo(() => groupContactsByRelation(filteredContacts), [filteredContacts]);
 
   async function onAddSubmit(e: FormEvent) {
     e.preventDefault();
@@ -98,10 +90,24 @@ export function PersonaTab({
     }
   }
 
+  function onContactRowClick(c: ContactItem) {
+    if (!c.relationType) {
+      setEditContact(c);
+      return;
+    }
+    onOpenChat(c);
+  }
+
+  function onContactSaved(next: ContactItem) {
+    setContacts((prev) => prev.map((x) => (x.contactUserId === next.contactUserId ? next : x)));
+    setEditContact(null);
+  }
+
   const pending = friendRequestPendingCount > 0 ? friendRequestPendingCount : 0;
-  const showContactsSection = !q || filteredContacts.length > 0;
-  const showEmpty =
-    !loading && !showMolEntry && !showAiEntry && (!showContactsSection || filteredContacts.length === 0);
+  const hasListContent = filteredContacts.length > 0;
+  const showContactsBlock = !loading && (hasListContent || showGuardianSection);
+  const contactCount = filteredContacts.length + (showGuardianSection ? 1 : 0);
+  const showEmpty = !loading && !showGuardianSection && !hasListContent;
 
   return (
     <div className="aichat-main-shell-tab persona-tab">
@@ -113,7 +119,7 @@ export function PersonaTab({
         <input
           className="persona-tab__search"
           type="search"
-          placeholder="搜联系人"
+          placeholder="搜联系人、关系"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -135,67 +141,79 @@ export function PersonaTab({
               ›
             </span>
           </button>
-
-          {showMolEntry ? (
-            <button type="button" className="contacts-entry-card persona-tab__entry persona-tab__entry--mol" onClick={onOpenMolList}>
-              <span className="contacts-entry-card__icon" aria-hidden>
-                <AppIcon name="mol" className="app-icon app-icon--mol" />
-              </span>
-              <span className="contacts-entry-card__body">
-                <span className="contacts-entry-card__title">{SUYAN.my}</span>
-              </span>
-              <span className="contacts-entry-card__arrow" aria-hidden>
-                ›
-              </span>
-            </button>
-          ) : null}
-
-          {showAiEntry ? (
-            <button type="button" className="contacts-entry-card persona-tab__entry persona-tab__entry--ai" onClick={onOpenGuardianHall}>
-              <span className="contacts-entry-card__icon" aria-hidden>
-                <AppIcon name="aiContact" className="app-icon app-icon--guardian" />
-              </span>
-              <span className="contacts-entry-card__body">
-                <span className="contacts-entry-card__title">搭子</span>
-              </span>
-              <span className="contacts-entry-card__arrow" aria-hidden>
-                ›
-              </span>
-            </button>
-          ) : null}
         </div>
 
         {loading ? null : showEmpty ? (
           <div className="persona-tab__empty">
             <p>没有匹配的联系人</p>
             {q ? (
-              <button type="button" className="aichat-btn-ghost" onClick={() => setQuery("")}>
+              <button
+                type="button"
+                className="aichat-btn-ghost"
+                onClick={() => setQuery("")}
+              >
                 清除搜索
               </button>
             ) : null}
           </div>
-        ) : showContactsSection ? (
-          <section className="persona-tab__section" aria-label="联系人">
-            <div className="persona-tab__section-head">
+        ) : showContactsBlock ? (
+          <>
+            <div className="persona-tab__section-head persona-tab__section-head--global">
               <h2>联系人</h2>
-              <span>{contacts.length}</span>
+              <span>{contactCount}</span>
               <button type="button" className="persona-tab__section-act" onClick={() => setSheetOpen(true)}>
                 添加
               </button>
             </div>
-            {filteredContacts.length === 0 ? (
-              <p className="persona-tab__section-empty">暂无联系人</p>
-            ) : (
-              filteredContacts.map((c) => (
-                <button key={c.contactUserId} type="button" className="persona-tab__row" onClick={() => onOpenChat(c)}>
-                  <ContactAvatar contact={c} className="persona-tab__av persona-tab__av--human" alt="" />
+            {showGuardianSection ? (
+              <section className="persona-tab__section persona-tab__section--guardian" aria-label="搭子">
+                <div className="persona-tab__section-head">
+                  <h2>搭子</h2>
+                </div>
+                <button type="button" className="persona-tab__row persona-tab__row--guardian" onClick={onOpenGuardianHall}>
+                  <span className="persona-tab__av persona-tab__av--ai" aria-hidden>
+                    <AppIcon name="aiContact" className="app-icon app-icon--guardian" />
+                  </span>
                   <span className="persona-tab__mid">
-                    <strong>{displayContactName(c)}</strong>
+                    <strong>搭子大厅</strong>
+                    <span className="persona-tab__mid-hint">群聊场景角色</span>
+                  </span>
+                  <span className="persona-tab__row-arrow" aria-hidden>
+                    ›
                   </span>
                 </button>
-              ))
-            )}
-          </section>
+              </section>
+            ) : null}
+            {contactGroups.map((group) => (
+              <section key={group.label} className="persona-tab__section" aria-label={group.label}>
+                <div className="persona-tab__section-head">
+                  <h2>{group.label}</h2>
+                  <span>{group.contacts.length}</span>
+                </div>
+                {group.contacts.map((c) => (
+                  <button
+                    key={c.contactUserId}
+                    type="button"
+                    className="persona-tab__row"
+                    onClick={() => onContactRowClick(c)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setEditContact(c);
+                    }}
+                  >
+                    <ContactAvatar contact={c} className="persona-tab__av persona-tab__av--human" alt="" />
+                    <span className="persona-tab__mid">
+                      <strong>{displayContactName(c)}</strong>
+                      {!c.relationType ? <span className="persona-tab__mid-hint">点击设置关系</span> : null}
+                    </span>
+                    <span className="persona-tab__row-arrow" aria-hidden>
+                      ›
+                    </span>
+                  </button>
+                ))}
+              </section>
+            ))}
+          </>
         ) : null}
       </div>
 
@@ -238,6 +256,15 @@ export function PersonaTab({
             </form>
           </div>
         </div>
+      ) : null}
+
+      {editContact ? (
+        <ContactRelationSheet
+          contact={editContact}
+          open
+          onClose={() => setEditContact(null)}
+          onSaved={onContactSaved}
+        />
       ) : null}
     </div>
   );

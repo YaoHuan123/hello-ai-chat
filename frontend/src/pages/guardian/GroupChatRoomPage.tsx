@@ -59,6 +59,8 @@ function contactForMember(
     nickname: null,
     avatarUrl: null,
     avatarUpdatedAt: null,
+    relationType: null,
+    defaultMolId: null,
     createdAt: 0,
   };
 }

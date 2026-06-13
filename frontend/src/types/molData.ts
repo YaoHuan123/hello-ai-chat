@@ -1,5 +1,5 @@
-/** 我的 Mol：单条数据（对话样例或约束） */
-export type AssistMolDataKind = "dialogue" | "rule";
+/** 我的素颜：单条约束数据 */
+export type AssistMolDataKind = "rule";
 
 export type AssistMolDataItem = {
   id: string;

@@ -59,6 +59,19 @@ function migrateGuardianGroupsMultiMember(db: DatabaseSync): void {
   }
 }
 
+/** 联系人：关系类型与默认素颜 */
+function migrateContactRelations(db: DatabaseSync): void {
+  const addColumn = (sql: string) => {
+    try {
+      db.exec(sql);
+    } catch {
+      /* column may already exist */
+    }
+  };
+  addColumn("ALTER TABLE contacts ADD COLUMN relation_type TEXT");
+  addColumn("ALTER TABLE contacts ADD COLUMN default_mol_id TEXT");
+}
+
 export const initDb = (): DatabaseSync => {
   ensureDir(DATA_ROOT);
   ensureDir(path.dirname(DATA_DB_FILE));
@@ -247,6 +260,7 @@ export const initDb = (): DatabaseSync => {
   );
 
   migrateGuardianGroupsMultiMember(db);
+  migrateContactRelations(db);
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS user_moment_feeds (

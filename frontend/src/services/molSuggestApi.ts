@@ -14,8 +14,8 @@ export async function suggestRepliesApi(
   lastMessages: MolSuggestLastMessage[],
   molId?: string,
   token?: string,
-): Promise<{ suggestions: string[] }> {
-  return postJson<{ suggestions: string[] }>(
+): Promise<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }> {
+  return postJson<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }>(
     "/api/mol/suggest",
     { peerUserId, lastMessages, ...(molId ? { molId } : {}) },
     token ?? authT(),

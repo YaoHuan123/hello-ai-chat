@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIChat · 关系体系 UI 原型</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #14171a;
+      --muted: #6b7380;
+      --border: rgba(20, 23, 26, 0.08);
+      --accent: #4f6df5;
+      --accent-soft: rgba(79, 109, 245, 0.12);
+      --accent-pressed: #3d52c7;
+      --danger: #d64646;
+      --success: #2f9e6f;
+      --success-soft: rgba(47, 158, 111, 0.12);
+      --guardian: #c44d72;
+      --guardian-soft: rgba(196, 77, 114, 0.12);
+      --warm: #e07a3a;
+      --warm-soft: rgba(224, 122, 58, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-card: 0 4px 14px rgba(20, 23, 26, 0.05);
+      --shadow-elevated: 0 12px 40px rgba(20, 23, 26, 0.1);
+      --phone-w: 390px;
+      --phone-h: 780px;
+      --sidebar-w: 220px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e9ebf1;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .gallery {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+    }
+
+    .gallery__head {
+      margin-bottom: 28px;
+    }
+
+    .gallery__head h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 650;
+    }
+
+    .gallery__head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 720px;
+    }
+
+    .gallery__nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .gallery__nav button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .gallery__nav button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .screen-panel {
+      display: none;
+    }
+
+    .screen-panel.active {
+      display: block;
+    }
+
+    .screen-panel__meta {
+      margin-bottom: 16px;
+    }
+
+    .screen-panel__meta h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .screen-panel__meta p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 640px;
+    }
+
+    .screen-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    .phone-wrap {
+      flex: 0 0 auto;
+    }
+
+    .phone-wrap__label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      background: var(--bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow-elevated);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 8px solid #1a1d21;
+      position: relative;
+    }
+
+    .phone--desktop {
+      width: 920px;
+      height: var(--phone-h);
+      flex-direction: row;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 10px;
+      flex-shrink: 0;
+    }
+
+    .sidebar__logo {
+      font-weight: 700;
+      font-size: 15px;
+      padding: 8px 10px 20px;
+      color: var(--accent);
+    }
+
+    .sidebar__btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      background: transparent;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      color: var(--muted);
+      text-align: left;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .sidebar__btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .sidebar__icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: currentColor;
+      opacity: 0.25;
+    }
+
+    .sidebar__btn.active .sidebar__icon { opacity: 0.55; }
+
+    .phone__frame {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 650;
+    }
+
+    .topbar--chat {
+      gap: 10px;
+    }
+
+    .topbar__back {
+      border: none;
+      background: none;
+      font-size: 22px;
+      color: var(--text);
+      padding: 0 4px;
+      line-height: 1;
+    }
+
+    .topbar__peer {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .topbar__peer-meta {
+      min-width: 0;
+    }
+
+    .topbar__peer-name {
+      display: block;
+      font-weight: 600;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar__peer-sub {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topbar__more {
+      border: none;
+      background: none;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+
+    .scroll {
+      flex: 1;
+      overflow: auto;
+      padding-bottom: 8px;
+    }
+
+    .search {
+      margin: 12px 16px;
+      width: calc(100% - 32px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 10px 14px;
+      font-size: 14px;
+      background: var(--surface);
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius-pill);
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chip.active {
+      background: var(--accent-soft);
+      border-color: rgba(79, 109, 245, 0.25);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .entry-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 16px 10px;
+      padding: 14px;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      border: none;
+      width: calc(100% - 32px);
+      text-align: left;
+      font: inherit;
+      color: inherit;
+    }
+
+    .entry-card__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .entry-card__icon--mail { background: var(--warm-soft); }
+    .entry-card__icon--mol { background: var(--accent-soft); }
+    .entry-card__icon--ai { background: var(--guardian-soft); }
+
+    .entry-card__title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .entry-card__arrow {
+      margin-left: auto;
+      color: var(--muted);
+    }
+
+    .badge {
+      background: var(--danger);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      margin-left: auto;
+      margin-right: 4px;
+    }
+
+    .section {
+      margin: 8px 0 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .section-head span:last-child {
+      margin-left: auto;
+      font-weight: 500;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: none;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .row:last-child { border-bottom: none; }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .avatar--a { background: linear-gradient(135deg, #6b8af5, #4f6df5); }
+    .avatar--b { background: linear-gradient(135deg, #e07a3a, #c95d28); }
+    .avatar--c { background: linear-gradient(135deg, #2f9e6f, #1f7a55); }
+    .avatar--d { background: linear-gradient(135deg, #c44d72, #a33a5a); }
+    .avatar--e { background: linear-gradient(135deg, #8b6cf0, #6b4fd4); }
+
+    .row__mid { flex: 1; min-width: 0; }
+
+    .row__name {
+      display: block;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .row__sub {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .rel-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      margin-top: 4px;
+    }
+
+    .rel-tag--love { background: var(--guardian-soft); color: var(--guardian); }
+    .rel-tag--family { background: var(--warm-soft); color: var(--warm); }
+    .rel-tag--work { background: var(--accent-soft); color: var(--accent); }
+    .rel-tag--friend { background: var(--success-soft); color: var(--success); }
+    .rel-tag--school { background: rgba(139, 108, 240, 0.12); color: #6b4fd4; }
+    .rel-tag--none { background: rgba(107, 115, 128, 0.1); color: var(--muted); }
+
+    .tabbar {
+      display: flex;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 6px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .tabbar__btn {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 0;
+    }
+
+    .tabbar__btn.active { color: var(--accent); font-weight: 600; }
+
+    .tabbar__dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: currentColor;
+      opacity: 0.2;
+    }
+
+    .tabbar__btn.active .tabbar__dot { opacity: 0.45; }
+
+    /* Chat */
+    .chat-list {
+      list-style: none;
+      margin: 0;
+      padding: 12px 16px;
+    }
+
+    .chat-bubble-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .chat-bubble-row--me {
+      flex-direction: row-reverse;
+    }
+
+    .chat-bubble {
+      max-width: 72%;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .chat-bubble--other {
+      background: var(--surface);
+      box-shadow: var(--shadow-card);
+    }
+
+    .chat-bubble--me {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .composer-dock {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 12px 12px;
+    }
+
+    .suggest-panel {
+      background: #f0f2f8;
+      border-radius: var(--radius-md);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .suggest-panel__ctx {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .suggest-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .suggest-item:last-of-type { margin-bottom: 0; }
+
+    .suggest-foot {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .compose-bar {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .compose-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 10px 14px;
+      font-size: 14px;
+      min-height: 40px;
+    }
+
+    .compose-send {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .mol-btn {
+      border: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: var(--radius-pill);
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Sheet overlay */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(20, 23, 26, 0.35);
+      display: flex;
+      align-items: flex-end;
+      z-index: 10;
+    }
+
+    .sheet {
+      width: 100%;
+      background: var(--surface);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 8px 20px 24px;
+      max-height: 85%;
+      overflow: auto;
+    }
+
+    .sheet__handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: var(--radius-pill);
+      margin: 0 auto 16px;
+    }
+
+    .sheet h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .sheet__hint {
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .rel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .rel-opt {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      font-size: 13px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .rel-opt.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .field-select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      background: var(--surface);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn--ghost {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Friend request card */
+    .req-card {
+      margin: 12px 16px;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+    }
+
+    .req-card__head {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .req-card__msg {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+    }
+
+    .req-card__label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .req-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .req-actions .btn { flex: 1; }
+
+    .btn--reject {
+      background: var(--bg);
+      color: var(--muted);
+    }
+
+    /* Mol pick */
+    .mol-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      background: none;
+      text-align: left;
+      font: inherit;
+    }
+
+    .mol-row:last-child { border-bottom: none; }
+
+    .mol-row.recommended {
+      background: var(--accent-soft);
+      margin: 0 -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      border-radius: var(--radius-sm);
+    }
+
+    .mol-row__badge {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .note-box {
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      max-width: 420px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .note-box strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .note-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .note-box li { margin-bottom: 4px; }
+
+    @media (max-width: 960px) {
+      .phone--desktop {
+        width: var(--phone-w);
+        flex-direction: column;
+        height: auto;
+        min-height: var(--phone-h);
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar__logo { display: none; }
+      .sidebar__btn { width: auto; flex-shrink: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <header class="gallery__head">
+      <h1>关系体系 · 页面改造原型</h1>
+      <p>静态 HTML 示意，色系与 AIChat 现有设计令牌对齐。点击上方标签切换各屏；每屏标注了对应需改动的源码页面。</p>
+    </header>
+
+    <nav class="gallery__nav" id="nav"></nav>
+
+    <!-- 1. 关系 Tab -->
+    <section class="screen-panel active" data-screen="relation-tab">
+      <div class="screen-panel__meta">
+        <h2>1 · 关系 Tab（按关系分组）</h2>
+        <p>对应 <code>PersonaTab.tsx</code>。联系人按关系分组展示；顶部筛选 chip；未设置关系的联系人单独成组并提示补全。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">移动端 · 全部分组</div>
+          <div class="phone">
+            <div class="phone__frame">
+              <header class="topbar"><h1>关系</h1></header>
+              <input class="search" type="search" placeholder="搜联系人、关系" readonly value="" />
+              <div class="chips">
+                <span class="chip active">全部</span>
+                <span class="chip">家人</span>
+                <span class="chip">恋人</span>
+                <span class="chip">同事</span>
+                <span class="chip">同学</span>
+                <span class="chip">未设置</span>
+              </div>
+              <div class="scroll">
+                <button class="entry-card">
+                  <span class="entry-card__icon entry-card__icon--mail">✉</span>
+                  <span class="entry-card__title">好友请求</span>
+                  <span class="badge">2</span>
+                  <span class="entry-card__arrow">›</span>
+                </button>
+                <button class="entry-card">
+                  <span class="entry-card__icon entry-card__icon--mol">◇</span>
+                  <span class="entry-card__title">我的素颜</span>
+                  <span class="entry-card__arrow">›</span>
+                </button>
+                <button class="entry-card">
+                  <span class="entry-card__icon entry-card__icon--ai">✦</span>
+                  <span class="entry-card__title">搭子</span>
+                  <span class="entry-card__arrow">›</span>
+                </button>
+
+                <div class="section">
+                  <div class="section-head">恋人 <span>1</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--d">雨</span>
+                    <span class="row__mid">
+                      <span class="row__name">林雨晴</span>
+                      <span class="rel-tag rel-tag--love">恋人</span>
+                    </span>
+                    <span class="entry-card__arrow">›</span>
+                  </button>
+                </div>
+
+                <div class="section">
+                  <div class="section-head">家人 <span>2</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--b">妈</span>
+                    <span class="row__mid">
+                      <span class="row__name">妈妈</span>
+                      <span class="rel-tag rel-tag--family">父母</span>
+                    </span>
+                    <span class="entry-card__arrow">›</span>
+                  </button>
+                  <button class="row">
+                    <span class="avatar avatar--c">弟</span>
+                    <span class="row__mid">
+                      <span class="row__name">陈小明</span>
+                      <span class="rel-tag rel-tag--family">兄弟</span>
+                    </span>
+                    <span class="entry-card__arrow">›</span>
+                  </button>
+                </div>
+
+                <div class="section">
+                  <div class="section-head">同事 <span>1</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--a">王</span>
+                    <span class="row__mid">
+                      <span class="row__name">王经理</span>
+                      <span class="rel-tag rel-tag--work">上级</span>
+                    </span>
+                    <span class="entry-card__arrow">›</span>
+                  </button>
+                </div>
+
+                <div class="section">
+                  <div class="section-head">未设置关系 <span>1</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--e">?</span>
+                    <span class="row__mid">
+                      <span class="row__name">138****8821</span>
+                      <span class="row__sub">点击设置关系</span>
+                      <span class="rel-tag rel-tag--none">未设置</span>
+                    </span>
+                    <span class="entry-card__arrow">›</span>
+                  </button>
+                </div>
+              </div>
+              <nav class="tabbar">
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>消息</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>群聊</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>朋友圈</button>
+                <button class="tabbar__btn active"><span class="tabbar__dot"></span>关系</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>我的</button>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="note-box">
+          <strong>交互说明</strong>
+          <ul>
+            <li>点击联系人 → 进入关系详情 / 私聊（长按可快捷改关系）</li>
+            <li>分组顺序：常用关系优先，「未设置」置底</li>
+            <li>搜索同时匹配姓名、备注、关系标签</li>
+            <li>「添加」仍走好友请求；关系在接受后或首次聊天前设置</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 关系编辑 Sheet -->
+    <section class="screen-panel" data-screen="relation-edit">
+      <div class="screen-panel__meta">
+        <h2>2 · 联系人关系编辑</h2>
+        <p>新增 Sheet 或独立页。可从关系 Tab 联系人、私聊顶部菜单、接受好友后进入。对应新组件 + <code>App.tsx</code> 路由。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">关系编辑 · 底部 Sheet</div>
+          <div class="phone">
+            <div class="phone__frame" style="background: var(--bg);">
+              <header class="topbar topbar--chat">
+                <button class="topbar__back">‹</button>
+                <div class="topbar__peer">
+                  <span class="avatar avatar--d" style="width:36px;height:36px;font-size:14px;">雨</span>
+                  <div class="topbar__peer-meta">
+                    <span class="topbar__peer-name">林雨晴</span>
+                    <span class="topbar__peer-sub">恋人 · 在线</span>
+                  </div>
+                </div>
+                <button class="topbar__more">···</button>
+              </header>
+              <div class="scroll" style="opacity:0.35; pointer-events:none;">
+                <ul class="chat-list">
+                  <li class="chat-bubble-row">
+                    <span class="avatar avatar--d" style="width:32px;height:32px;font-size:12px;">雨</span>
+                    <span class="chat-bubble chat-bubble--other">周末有空吗</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="overlay">
+                <div class="sheet">
+                  <div class="sheet__handle"></div>
+                  <h2>设置关系</h2>
+                  <p class="sheet__hint">关系会影响回复推荐的语气与边界。</p>
+                  <span class="field-label">关系类型</span>
+                  <div class="rel-grid">
+                    <div class="rel-opt">恋人</div>
+                    <div class="rel-opt selected">暧昧中</div>
+                    <div class="rel-opt">父母</div>
+                    <div class="rel-opt">子女</div>
+                    <div class="rel-opt">兄弟</div>
+                    <div class="rel-opt">闺蜜</div>
+                    <div class="rel-opt">同学</div>
+                    <div class="rel-opt">同事</div>
+                    <div class="rel-opt">上级</div>
+                    <div class="rel-opt">客户</div>
+                    <div class="rel-opt">初识</div>
+                    <div class="rel-opt">其它</div>
+                  </div>
+                  <span class="field-label">默认素颜（可选）</span>
+                  <select class="field-select">
+                    <option>恋爱沟通 · 推荐</option>
+                    <option>日常轻松</option>
+                    <option>不绑定</option>
+                  </select>
+                  <div class="btn-row">
+                    <button class="btn btn--ghost">取消</button>
+                    <button class="btn btn--primary">保存</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note-box">
+          <strong>字段设计</strong>
+          <ul>
+            <li><code>relationType</code>：单选，必填（接受好友时）</li>
+            <li><code>defaultMolId</code>：该联系人聊天默认使用的素颜</li>
+            <li>保留现有 <code>remark</code> 备注，与关系独立</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 好友请求 -->
+    <section class="screen-panel" data-screen="friend-request">
+      <div class="screen-panel__meta">
+        <h2>3 · 好友请求（接受时设关系）</h2>
+        <p>对应 <code>FriendRequestsPage.tsx</code>。接受前选择关系，避免进入「未设置」分组。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">接受请求</div>
+          <div class="phone">
+            <div class="phone__frame">
+              <header class="topbar topbar--chat">
+                <button class="topbar__back">‹</button>
+                <h1 style="flex:1;text-align:center;font-size:17px;margin:0;">好友请求</h1>
+                <span style="width:28px;"></span>
+              </header>
+              <div class="scroll">
+                <div class="req-card">
+                  <div class="req-card__head">
+                    <span class="avatar avatar--a">张</span>
+                    <div>
+                      <strong>张同学</strong>
+                      <div style="font-size:12px;color:var(--muted);">138****5566</div>
+                    </div>
+                  </div>
+                  <p class="req-card__msg">「我是张同学，上次活动加的。」</p>
+                  <div class="req-card__label">接受后，TA 是你的</div>
+                  <div class="rel-grid" style="margin-bottom:0;">
+                    <div class="rel-opt">同学</div>
+                    <div class="rel-opt selected">普通朋友</div>
+                    <div class="rel-opt">同事</div>
+                    <div class="rel-opt">初识</div>
+                    <div class="rel-opt">客户</div>
+                    <div class="rel-opt">其它</div>
+                  </div>
+                  <div class="req-actions">
+                    <button class="btn btn--reject">拒绝</button>
+                    <button class="btn btn--primary">接受并保存</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 消息 Tab -->
+    <section class="screen-panel" data-screen="messages-tab">
+      <div class="screen-panel__meta">
+        <h2>4 · 消息 Tab（会话列表带关系）</h2>
+        <p>对应 <code>MessagesTab.tsx</code>。副标题展示关系，便于在会话列表中识别对象。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">会话列表</div>
+          <div class="phone">
+            <div class="phone__frame">
+              <header class="topbar"><h1>消息</h1></header>
+              <div class="scroll">
+                <button class="row">
+                  <span class="avatar avatar--d">雨</span>
+                  <span class="row__mid">
+                    <span class="row__name">林雨晴</span>
+                    <span class="row__sub">周末有空吗 · 18:32</span>
+                  </span>
+                  <span class="rel-tag rel-tag--love">恋人</span>
+                </button>
+                <button class="row">
+                  <span class="avatar avatar--b">妈</span>
+                  <span class="row__mid">
+                    <span class="row__name">妈妈</span>
+                    <span class="row__sub">记得吃饭 · 昨天</span>
+                  </span>
+                  <span class="rel-tag rel-tag--family">父母</span>
+                </button>
+                <button class="row">
+                  <span class="avatar avatar--a">王</span>
+                  <span class="row__mid">
+                    <span class="row__name">王经理</span>
+                    <span class="row__sub">周报发我一下 · 周二</span>
+                  </span>
+                  <span class="rel-tag rel-tag--work">上级</span>
+                </button>
+              </div>
+              <nav class="tabbar">
+                <button class="tabbar__btn active"><span class="tabbar__dot"></span>消息</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>群聊</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>朋友圈</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>关系</button>
+                <button class="tabbar__btn"><span class="tabbar__dot"></span>我的</button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 私聊 + 推荐 -->
+    <section class="screen-panel" data-screen="chat-suggest">
+      <div class="screen-panel__meta">
+        <h2>5 · 私聊 + 关系驱动回复推荐</h2>
+        <p>对应 <code>ChatRoomPage.tsx</code> + <code>MolSuggestPanel.tsx</code>。顶部展示关系；推荐区标注当前关系与素颜；建议文案随关系变化。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">恋人 · 回复推荐展开</div>
+          <div class="phone">
+            <div class="phone__frame">
+              <header class="topbar topbar--chat">
+                <button class="topbar__back">‹</button>
+                <div class="topbar__peer">
+                  <span class="avatar avatar--d" style="width:36px;height:36px;font-size:14px;">雨</span>
+                  <div class="topbar__peer-meta">
+                    <span class="topbar__peer-name">林雨晴</span>
+                    <span class="topbar__peer-sub">恋人 · 在线</span>
+                  </div>
+                </div>
+                <button class="topbar__more">···</button>
+              </header>
+              <div class="scroll">
+                <ul class="chat-list">
+                  <li class="chat-bubble-row">
+                    <span class="avatar avatar--d" style="width:32px;height:32px;font-size:12px;">雨</span>
+                    <span class="chat-bubble chat-bubble--other">这周末有空吗，想一起去看展</span>
+                  </li>
+                  <li class="chat-bubble-row chat-bubble-row--me">
+                    <span class="avatar avatar--a" style="width:32px;height:32px;font-size:12px;background:var(--accent);">我</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="composer-dock">
+                <div class="suggest-panel">
+                  <div class="suggest-panel__ctx">
+                    <span class="rel-tag rel-tag--love">恋人</span>
+                    <span>·</span>
+                    <span>素颜：恋爱沟通</span>
+                    <span>·</span>
+                    <span>任务：邀约</span>
+                  </div>
+                  <button class="suggest-item">好啊，周六下午可以吗？我请你喝咖啡。</button>
+                  <button class="suggest-item">想看什么展？发我链接，我先看看时间。</button>
+                  <button class="suggest-item">这周有点忙，下周可以吗？</button>
+                  <div class="suggest-foot">
+                    <span>基于关系与聊天上下文生成</span>
+                    <span>换一批</span>
+                  </div>
+                </div>
+                <div class="compose-bar">
+                  <button class="mol-btn">素颜</button>
+                  <input class="compose-input" placeholder="输入消息" readonly />
+                  <button class="compose-send">发送</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">上级 · 同一句话不同推荐</div>
+          <div class="phone">
+            <div class="phone__frame">
+              <header class="topbar topbar--chat">
+                <button class="topbar__back">‹</button>
+                <div class="topbar__peer">
+                  <span class="avatar avatar--a" style="width:36px;height:36px;font-size:14px;">王</span>
+                  <div class="topbar__peer-meta">
+                    <span class="topbar__peer-name">王经理</span>
+                    <span class="topbar__peer-sub">上级 · 在线</span>
+                  </div>
+                </div>
+                <button class="topbar__more">···</button>
+              </header>
+              <div class="scroll">
+                <ul class="chat-list">
+                  <li class="chat-bubble-row">
+                    <span class="avatar avatar--a" style="width:32px;height:32px;font-size:12px;">王</span>
+                    <span class="chat-bubble chat-bubble--other">周报今天能发我吗</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="composer-dock">
+                <div class="suggest-panel">
+                  <div class="suggest-panel__ctx">
+                    <span class="rel-tag rel-tag--work">上级</span>
+                    <span>·</span>
+                    <span>素颜：职场沟通</span>
+                    <span>·</span>
+                    <span>任务：催进度</span>
+                  </div>
+                  <button class="suggest-item">好的王经理，我下午三点前发您。</button>
+                  <button class="suggest-item">收到，正在整理数据，今天下班前给您。</button>
+                  <button class="suggest-item">目前还差一项数据，预计今晚完成，可以吗？</button>
+                  <div class="suggest-foot">
+                    <span>基于关系与聊天上下文生成</span>
+                    <span>换一批</span>
+                  </div>
+                </div>
+                <div class="compose-bar">
+                  <button class="mol-btn">素颜</button>
+                  <input class="compose-input" placeholder="输入消息" readonly />
+                  <button class="compose-send">发送</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 素颜切换 -->
+    <section class="screen-panel" data-screen="mol-switch">
+      <div class="screen-panel__meta">
+        <h2>6 · 素颜切换（按关系推荐）</h2>
+        <p>对应 <code>ChatMolSwitchModal.tsx</code>。根据联系人关系高亮推荐素颜，可与 <code>defaultMolId</code> 联动。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">切换素颜</div>
+          <div class="phone">
+            <div class="phone__frame" style="background:rgba(0,0,0,0.04);">
+              <div class="overlay" style="align-items:center;justify-content:center;padding:24px;">
+                <div class="sheet" style="border-radius:var(--radius-lg);max-height:none;">
+                  <h2 style="margin-bottom:4px;">选择素颜</h2>
+                  <p class="sheet__hint">当前联系人：林雨晴（恋人）</p>
+                  <button class="mol-row recommended">
+                    <span class="avatar avatar--d" style="width:40px;height:40px;font-size:14px;">恋</span>
+                    <span class="row__mid">
+                      <span class="row__name">恋爱沟通</span>
+                      <span class="row__sub">亲密关系 · 邀约、推进关系</span>
+                    </span>
+                    <span class="mol-row__badge">推荐</span>
+                  </button>
+                  <button class="mol-row">
+                    <span class="avatar avatar--e" style="width:40px;height:40px;font-size:14px;">日</span>
+                    <span class="row__mid">
+                      <span class="row__name">日常轻松</span>
+                      <span class="row__sub">朋友社交 · 延续聊天</span>
+                    </span>
+                  </button>
+                  <button class="mol-row">
+                    <span class="avatar avatar--a" style="width:40px;height:40px;font-size:14px;">职</span>
+                    <span class="row__mid">
+                      <span class="row__name">职场沟通</span>
+                      <span class="row__sub">职场沟通 · 维护边界</span>
+                    </span>
+                  </button>
+                  <div class="btn-row" style="margin-top:16px;">
+                    <button class="btn btn--ghost">管理素颜</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Desktop shell -->
+    <section class="screen-panel" data-screen="desktop">
+      <div class="screen-panel__meta">
+        <h2>7 · 桌面端 · 关系 Tab 布局</h2>
+        <p>对应 <code>MainShellPage.tsx</code> 宽屏侧栏 + 内容区，与现有 shell 结构一致。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">Desktop · sidebar + 关系分组</div>
+          <div class="phone phone--desktop">
+            <aside class="sidebar">
+              <div class="sidebar__logo">AIChat</div>
+              <button class="sidebar__btn"><span class="sidebar__icon"></span>消息</button>
+              <button class="sidebar__btn"><span class="sidebar__icon"></span>群聊</button>
+              <button class="sidebar__btn"><span class="sidebar__icon"></span>朋友圈</button>
+              <button class="sidebar__btn active"><span class="sidebar__icon"></span>关系</button>
+              <button class="sidebar__btn"><span class="sidebar__icon"></span>我的</button>
+            </aside>
+            <div class="phone__frame">
+              <header class="topbar"><h1>关系</h1></header>
+              <input class="search" type="search" placeholder="搜联系人、关系" readonly />
+              <div class="chips">
+                <span class="chip active">全部</span>
+                <span class="chip">家人</span>
+                <span class="chip">恋人</span>
+                <span class="chip">同事</span>
+              </div>
+              <div class="scroll">
+                <div class="section">
+                  <div class="section-head">恋人 <span>1</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--d">雨</span>
+                    <span class="row__mid">
+                      <span class="row__name">林雨晴</span>
+                      <span class="rel-tag rel-tag--love">恋人</span>
+                    </span>
+                  </button>
+                </div>
+                <div class="section">
+                  <div class="section-head">家人 <span>2</span></div>
+                  <button class="row">
+                    <span class="avatar avatar--b">妈</span>
+                    <span class="row__mid"><span class="row__name">妈妈</span></span>
+                  </button>
+                  <button class="row">
+                    <span class="avatar avatar--c">弟</span>
+                    <span class="row__mid"><span class="row__name">陈小明</span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const screens = [
+      { id: "relation-tab", label: "1 · 关系 Tab" },
+      { id: "relation-edit", label: "2 · 关系编辑" },
+      { id: "friend-request", label: "3 · 好友请求" },
+      { id: "messages-tab", label: "4 · 消息 Tab" },
+      { id: "chat-suggest", label: "5 · 私聊推荐" },
+      { id: "mol-switch", label: "6 · 素颜切换" },
+      { id: "desktop", label: "7 · 桌面端" },
+    ];
+
+    const nav = document.getElementById("nav");
+    const panels = document.querySelectorAll(".screen-panel");
+
+    screens.forEach((s, i) => {
+      const btn = document.createElement("button");
+      btn.textContent = s.label;
+      btn.dataset.target = s.id;
+      if (i === 0) btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        nav.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        panels.forEach((p) => {
+          p.classList.toggle("active", p.dataset.screen === s.id);
+        });
+      });
+      nav.appendChild(btn);
+    });
+  </script>
+</body>
+</html>

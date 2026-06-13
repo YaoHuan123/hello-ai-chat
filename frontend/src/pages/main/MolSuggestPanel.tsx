@@ -1,12 +1,15 @@
 import { SUYAN } from "../../constants/suyanCopy";
 import { useCallback, useEffect, useState } from "react";
+import { relationLabel, type RelationType } from "../../constants/relationTypes";
 import { suggestRepliesApi, type MolSuggestLastMessage } from "../../services/molSuggestApi";
+import { RelationTag } from "../../components/RelationTag";
 
 type Props = {
   open: boolean;
   peerUserId: string;
   molId: string | null;
   molName: string | null;
+  relationType?: RelationType | null;
   getLastMessages: () => MolSuggestLastMessage[];
   draftText?: string;
   onPick: (text: string) => void;
@@ -19,6 +22,7 @@ export function MolSuggestPanel({
   peerUserId,
   molId,
   molName,
+  relationType = null,
   getLastMessages,
   draftText = "",
   onPick,
@@ -70,6 +74,7 @@ export function MolSuggestPanel({
   if (!open) return null;
 
   const draft = draftText.trim();
+  const rel = relationLabel(relationType);
 
   return (
     <div className="mol-composer-panel" role="region" aria-label={SUYAN.suggest}>
@@ -90,9 +95,21 @@ export function MolSuggestPanel({
             "请先添加"
           )}
         </p>
-      ) : loading ? (
+      ) : (
+        <div className="mol-composer-context">
+          {relationType ? <RelationTag type={relationType} /> : null}
+          {rel && molName ? (
+            <span className="mol-composer-context__text">
+              {relationType ? " · " : ""}
+              {SUYAN.name}：{molName}
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {hasMol && loading ? (
         <p className="mol-composer-status">生成中…</p>
-      ) : err ? (
+      ) : hasMol && err ? (
         <div className="mol-composer-status-block">
           <p className="mol-composer-status mol-composer-status--err">{err}</p>
           {errCode === "NO_USER_MOLS" ? (
@@ -105,9 +122,9 @@ export function MolSuggestPanel({
             <p className="mol-composer-status">请在服务端配置 OPENAI_API_KEY 等环境变量。</p>
           ) : null}
         </div>
-      ) : items.length === 0 ? (
+      ) : hasMol && items.length === 0 ? (
         <p className="mol-composer-status">暂无建议</p>
-      ) : (
+      ) : hasMol ? (
         <ul className="mol-composer-suggest" aria-label="回复建议">
           {items.map((text, i) => (
             <li key={`${i}-${text.slice(0, 12)}`}>
@@ -124,10 +141,11 @@ export function MolSuggestPanel({
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
 
       {hasMol && !err ? (
         <div className="mol-composer-foot">
+          <span className="mol-composer-foot__hint">基于关系与聊天上下文生成</span>
           <button type="button" disabled={loading} onClick={() => void load()}>
             换一批
           </button>

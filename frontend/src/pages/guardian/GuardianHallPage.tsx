@@ -1,22 +1,12 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { listGuardianRolesApi } from "../../services/guardianApi";
-import type { GuardianRole, GuardianScene } from "../../types/guardian";
+import type { GuardianRole } from "../../types/guardian";
 
 type Props = {
   onBack: () => void;
   onOpenRole: (roleId: string) => void;
 };
-
-const SCENES: GuardianScene[] = [
-  "恋爱暧昧",
-  "校园师生",
-  "亲子沟通",
-  "科学育儿",
-  "居家装修",
-  "大件采购",
-  "店铺经营",
-];
 
 function roleCardStyle(role: GuardianRole): CSSProperties {
   return {
@@ -25,7 +15,6 @@ function roleCardStyle(role: GuardianRole): CSSProperties {
 }
 
 export function GuardianHallPage({ onBack, onOpenRole }: Props) {
-  const [scene, setScene] = useState<GuardianScene | "全部">("全部");
   const [roles, setRoles] = useState<GuardianRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -36,7 +25,7 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
       setLoading(true);
       setErr("");
       try {
-        const { items } = await listGuardianRolesApi(scene === "全部" ? undefined : scene);
+        const { items } = await listGuardianRolesApi();
         if (!cancelled) setRoles(items);
       } catch (e: unknown) {
         if (!cancelled) setErr(e instanceof Error ? e.message : String(e));
@@ -47,7 +36,7 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [scene]);
+  }, []);
 
   return (
     <div className="aichat-shell guardian-hall">
@@ -68,22 +57,6 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
           <p className="guardian-hall__banner-sub">每人性格与立场不同：有的中立疏导，有的协调事务，有的会按人设护一方</p>
         </section>
 
-        <div className="guardian-scene-chips guardian-hall__chips" role="tablist" aria-label="场景筛选">
-          {(["全部", ...SCENES] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              role="tab"
-              aria-selected={scene === s}
-              data-scene={s === "全部" ? undefined : s}
-              className={`guardian-scene-chip${scene === s ? " guardian-scene-chip--on" : ""}`}
-              onClick={() => setScene(s)}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-
         {err && <p className="aichat-form-msg err">{err}</p>}
         {loading ? (
           <p className="aichat-muted-line">正在加载…</p>
@@ -101,10 +74,7 @@ export function GuardianHallPage({ onBack, onOpenRole }: Props) {
                   <span className="guardian-role-card-v2__shine" aria-hidden />
                   <GuardianAvatar role={r} className="guardian-role-card-v2__avatar" alt="" />
                   <span className="guardian-role-card-v2__body">
-                    <span className="guardian-role-card-v2__head">
-                      <strong className="guardian-role-card-v2__name">{r.name}</strong>
-                      <span className="guardian-role-card-v2__scene">{r.scene}</span>
-                    </span>
+                    <strong className="guardian-role-card-v2__name">{r.name}</strong>
                     {r.userMessage.trim() ? (
                       <span className="guardian-role-card-v2__tagline">{r.userMessage}</span>
                     ) : null}

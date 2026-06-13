@@ -52,7 +52,7 @@ function toCatalogItem(rec: MolWorldFile, userId: string, ownedIds: Set<string>)
     id: rec.id,
     name: rec.name,
     summary: rec.summary,
-    price: rec.price,
+    price: 0,
     owned: ownedIds.has(rec.id),
     primaryCategory: rec.primaryCategory,
     taskTags: rec.taskTags,
@@ -72,7 +72,7 @@ function toMineItem(rec: MolWorldFile, source: string, userId: string): Record<s
     id: rec.id,
     name: rec.name,
     summary: rec.summary,
-    price: rec.price,
+    price: 0,
     owned: true,
     primaryCategory: rec.primaryCategory,
     taskTags: rec.taskTags,
@@ -116,20 +116,8 @@ export const createMyMolsRouter = (molWorld: MolWorldService, userMols: UserMols
     }
   });
 
-  router.post("/", authMiddleware, (req, res) => {
-    const user = req.user;
-    if (!user) {
-      res.status(401).json({ code: "UNAUTHORIZED", message: "未登录" });
-      return;
-    }
-    try {
-      const created = userMols.createPrivateMol(user.userId, user.phone, req.body);
-      const item = toMineItem(created, "created", user.userId);
-      res.status(201).json(item);
-    } catch (error) {
-      if (mapError(res, error)) return;
-      res.status(500).json({ code: "INTERNAL_ERROR", message: "创建失败" });
-    }
+  router.post("/", authMiddleware, (_req, res) => {
+    res.status(403).json({ code: "CREATE_DISABLED", message: "不支持自建素颜，请从素颜世界添加。" });
   });
 
   router.post("/import", authMiddleware, (req, res) => {

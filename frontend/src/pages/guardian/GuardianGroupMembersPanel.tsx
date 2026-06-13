@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { contactDisplayName } from "../../lib/contactDisplay";
-import { addGuardianGroupMembersApi, removeGuardianGroupMemberApi } from "../../services/guardianApi";
+import { addGuardianGroupMembersApi, removeGuardianGroupMemberApi, updateGuardianGroupNameApi } from "../../services/guardianApi";
 import type { ContactItem } from "../../types/contact";
 import type { GuardianGroup, GuardianRole } from "../../types/guardian";
 
@@ -18,6 +18,14 @@ type Props = {
 };
 
 const MAX_HUMANS = 20;
+const MAX_GROUP_NAME_LEN = 32;
+
+function groupDisplayName(group: GuardianGroup): string {
+  const name = group.name?.trim();
+  if (name) return name;
+  const count = group.members.length;
+  return count > 0 ? `群聊(${count})` : "群聊";
+}
 
 function contactForMember(contacts: ContactItem[], userId: string, phone: string): ContactItem {
   return (
@@ -28,6 +36,8 @@ function contactForMember(contacts: ContactItem[], userId: string, phone: string
       nickname: null,
       avatarUrl: null,
       avatarUpdatedAt: null,
+      relationType: null,
+      defaultMolId: null,
       createdAt: 0,
     }
   );
@@ -45,6 +55,8 @@ export function GuardianGroupMembersPanel({
 }: Props) {
   const [busy, setBusy] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
   const [picked, setPicked] = useState<string[]>([]);
   const [err, setErr] = useState("");
 
@@ -121,6 +133,43 @@ export function GuardianGroupMembersPanel({
     }
   }
 
+  function openRename() {
+    setRenameValue(group.name?.trim() ?? "");
+    setErr("");
+    setRenameOpen(true);
+  }
+
+  function closeRename() {
+    if (busy) return;
+    setRenameOpen(false);
+    setErr("");
+  }
+
+  async function onRenameSubmit() {
+    const trimmed = renameValue.trim();
+    if (trimmed.length > MAX_GROUP_NAME_LEN) {
+      setErr(`群名称最多 ${MAX_GROUP_NAME_LEN} 字`);
+      return;
+    }
+    if (trimmed === (group.name?.trim() ?? "")) {
+      closeRename();
+      return;
+    }
+    setBusy(true);
+    setErr("");
+    try {
+      const { group: next } = await updateGuardianGroupNameApi(groupId, trimmed);
+      onGroupUpdated(next);
+      setRenameOpen(false);
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const displayName = groupDisplayName(group);
+
   return (
     <div className="aichat-shell guardian-group-members">
       <header className="aichat-topbar aichat-topbar-flex guardian-group-members__topbar">
@@ -144,7 +193,27 @@ export function GuardianGroupMembersPanel({
       </header>
 
       <div className="aichat-main guardian-group-members__main">
-        {err && !addOpen ? <p className="aichat-form-msg err">{err}</p> : null}
+        {err && !addOpen && !renameOpen ? <p className="aichat-form-msg err">{err}</p> : null}
+        <section className="guardian-group-members__section" aria-labelledby="guardian-group-name">
+          <h2 id="guardian-group-name" className="guardian-group-members__section-title">
+            群名称
+          </h2>
+          {isOwner ? (
+            <button
+              type="button"
+              className="guardian-group-members__name-row"
+              disabled={busy}
+              onClick={openRename}
+            >
+              <span className="guardian-group-members__name-value">{displayName}</span>
+              <span className="guardian-group-members__name-action" aria-hidden>
+                修改
+              </span>
+            </button>
+          ) : (
+            <p className="guardian-group-members__name-static">{displayName}</p>
+          )}
+        </section>
         <section className="guardian-group-members__section" aria-labelledby="guardian-members-human">
           <h2 id="guardian-members-human" className="guardian-group-members__section-title">
             成员
@@ -199,6 +268,45 @@ export function GuardianGroupMembersPanel({
           </section>
         ) : null}
       </div>
+
+      {renameOpen ? (
+        <div className="contacts-sheet-overlay" role="presentation" onClick={closeRename}>
+          <div
+            className="contacts-sheet guardian-group-members__rename-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guardian-rename-title"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <div className="contacts-sheet__handle" aria-hidden />
+            <h2 id="guardian-rename-title" className="contacts-sheet__title">
+              修改群名称
+            </h2>
+            <label className="aichat-moldt-info-form__lab" htmlFor="guardian-group-rename">
+              群名称
+            </label>
+            <input
+              id="guardian-group-rename"
+              className="aichat-input"
+              value={renameValue}
+              maxLength={MAX_GROUP_NAME_LEN}
+              placeholder="输入群名称"
+              disabled={busy}
+              onChange={(e) => setRenameValue(e.target.value)}
+            />
+            <p className="guardian-group-members__hint">留空将恢复默认名称</p>
+            {err ? <p className="aichat-form-msg err">{err}</p> : null}
+            <div className="contacts-sheet__actions">
+              <button type="button" className="aichat-btn-ghost contacts-sheet__btn" disabled={busy} onClick={closeRename}>
+                取消
+              </button>
+              <button type="button" className="aichat-btn-primary contacts-sheet__btn" disabled={busy} onClick={() => void onRenameSubmit()}>
+                {busy ? "保存中…" : "保存"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {addOpen ? (
         <div className="contacts-sheet-overlay" role="presentation" onClick={closeAdd}>

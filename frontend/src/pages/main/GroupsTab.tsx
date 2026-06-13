@@ -66,7 +66,7 @@ export function GroupsTab({ onOpenGuardianGroup, onCreateGroup, onOpenGuardianHa
 
   useEffect(() => {
     const unsub = wsClient.subscribe((msg: WsServerMessage) => {
-      if (msg.type === "guardian_group_message") {
+      if (msg.type === "guardian_group_message" || msg.type === "guardian_group_updated") {
         load();
       }
     });

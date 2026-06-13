@@ -24,15 +24,11 @@ const TONE_TAGS: Record<PolishTone, string[]> = {
 };
 
 const PERSONA_HEAD: Record<string, string> = {
-  pro: "好的，",
-  social: "收到～",
-  warm: "诶，",
+  refuse: "好的，",
 };
 
 const PERSONA_TAIL: Record<string, string> = {
-  pro: "你看方便吗？",
-  social: "你看怎么安排都行～",
-  warm: "你说咋整就咋整。",
+  refuse: "你看方便吗？",
 };
 
 const KEEP_SUFFIX = ["", "，你看方便吗？", "，我这边都行", "，等你回话", "，怎么方便怎么来"];
@@ -51,12 +47,9 @@ function applyTone(
   switch (tone) {
     case "recommended": {
       // 推荐按当前 Mol 风格给一个稳妥版本：职场偏礼貌，社交/亲友偏亲近。
-      if (molId === "pro") {
+      if (molId === "refuse") {
         const base = `${head}${t}`;
         return variantIndex === 0 ? `${base}。` : `${base}。${tail}`;
-      }
-      if (molId === "social" || molId === "warm") {
-        return variantIndex === 0 ? `${head}${t}～` : `${t}，我这边都能配合。`;
       }
       const base = t.replace(/  +/g, " ");
       return variantIndex === 0 ? base : `${base}，你看可以吗？`;

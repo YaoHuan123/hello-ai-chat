@@ -1,7 +1,11 @@
 import { deleteJson, getJson, patchJson, postJson } from "./api";
 import { SUYAN, normalizeLegacySuyanName } from "../constants/suyanCopy";
+import { defaultInfoItemsForMol } from "../data/molPersonaDefaults";
 import { isApiMock } from "./mock";
+import { clearAssistMolItems } from "./molDataLocalStorage";
 import { getAuthToken } from "./storage";
+
+const DEFAULT_MOL_CATEGORY = "职场沟通";
 
 export type ChatRole = "visitor" | "agent";
 export type OneWayMessage = {
@@ -62,17 +66,6 @@ export type MolInfoItem = {
   softRemoved?: boolean;
 };
 
-export type CreateMyMolInput = {
-  name: string;
-  summary: string;
-  /** 与 molWorldTaxonomy 一级场景一致，不含「全部」 */
-  primaryCategory: string;
-  /** 创建时同时写入的详情信息项（id 在服务端/mock 中生成，可不传 id） */
-  initialInfo?: Array<Omit<MolInfoItem, "id"> & { id?: string }>;
-};
-
-const DEFAULT_MOL_CATEGORY = "职场沟通";
-const DEFAULT_MOL_SUMMARY = "待完善";
 
 export type UpdateMyMolInput = {
   name?: string;
@@ -85,25 +78,6 @@ function authT(): string {
   const t = getAuthToken().trim();
   if (!t) throw new Error("未登录");
   return t;
-}
-
-function fileRecordToCatalogItem(rec: Record<string, unknown>, owned = true): MolCatalogItem {
-  return {
-    id: String(rec.id),
-    name: String(rec.name),
-    summary: String(rec.summary),
-    price: Number(rec.price ?? 0),
-    owned,
-    primaryCategory: String(rec.primaryCategory),
-    taskTags: (rec.taskTags as string[]) ?? [],
-    toneTags: (rec.toneTags as string[]) ?? [],
-    relationshipTags: (rec.relationshipTags as string[]) ?? [],
-    abilityTags: (rec.abilityTags as string[]) ?? [],
-    recommended: Boolean(rec.recommended),
-    popularityScore: Number(rec.popularityScore ?? 0),
-    uploaderIsMe: rec.uploaderIsMe as boolean | undefined,
-    uploaderUserId: rec.uploaderUserId as string | undefined,
-  };
 }
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -136,108 +110,10 @@ const dataBoardMock: DataBoardSnapshot = {
 
 let molCatalogMock: MolCatalogItem[] = [
   {
-    id: "pro",
-    name: "职场沟通专家",
-    summary: "偏正式、强调结构与边界。",
-    price: 0,
-    owned: true,
-    primaryCategory: "职场沟通",
-    taskTags: ["谈合作", "催进度", "维护边界", "表达感谢"],
-    toneTags: ["专业", "有边界感"],
-    relationshipTags: ["同事", "客户", "领导"],
-    abilityTags: ["会润色", "会多步引导"],
-    recommended: true,
-    popularityScore: 920,
-  },
-  {
-    id: "social",
-    name: "朋友社交达人",
-    summary: "偏亲和、延续日常话题。",
-    price: 29,
-    owned: false,
-    primaryCategory: "朋友社交",
-    taskTags: ["破冰", "延续聊天", "推进关系", "表达感谢"],
-    toneTags: ["温和", "活泼"],
-    relationshipTags: ["朋友"],
-    abilityTags: ["会接话", "会润色"],
-    recommended: true,
-    popularityScore: 780,
-  },
-  {
-    id: "warm",
-    name: "亲友表达助手",
-    summary: "自然口语，适合家庭与密友。",
-    price: 19,
-    owned: true,
-    primaryCategory: "家庭亲友",
-    taskTags: ["安慰", "表达感谢", "邀约", "延续聊天"],
-    toneTags: ["温和", "有边界感"],
-    relationshipTags: ["家人", "朋友"],
-    abilityTags: ["擅长安慰", "会接话"],
-    recommended: true,
-    popularityScore: 750,
-  },
-  {
-    id: "ice",
-    name: "陌生人破冰",
-    summary: "首句不尬、接得住对方话题。",
-    price: 15,
-    owned: false,
-    primaryCategory: "陌生人破冰",
-    taskTags: ["破冰", "推进关系", "延续聊天", "表达感谢"],
-    toneTags: ["温和", "活泼", "有边界感"],
-    relationshipTags: ["朋友", "客户"],
-    abilityTags: ["会接话", "会多步引导"],
-    recommended: false,
-    popularityScore: 680,
-  },
-  {
-    id: "love",
-    name: "亲密关系表达",
-    summary: "适合暧昧、约会与关系推进。",
-    price: 25,
-    owned: false,
-    primaryCategory: "亲密关系",
-    taskTags: ["推进关系", "邀约", "延续聊天", "表达感谢", "维护边界"],
-    toneTags: ["温和", "暧昧", "有边界感"],
-    relationshipTags: ["暧昧对象"],
-    abilityTags: ["会接话", "会润色"],
-    recommended: false,
-    popularityScore: 700,
-  },
-  {
-    id: "oneway",
-    name: "单向体助理",
-    summary: "面向访客的稳态风格与多轮接话。",
-    price: 0,
-    owned: false,
-    primaryCategory: "单向智能体",
-    taskTags: ["延续聊天", "谈合作", "催进度", "表达感谢", "维护边界"],
-    toneTags: ["专业", "温和", "有边界感"],
-    relationshipTags: ["客户", "朋友"],
-    abilityTags: ["会多步引导", "会接话", "会润色"],
-    recommended: true,
-    popularityScore: 800,
-  },
-  {
-    id: "write",
-    name: "长文与表达",
-    summary: "朋友圈、签名与长消息的结构化表达。",
-    price: 9,
-    owned: false,
-    primaryCategory: "内容表达",
-    taskTags: ["表达感谢", "推进关系", "维护边界", "延续聊天"],
-    toneTags: ["专业", "温和", "直接"],
-    relationshipTags: ["朋友", "客户", "同事"],
-    abilityTags: ["会润色"],
-    recommended: false,
-    popularityScore: 550,
-  },
-  {
     id: "refuse",
-    name: "婉拒与边界",
+    name: "婉拒边界",
     summary: "礼貌说「不」并给替代方案。",
-    price: 12,
+    price: 0,
     owned: false,
     primaryCategory: "职场沟通",
     taskTags: ["婉拒", "维护边界", "催进度"],
@@ -247,24 +123,154 @@ let molCatalogMock: MolCatalogItem[] = [
     recommended: false,
     popularityScore: 850,
   },
+  {
+    id: "age18",
+    name: "我在18岁",
+    summary: "历经风霜，归来仍是少年：年轻、松弛，但不幼稚。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "安慰", "破冰", "表达感谢"],
+    toneTags: ["活泼", "温和"],
+    relationshipTags: ["朋友", "同学"],
+    abilityTags: ["会接话", "擅长安慰"],
+    recommended: true,
+    popularityScore: 810,
+  },
+  {
+    id: "tsundere",
+    name: "傲娇柔病",
+    summary: "嘴硬心软：表面冷淡、内里关心，不油腻。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "安慰", "推进关系", "表达感谢"],
+    toneTags: ["嘴硬", "温和"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "会润色"],
+    recommended: true,
+    popularityScore: 795,
+  },
+  {
+    id: "neihan",
+    name: "内涵段子",
+    summary: "留白式幽默：一句里有点意思，接得住就接，接不住也不尬。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "破冰", "表达感谢", "邀约"],
+    toneTags: ["幽默", "轻松"],
+    relationshipTags: ["朋友"],
+    abilityTags: ["会接话", "会润色"],
+    recommended: true,
+    popularityScore: 770,
+  },
+  {
+    id: "zhihu",
+    name: "之乎者也",
+    summary: "半文半白：带点文言气口，关键意思仍讲清楚。",
+    price: 0,
+    owned: false,
+    primaryCategory: "内容表达",
+    taskTags: ["延续聊天", "表达感谢", "维护边界", "邀约"],
+    toneTags: ["文雅", "克制"],
+    relationshipTags: ["朋友", "同事"],
+    abilityTags: ["会润色"],
+    recommended: true,
+    popularityScore: 760,
+  },
+  {
+    id: "doubao",
+    name: "豆包体",
+    summary: "清楚、好读：先接住话题，再给具体说法。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "表达感谢", "谈合作", "催进度"],
+    toneTags: ["清楚", "温和"],
+    relationshipTags: ["朋友", "同事"],
+    abilityTags: ["会接话", "会润色", "会多步引导"],
+    recommended: true,
+    popularityScore: 785,
+  },
+  {
+    id: "mabao",
+    name: "专业妈宝",
+    summary: "会撒娇、会求照顾，但办事不含糊。",
+    price: 0,
+    owned: false,
+    primaryCategory: "家庭亲友",
+    taskTags: ["安慰", "延续聊天", "表达感谢", "维护边界"],
+    toneTags: ["软", "幽默"],
+    relationshipTags: ["家人", "朋友"],
+    abilityTags: ["会接话", "擅长安慰"],
+    recommended: true,
+    popularityScore: 755,
+  },
+  {
+    id: "yaoyao",
+    name: "遥遥领先",
+    summary: "自信但不讨人厌：敢说领先，也拿得出依据。",
+    price: 0,
+    owned: false,
+    primaryCategory: "职场沟通",
+    taskTags: ["谈合作", "催进度", "表达感谢", "延续聊天"],
+    toneTags: ["自信", "直接"],
+    relationshipTags: ["同事", "客户", "朋友"],
+    abilityTags: ["会润色", "会接话"],
+    recommended: true,
+    popularityScore: 748,
+  },
+  {
+    id: "kongmen",
+    name: "遁入空门",
+    summary: "看淡、少争：能婉拒，也能好好说话。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["婉拒", "维护边界", "延续聊天", "安慰"],
+    toneTags: ["淡", "克制"],
+    relationshipTags: ["朋友"],
+    abilityTags: ["擅长拒绝", "会接话"],
+    recommended: true,
+    popularityScore: 742,
+  },
+  {
+    id: "baobao",
+    name: "人家还是宝宝",
+    summary: "软萌但不幼态过头：会撒娇，也能把事情说清。",
+    price: 0,
+    owned: false,
+    primaryCategory: "朋友社交",
+    taskTags: ["安慰", "延续聊天", "邀约", "表达感谢"],
+    toneTags: ["软", "活泼"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "擅长安慰"],
+    recommended: true,
+    popularityScore: 738,
+  },
+  {
+    id: "keyan",
+    name: "科研圣体",
+    summary: "结构清楚、有据可依：像做科研一样聊事，但不堆术语。",
+    price: 0,
+    owned: false,
+    primaryCategory: "职场沟通",
+    taskTags: ["谈合作", "催进度", "维护边界", "表达感谢"],
+    toneTags: ["专业", "严谨"],
+    relationshipTags: ["同事", "同学", "客户"],
+    abilityTags: ["会润色", "会多步引导"],
+    recommended: true,
+    popularityScore: 732,
+  },
 ];
 
 let userMolsList: MolCatalogItem[] = [];
 
 let molInfoById: Record<string, MolInfoItem[]> = {};
 
-function nextMolInfoId(): string {
-  return `inf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function defaultProInfoList(): MolInfoItem[] {
-  return [
-    { id: "inf-d1", source: "custom", title: "沟通风格", body: "专业、简洁、高效，避免口语化表达" },
-    { id: "inf-d2", source: "store", title: "常用开场白", body: "您好，关于XX事项，我想和您沟通一下…" },
-    { id: "inf-d3", source: "store", title: "商务礼仪规范", body: "与客户沟通时需注意的礼仪和话术规范", softRemoved: true },
-    { id: "inf-d4", source: "custom", title: "核心关键词", body: "专业、靠谱、高效、解决方案、落地" },
-    { id: "inf-d5", source: "store", title: "拒绝话术模板", body: "委婉拒绝不合理需求的标准话术" },
-  ];
+function resolveMockInfo(molId: string, category: string): MolInfoItem[] {
+  return defaultInfoItemsForMol(molId, category) as MolInfoItem[];
 }
 
 function mergeMyMolsListMock(): MolInMyCollection[] {
@@ -378,16 +384,6 @@ export async function getMyMols(): Promise<MolInMyCollection[]> {
   return getJson<MolInMyCollection[]>("/api/mol-mine", authT());
 }
 
-function normalizeInfoDrafts(rows: CreateMyMolInput["initialInfo"]): MolInfoItem[] {
-  if (!rows?.length) return [];
-  return rows.map((row) => ({
-    id: nextMolInfoId(),
-    source: row.source,
-    title: row.title.trim(),
-    body: row.body.trim(),
-    softRemoved: row.softRemoved,
-  }));
-}
 
 export async function getMolInfoItems(molId: string): Promise<MolInfoItem[]> {
   if (isApiMock()) {
@@ -395,12 +391,11 @@ export async function getMolInfoItems(molId: string): Promise<MolInfoItem[]> {
     if (molId in molInfoById) {
       return (molInfoById[molId] ?? []).map((x) => ({ ...x }));
     }
-    if (molId === "pro") {
-      const seed = defaultProInfoList();
-      molInfoById = { ...molInfoById, [molId]: seed };
-      return seed.map((x) => ({ ...x }));
-    }
-    return [];
+    const fromList = [...molCatalogMock, ...userMolsList].find((m) => m.id === molId);
+    const cat = fromList?.primaryCategory ?? DEFAULT_MOL_CATEGORY;
+    const seed = resolveMockInfo(molId, cat);
+    molInfoById = { ...molInfoById, [molId]: seed };
+    return seed.map((x) => ({ ...x }));
   }
   const { info } = await getMyMolDetailForEdit(molId);
   return info;
@@ -427,83 +422,6 @@ export async function getMyMolDetailForEdit(molId: string): Promise<{ item: MolI
     return { item, info };
   }
   return getJson<{ item: MolInMyCollection; info: MolInfoItem[] }>(`/api/mol-mine/${encodeURIComponent(molId)}/detail`, authT());
-}
-
-/** 自建 Mol（私有）：仅出现在「我的 Mol」，不上架 Mol 世界。 */
-export async function createMyMolPrivate(input: CreateMyMolInput): Promise<MolCatalogItem> {
-  const name = normalizeLegacySuyanName(input.name.trim());
-  const summary = input.summary.trim();
-  const primaryCategory = input.primaryCategory.trim();
-  if (!name || !summary || !primaryCategory) {
-    throw new Error("请填写名称、简介与场景。");
-  }
-  if (isApiMock()) {
-    await wait(200);
-    const newItem: MolCatalogItem = {
-      id: `mp-${Date.now()}`,
-      name,
-      summary,
-      price: 0,
-      owned: true,
-      primaryCategory,
-      taskTags: [],
-      toneTags: [],
-      relationshipTags: [],
-      abilityTags: [],
-      recommended: false,
-      popularityScore: 0,
-      uploaderIsMe: true,
-    };
-    userMolsList = [...userMolsList, newItem];
-    const initial = normalizeInfoDrafts(input.initialInfo);
-    molInfoById = { ...molInfoById, [newItem.id]: initial };
-    return { ...newItem };
-  }
-  const t = authT();
-  const initialInfo = input.initialInfo?.map((row) => ({
-    id: row.id,
-    title: row.title.trim(),
-    body: row.body.trim(),
-    source: row.source ?? "custom",
-    softRemoved: row.softRemoved,
-  }));
-  const created = await postJson<Record<string, unknown>>(
-    "/api/mol-mine",
-    { name, summary, primaryCategory, initialInfo },
-    t,
-  );
-  return fileRecordToCatalogItem(created, true);
-}
-
-/** 仅名称快速创建，简介与场景使用默认值，详情在 Mol 数据页维护。 */
-export async function createMyMolQuick(name: string): Promise<MolCatalogItem> {
-  const trimmed = name.trim();
-  if (!trimmed) {
-    throw new Error(`请输入${SUYAN.name}名称。`);
-  }
-  return createMyMolPrivate({
-    name: trimmed,
-    summary: DEFAULT_MOL_SUMMARY,
-    primaryCategory: DEFAULT_MOL_CATEGORY,
-  });
-}
-
-const MOL_AUTO_NAME_RE = /^(?:素颜|MOL)-(\d+)$/i;
-
-/** 根据已有名称生成下一个 素颜-N 序号名（兼容旧 MOL-N）。 */
-export function nextAutoMolName(existingNames: string[]): string {
-  let max = 0;
-  for (const raw of existingNames) {
-    const m = raw.trim().match(MOL_AUTO_NAME_RE);
-    if (m) max = Math.max(max, Number.parseInt(m[1]!, 10));
-  }
-  return `${SUYAN.autoPrefix}-${max + 1}`;
-}
-
-/** 自动命名为 素颜-1、素颜-2… 并创建。 */
-export async function createMyMolAuto(existingNames?: string[]): Promise<MolCatalogItem> {
-  const names = existingNames ?? (await getMyMols()).map((m) => m.name);
-  return createMyMolQuick(nextAutoMolName(names));
 }
 
 export async function updateMyMol(molId: string, patch: UpdateMyMolInput): Promise<void> {
@@ -564,6 +482,7 @@ export async function removeMyMol(molId: string, options?: { deleteFromWorld?: b
         delete next[molId];
         molInfoById = next;
       }
+      clearAssistMolItems(molId);
       return;
     }
     if (molCatalogMock.some((m) => m.id === molId && m.owned)) {
@@ -573,6 +492,7 @@ export async function removeMyMol(molId: string, options?: { deleteFromWorld?: b
         delete next[molId];
         molInfoById = next;
       }
+      clearAssistMolItems(molId);
       return;
     }
     throw new Error(`该${SUYAN.name}不存在或已移除。`);
@@ -582,4 +502,5 @@ export async function removeMyMol(molId: string, options?: { deleteFromWorld?: b
   } else {
     await deleteJson<unknown>(`/api/mol-mine/${encodeURIComponent(molId)}`, authT());
   }
+  clearAssistMolItems(molId);
 }
