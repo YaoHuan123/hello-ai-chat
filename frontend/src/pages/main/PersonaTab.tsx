@@ -106,7 +106,7 @@ export function PersonaTab({
   return (
     <div className="aichat-main-shell-tab persona-tab">
       <header className="aichat-topbar persona-tab__topbar aichat-topbar--plain">
-        <h1>人物</h1>
+        <h1>关系</h1>
       </header>
 
       <div className="persona-tab__search-wrap">

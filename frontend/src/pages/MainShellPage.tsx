@@ -29,7 +29,7 @@ const TAB_LABEL: Record<MainTabId, string> = {
   messages: "消息",
   groups: "群聊",
   moments: "朋友圈",
-  people: "人物",
+  people: "关系",
   me: "我的",
 };
 
