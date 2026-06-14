@@ -21,6 +21,7 @@
   --aichat-shadow-card: 0 4px 14px rgba(20, 23, 26, 0.05);
   --aichat-shadow-elevated: 0 12px 40px rgba(20, 23, 26, 0.1);
   --aichat-screen-max: 428px;
+  --aichat-tabbar-h: 56px;
   --aichat-safe-bottom: env(safe-area-inset-bottom, 0px);
   --aichat-sidebar-w: 220px;
   font-synthesis: none;
@@ -3061,7 +3062,10 @@ body {
 
 /* —— 主导航 4 Tab + 消息模式色调 —— */
 .aichat-main-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
+  min-height: var(--aichat-app-height, 100dvh);
   padding-bottom: 0;
 }
 
@@ -3890,6 +3894,34 @@ button.msg-mol-placeholder-bubble--switchable::after {
 
 .aichat-tabbar__btn--active {
   color: var(--aichat-accent);
+}
+
+/* 移动壳：Tab 相对视口固定底部（不依赖 flex 链撑满高度） */
+@media (max-width: 767px) {
+  .aichat-main-shell__frame {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .aichat-main-shell__body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: calc(var(--aichat-tabbar-h) + var(--aichat-safe-bottom));
+  }
+
+  .aichat-main-shell .aichat-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 80;
+    width: 100%;
+    max-width: var(--aichat-screen-max);
+    margin: 0 auto;
+  }
 }
 
 .msg-chat-room.msg-mode-normal {
@@ -9127,5 +9159,129 @@ span:has(> .contact-avatar__img) {
 
   .msg-chat-composer {
     max-width: 480px;
+  }
+}
+
+/* ===== Capacitor 原生壳：全屏 + 底部 Tab，禁用 Web 桌面侧栏 ===== */
+
+html.aichat-native-app {
+  --aichat-screen-max: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+html.aichat-native-app body {
+  background: var(--aichat-bg);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.aichat-native-app #root {
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: var(--aichat-app-height, 100dvh);
+  min-height: 0;
+  max-height: var(--aichat-app-height, 100dvh);
+  overflow: hidden;
+}
+
+html.aichat-native-app .aichat-shell {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+html.aichat-native-app .aichat-main-shell {
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  border-radius: 0;
+  border: none;
+  overflow: hidden;
+}
+
+html.aichat-native-app .aichat-main-shell__frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+html.aichat-native-app .aichat-tabbar {
+  display: flex;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+html.aichat-native-app .aichat-main-shell__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: calc(var(--aichat-tabbar-h) + var(--aichat-safe-bottom));
+}
+
+html.aichat-native-app .msg-chat-composer {
+  max-width: none;
+}
+
+@media (min-width: 768px) {
+  html.aichat-native-app body {
+    background: var(--aichat-bg);
+  }
+
+  html.aichat-native-app #root {
+    padding: 0;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  html.aichat-native-app .aichat-shell:not(.aichat-main-shell):not(.aichat-assist),
+  html.aichat-native-app .aichat-shell.aichat-molworld,
+  html.aichat-native-app .aichat-shell.guardian-hall,
+  html.aichat-native-app .aichat-shell.assist-mol-a-shell,
+  html.aichat-native-app .aichat-main-shell {
+    max-width: 100%;
+    min-height: 0;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+
+  html.aichat-native-app .aichat-main-shell {
+    flex-direction: column;
+  }
+
+  html.aichat-native-app .aichat-sidebar {
+    display: none;
+  }
+
+  html.aichat-native-app .aichat-tabbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 100%;
   }
 }

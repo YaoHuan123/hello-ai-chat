@@ -5,6 +5,11 @@ frontend/dist
 backend/node_modules
 backend/dist
 backend/data
+backend/.env
+
+# 前端本地环境（仅 .env.example 入库）
+frontend/.env
+frontend/.env.android
 
 .DS_Store
 *.log

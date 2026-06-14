@@ -1,0 +1,106 @@
+# AIChat · Capacitor Android CI
+# 文档：https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/
+#
+# Codemagic UI 需配置：
+# 1. Environment variables
+#    - VITE_API_BASE  生产 HTTPS 后端地址（如 https://api.example.com）
+#    - VITE_USE_MOCK  0
+# 2. android_signing（release 工作流）
+#    - 上传 keystore，Reference name 填 aichat_keystore
+
+workflows:
+  android-debug:
+    name: AIChat Android Debug
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+      node: 20
+      vars:
+        VITE_API_BASE: https://your-api.example.com
+        VITE_USE_MOCK: "0"
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: android
+          include: true
+        - pattern: main
+          include: true
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $CM_BUILD_DIR/frontend/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm ci
+      - name: Build web assets and sync Capacitor
+        script: |
+          cd frontend
+          npm run sync:android
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/frontend/android/local.properties"
+      - name: Build debug APK
+        script: |
+          cd frontend/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+    artifacts:
+      - frontend/android/app/build/outputs/apk/debug/*.apk
+
+  android-release:
+    name: AIChat Android Release
+    max_build_duration: 90
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+      node: 20
+      android_signing:
+        - aichat_keystore
+      vars:
+        VITE_API_BASE: https://your-api.example.com
+        VITE_USE_MOCK: "0"
+        PACKAGE_NAME: com.aichat.app
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: android
+          include: true
+        - pattern: main
+          include: true
+      tag_patterns:
+        - pattern: "v*"
+          include: true
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $CM_BUILD_DIR/frontend/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm ci
+      - name: Build web assets and sync Capacitor
+        script: |
+          cd frontend
+          npm run sync:android
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/frontend/android/local.properties"
+      - name: Build release App Bundle
+        script: |
+          cd frontend/android
+          chmod +x gradlew
+          ./gradlew bundleRelease
+      - name: Build release APK
+        script: |
+          cd frontend/android
+          ./gradlew assembleRelease
+    artifacts:
+      - frontend/android/app/build/outputs/bundle/release/*.aab
+      - frontend/android/app/build/outputs/apk/release/*.apk

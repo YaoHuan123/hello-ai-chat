@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:android:debug": "vite build --mode android && cap sync android && cd android && gradlew.bat assembleDebug",
-    "android": "cap open android",
+    "sync:android": "vite build --mode android && cap sync android",
+    "run:android": "npm run sync:android && cap run android",
+    "build:android:debug": "npm run sync:android && cd android && gradlew.bat assembleDebug",
+    "install:android:debug": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
+    "android:lan-ip": "node scripts/print-lan-ip.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

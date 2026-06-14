@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 仅开发联调：允许明文访问模拟器回环宿主机与本地。生产环境请使用 HTTPS 并移除此配置。 -->
+<!-- Release：HTTPS。Debug 包使用 src/debug 下更宽松的 cleartext 配置以支持局域网真机联调。 -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">10.0.2.2</domain>

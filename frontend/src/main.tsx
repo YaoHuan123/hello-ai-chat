@@ -2,8 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { initAndroidAppearance } from "./platform/androidShell";
+import { initNativeAppShell } from "./platform/appShell";
 import { App } from "./App";
 
+initNativeAppShell();
 initAndroidAppearance();
 
 createRoot(document.getElementById("root")!).render(

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ContactItem } from "../types/contact";
 import type { RouteName } from "../types/routes";
+import { isNativeAppShell } from "../platform/appShell";
 import { MessagesTab } from "./main/MessagesTab";
 import { GroupsTab } from "./main/GroupsTab";
 import { MomentsTab } from "./main/MomentsTab";
@@ -97,28 +98,31 @@ export function MainShellPage({
   const [internalTab, setInternalTab] = useState<MainTabId>("messages");
   const tab = activeTab ?? internalTab;
   const setTab = onTabChange ?? setInternalTab;
+  const showSidebar = !isNativeAppShell();
 
   return (
     <div className="aichat-shell aichat-main-shell">
-      <aside className="aichat-sidebar" aria-label="侧边导航">
-        <div className="aichat-sidebar__brand">
-          <span className="aichat-sidebar__logo">AIChat</span>
-        </div>
-        <nav className="aichat-sidebar__nav">
-          {TAB_ORDER.map((id) => (
-            <button
-              key={id}
-              type="button"
-              className={`aichat-sidebar__btn ${tab === id ? "aichat-sidebar__btn--active" : ""}`}
-              onClick={() => setTab(id)}
-              aria-current={tab === id ? "page" : undefined}
-            >
-              <TabIcon id={id} />
-              <span>{TAB_LABEL[id]}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+      {showSidebar && (
+        <aside className="aichat-sidebar" aria-label="侧边导航">
+          <div className="aichat-sidebar__brand">
+            <span className="aichat-sidebar__logo">AIChat</span>
+          </div>
+          <nav className="aichat-sidebar__nav">
+            {TAB_ORDER.map((id) => (
+              <button
+                key={id}
+                type="button"
+                className={`aichat-sidebar__btn ${tab === id ? "aichat-sidebar__btn--active" : ""}`}
+                onClick={() => setTab(id)}
+                aria-current={tab === id ? "page" : undefined}
+              >
+                <TabIcon id={id} />
+                <span>{TAB_LABEL[id]}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+      )}
 
       <div className="aichat-main-shell__frame">
         <div className="aichat-main-shell__body">

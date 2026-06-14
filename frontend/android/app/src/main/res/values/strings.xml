@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">hello chat</string>
-    <string name="title_activity_main">hello chat</string>
+    <string name="app_name">AIChat</string>
+    <string name="title_activity_main">AIChat</string>
     <string name="package_name">com.aichat.app</string>
     <string name="custom_url_scheme">com.aichat.app</string>
 </resources>
