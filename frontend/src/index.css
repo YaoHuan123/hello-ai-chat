@@ -8988,6 +8988,14 @@ span:has(> .contact-avatar__img) {
   background: #fafbfc;
 }
 
+.me-tab__row--static {
+  cursor: default;
+}
+
+.me-tab__row--static:hover {
+  background: var(--aichat-surface);
+}
+
 .me-tab__row-icon {
   width: 32px;
   height: 32px;

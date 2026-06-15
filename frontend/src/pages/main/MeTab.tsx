@@ -18,6 +18,7 @@ import {
   setAvatarCache,
   setNicknameCache,
 } from "../../services/storage";
+import { formatAppVersion, getAppVersion } from "../../platform/appVersion";
 
 type Props = {
   onNavigateFeature: (route: RouteName) => void;
@@ -41,6 +42,7 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [err, setErr] = useState("");
+  const [versionLabel, setVersionLabel] = useState("—");
   const fileRef = useRef<HTMLInputElement>(null);
 
   function applyMeProfile(me: Awaited<ReturnType<typeof getMeApi>>) {
@@ -50,6 +52,20 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
     setDraft(me.nickname ?? "");
     setAvatarContact(getMyAvatarContact());
   }
+
+  useEffect(() => {
+    let cancelled = false;
+    void getAppVersion()
+      .then((info) => {
+        if (!cancelled) setVersionLabel(formatAppVersion(info));
+      })
+      .catch(() => {
+        if (!cancelled) setVersionLabel("—");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -207,6 +223,15 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
               ›
             </span>
           </button>
+        </section>
+
+        <section className="me-tab__group" aria-label="关于">
+          <div className="me-tab__row me-tab__row--static">
+            <span className="me-tab__row-body">
+              <b>版本</b>
+              <span>{versionLabel}</span>
+            </span>
+          </div>
         </section>
 
         <button type="button" className="me-tab__logout" onClick={onLogout}>
