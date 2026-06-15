@@ -4,6 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>AIChat</title>
+    <script>
+      (function () {
+        var cap = window.Capacitor;
+        var protocol = window.location.protocol || "";
+        var native =
+          (cap && cap.isNativePlatform && cap.isNativePlatform()) ||
+          (cap && (cap.platform === "ios" || cap.platform === "android")) ||
+          protocol === "capacitor:" ||
+          protocol === "ionic:";
+        if (!native) return;
+        var html = document.documentElement;
+        html.classList.add("aichat-native-app");
+        html.style.setProperty("--aichat-screen-max", "100%");
+        if (cap && cap.platform === "ios") html.classList.add("aichat-ios-app");
+        if (cap && cap.platform === "android") html.classList.add("aichat-android-app");
+        if (!cap && protocol === "capacitor:") html.classList.add("aichat-ios-app");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

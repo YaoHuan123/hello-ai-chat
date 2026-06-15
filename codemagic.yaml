@@ -7,8 +7,9 @@
 #    - VITE_USE_MOCK  0
 # 2. android_signing（Android release）
 #    - 上传 keystore，Reference name 填 aichat_keystore
-# 3. ios_signing（iOS release）
-#    - 上传 Distribution .p12 + App Store .mobileprovision
+# 3. ios_signing（iOS release / ad hoc）
+#    - 上传 Distribution .p12 + App Store .mobileprovision（TestFlight / ios-release）
+#    - Ad Hoc：另建 Ad Hoc .mobileprovision，设备 UDID 须先登记（ios-ad-hoc）
 #    - Team ID: TCPBS85F56
 #    - Bundle ID: io.github.YaoHuan123.hello-ai-chat
 
@@ -196,6 +197,52 @@ workflows:
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
       - name: Build ipa for distribution
+        script: |
+          cd frontend/ios/App
+          xcode-project build-ipa \
+            --project App.xcodeproj \
+            --scheme App
+    artifacts:
+      - frontend/ios/App/build/ios/ipa/*.ipa
+
+  ios-ad-hoc:
+    name: AIChat iOS Ad Hoc
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      node: 22
+      xcode: latest
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: io.github.YaoHuan123.hello-ai-chat
+      vars:
+        VITE_API_BASE: http://192.168.137.1:4000
+        VITE_USE_MOCK: "0"
+        XCODE_PROJECT: frontend/ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: ios
+          include: true
+        - pattern: main
+          include: true
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/frontend/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm ci
+      - name: Build web assets and sync Capacitor
+        script: |
+          cd frontend
+          npm run sync:ios
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Build ipa for ad hoc distribution
         script: |
           cd frontend/ios/App
           xcode-project build-ipa \

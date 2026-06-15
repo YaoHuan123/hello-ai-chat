@@ -9245,6 +9245,25 @@ html.aichat-native-app .msg-chat-composer {
   max-width: none;
 }
 
+html.aichat-native-app .aichat-moldt,
+html.aichat-native-app .aichat-moldt-navbar,
+html.aichat-native-app .aichat-moldt-banner-err,
+html.aichat-native-app .contacts-sheet {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 767px) {
+  html.aichat-native-app .aichat-shell,
+  html.aichat-native-app .aichat-main-shell .aichat-tabbar {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 @media (min-width: 768px) {
   html.aichat-native-app body {
     background: var(--aichat-bg);
