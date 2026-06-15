@@ -48,9 +48,21 @@ export function isIOSShell(): boolean {
   return resolvePlatform() === "ios";
 }
 
-function syncNativeViewportHeight(): void {
-  const height = window.visualViewport?.height ?? window.innerHeight;
-  document.documentElement.style.setProperty("--aichat-app-height", `${Math.round(height)}px`);
+function syncAppViewportHeight(): void {
+  const vv = window.visualViewport;
+  const height = Math.round(vv?.height ?? window.innerHeight);
+  const offsetTop = Math.round(vv?.offsetTop ?? 0);
+  const root = document.documentElement;
+  root.style.setProperty("--aichat-app-height", `${height}px`);
+  root.style.setProperty("--aichat-viewport-offset-top", `${offsetTop}px`);
+}
+
+/** 同步可视区高度（软键盘、浏览器工具栏变化时供聊天等全屏页使用） */
+export function initAppViewportHeight(): void {
+  syncAppViewportHeight();
+  window.addEventListener("resize", syncAppViewportHeight);
+  window.visualViewport?.addEventListener("resize", syncAppViewportHeight);
+  window.visualViewport?.addEventListener("scroll", syncAppViewportHeight);
 }
 
 function applyNativeShellClasses(): void {
@@ -71,9 +83,4 @@ function applyNativeShellClasses(): void {
 export function initNativeAppShell(): void {
   if (!isNativeAppShell()) return;
   applyNativeShellClasses();
-
-  syncNativeViewportHeight();
-  window.addEventListener("resize", syncNativeViewportHeight);
-  window.visualViewport?.addEventListener("resize", syncNativeViewportHeight);
-  window.visualViewport?.addEventListener("scroll", syncNativeViewportHeight);
 }

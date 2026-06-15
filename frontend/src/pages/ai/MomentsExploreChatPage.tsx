@@ -12,6 +12,7 @@ import { ChatComposeBar } from "../../components/ChatComposeBar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { AppIcon } from "../../components/AppIcons";
 import { getMyAvatarContact } from "../../services/storage";
+import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
 
 type Props = {
   contact: ContactItem;
@@ -69,6 +70,8 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
     const el = scRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, sending]);
+
+  useChatViewportScroll(scRef);
 
   async function onSend() {
     const text = input.trim();

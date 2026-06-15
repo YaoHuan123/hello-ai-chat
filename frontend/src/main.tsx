@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { initAndroidAppearance } from "./platform/androidShell";
 import { initIOSAppearance } from "./platform/iosShell";
-import { initNativeAppShell } from "./platform/appShell";
+import { initAppViewportHeight, initNativeAppShell } from "./platform/appShell";
 import { App } from "./App";
 
+initAppViewportHeight();
 initNativeAppShell();
 initAndroidAppearance();
 initIOSAppearance();

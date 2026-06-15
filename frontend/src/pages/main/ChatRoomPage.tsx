@@ -22,6 +22,7 @@ import { ContactRelationSheet } from "../../components/ContactRelationSheet";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { pickRecommendedMolId } from "../../lib/contactRelations";
 import { getMyAvatarContact } from "../../services/storage";
+import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
 
 type Props = {
   contact: ContactItem;
@@ -177,6 +178,8 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
     const el = scRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, myUserId, molPanelOpen]);
+
+  useChatViewportScroll(scRef);
 
   const closeMolPanel = useCallback(() => {
     setMolPanelOpen(false);

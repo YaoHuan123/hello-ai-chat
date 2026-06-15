@@ -20,6 +20,7 @@ import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { contactDisplayName, maskPhoneDisplay } from "../../lib/contactDisplay";
 import { getMyAvatarContact } from "../../services/storage";
+import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
 
 type Props = {
   groupId: string;
@@ -181,6 +182,8 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  useChatViewportScroll(scRef);
+
   async function onSend() {
     const text = input.trim();
     if (!text || sending) return;
@@ -226,15 +229,19 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
 
   return (
     <div className="aichat-shell msg-chat-room msg-chat-c1 msg-mode-normal guardian-group-room guardian-group-room--simple">
-      <header className="aichat-topbar aichat-topbar-flex msg-tab-topbar guardian-group-room__topbar">
-        <button className="aichat-btn-ghost" type="button" onClick={onBack}>
-          返回
+      <header className="msg-chat-c1-topbar">
+        <button type="button" className="msg-chat-c1-icon-btn" onClick={onBack} aria-label="返回">
+          ‹
         </button>
-        <h1 className="guardian-group-room__title">{title}</h1>
-        <div className="guardian-group-room__menu-wrap">
+        <div className="msg-chat-c1-peer msg-chat-c1-peer--title-only">
+          <div className="msg-chat-c1-peer-meta">
+            <span className="msg-chat-c1-peer-name">{title}</span>
+          </div>
+        </div>
+        <div className="msg-chat-c1-topbar-actions">
           <button
             type="button"
-            className="contacts-more-btn guardian-group-room__more"
+            className="contacts-more-btn"
             aria-label="群成员"
             onClick={() => setMembersOpen(true)}
           >
