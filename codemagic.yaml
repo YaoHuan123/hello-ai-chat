@@ -21,7 +21,7 @@ workflows:
       java: 17
       node: 22
       vars:
-        VITE_API_BASE: https://your-api.example.com
+        VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
     triggering:
       events:
@@ -65,7 +65,7 @@ workflows:
       android_signing:
         - aichat_keystore
       vars:
-        VITE_API_BASE: https://your-api.example.com
+        VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
         PACKAGE_NAME: com.aichat.app
     triggering:
@@ -117,7 +117,7 @@ workflows:
       node: 22
       xcode: latest
       vars:
-        VITE_API_BASE: https://your-api.example.com
+        VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
         XCODE_PROJECT: frontend/ios/App/App.xcodeproj
         XCODE_SCHEME: App
@@ -165,7 +165,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: io.github.YaoHuan123.hello-ai-chat
       vars:
-        VITE_API_BASE: https://your-api.example.com
+        VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
         XCODE_PROJECT: frontend/ios/App/App.xcodeproj
         XCODE_SCHEME: App
