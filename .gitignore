@@ -12,6 +12,10 @@ frontend/.env
 frontend/.env.android
 frontend/.env.ios
 
+# 本地证书与私钥，勿提交
+证书文件/
+证书等/
+
 .DS_Store
 *.log
 

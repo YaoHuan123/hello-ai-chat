@@ -8,7 +8,9 @@
 # 2. android_signing（Android release）
 #    - 上传 keystore，Reference name 填 aichat_keystore
 # 3. ios_signing（iOS release）
-#    - 上传证书与 provisioning profile，Reference name 填 aichat_ios
+#    - 上传 Distribution .p12 + App Store .mobileprovision
+#    - Team ID: TCPBS85F56
+#    - Bundle ID: io.github.YaoHuan123.hello-ai-chat
 
 workflows:
   android-debug:
@@ -161,7 +163,7 @@ workflows:
       xcode: latest
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.aichat.app
+        bundle_identifier: io.github.YaoHuan123.hello-ai-chat
       vars:
         VITE_API_BASE: https://your-api.example.com
         VITE_USE_MOCK: "0"

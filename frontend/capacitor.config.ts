@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.aichat.app",
+  appId: "io.github.YaoHuan123.hello-ai-chat",
   appName: "AIChat",
   webDir: "dist",
   server: {
