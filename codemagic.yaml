@@ -147,7 +147,7 @@ workflows:
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=iPhone 16" \
+            -destination "generic/platform=iOS Simulator" \
             CODE_SIGNING_ALLOWED=NO
     artifacts:
       - frontend/ios/App/build/**/*.app
