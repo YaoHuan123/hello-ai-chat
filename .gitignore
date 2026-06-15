@@ -10,6 +10,7 @@ backend/.env
 # 前端本地环境（仅 .env.example 入库）
 frontend/.env
 frontend/.env.android
+frontend/.env.ios
 
 .DS_Store
 *.log

@@ -11,6 +11,10 @@
     "build:android:debug": "npm run sync:android && cd android && gradlew.bat assembleDebug",
     "install:android:debug": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
     "android:lan-ip": "node scripts/print-lan-ip.mjs",
+    "sync:ios": "vite build --mode ios && cap sync ios",
+    "run:ios": "npm run sync:ios && cap run ios",
+    "ios": "cap open ios",
+    "ios:lan-ip": "node scripts/print-lan-ip.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -18,6 +22,7 @@
     "@capacitor/android": "^8.3.3",
     "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.3.3",
+    "@capacitor/ios": "^8.4.0",
     "@capacitor/status-bar": "^8.0.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"

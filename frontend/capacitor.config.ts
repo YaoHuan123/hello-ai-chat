@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: "AIChat",
   webDir: "dist",
   server: {
-    // 真机联调：Debug 包允许局域网 HTTP；生产请用 HTTPS。
+    // 真机联调：Debug 允许局域网 HTTP；生产请用 HTTPS。
     androidScheme: "http",
+    iosScheme: "capacitor",
   },
   backgroundColor: "#f7f7f8",
 };

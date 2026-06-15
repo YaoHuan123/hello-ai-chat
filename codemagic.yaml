@@ -1,12 +1,14 @@
-# AIChat · Capacitor Android CI
+# AIChat · Capacitor Android / iOS CI
 # 文档：https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/
 #
 # Codemagic UI 需配置：
 # 1. Environment variables
 #    - VITE_API_BASE  生产 HTTPS 后端地址（如 https://api.example.com）
 #    - VITE_USE_MOCK  0
-# 2. android_signing（release 工作流）
+# 2. android_signing（Android release）
 #    - 上传 keystore，Reference name 填 aichat_keystore
+# 3. ios_signing（iOS release）
+#    - 上传证书与 provisioning profile，Reference name 填 aichat_ios
 
 workflows:
   android-debug:
@@ -104,3 +106,98 @@ workflows:
     artifacts:
       - frontend/android/app/build/outputs/bundle/release/*.aab
       - frontend/android/app/build/outputs/apk/release/*.apk
+
+  ios-debug:
+    name: AIChat iOS Debug
+    max_build_duration: 90
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      xcode: latest
+      vars:
+        VITE_API_BASE: https://your-api.example.com
+        VITE_USE_MOCK: "0"
+        XCODE_PROJECT: frontend/ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: ios
+          include: true
+        - pattern: main
+          include: true
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/frontend/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm ci
+      - name: Build web assets and sync Capacitor
+        script: |
+          cd frontend
+          npm run sync:ios
+      - name: Build unsigned iOS app
+        script: |
+          cd frontend/ios/App
+          xcodebuild build \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - frontend/ios/App/build/**/*.app
+
+  ios-release:
+    name: AIChat iOS Release
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.aichat.app
+      vars:
+        VITE_API_BASE: https://your-api.example.com
+        VITE_USE_MOCK: "0"
+        XCODE_PROJECT: frontend/ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: ios
+          include: true
+        - pattern: main
+          include: true
+      tag_patterns:
+        - pattern: "v*"
+          include: true
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/frontend/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm ci
+      - name: Build web assets and sync Capacitor
+        script: |
+          cd frontend
+          npm run sync:ios
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          cd frontend/ios/App
+          xcode-project build-ipa \
+            --project App.xcodeproj \
+            --scheme App
+    artifacts:
+      - frontend/ios/App/build/ios/ipa/*.ipa

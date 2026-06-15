@@ -1,12 +1,16 @@
 import { Capacitor } from "@capacitor/core";
 
-/** Capacitor 原生 WebView（当前仅 Android） */
+/** Capacitor 原生 WebView（Android / iOS） */
 export function isNativeAppShell(): boolean {
   return Capacitor.isNativePlatform();
 }
 
 export function isAndroidShell(): boolean {
   return Capacitor.getPlatform() === "android";
+}
+
+export function isIOSShell(): boolean {
+  return Capacitor.getPlatform() === "ios";
 }
 
 function syncNativeViewportHeight(): void {
@@ -22,6 +26,9 @@ export function initNativeAppShell(): void {
   document.documentElement.classList.add("aichat-native-app");
   if (isAndroidShell()) {
     document.documentElement.classList.add("aichat-android-app");
+  }
+  if (isIOSShell()) {
+    document.documentElement.classList.add("aichat-ios-app");
   }
 
   syncNativeViewportHeight();
