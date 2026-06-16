@@ -3,6 +3,7 @@ import { logWarn } from "../logger";
 import type { HotTopicPlatform, RawTrendItem } from "./hotTopicsSources.service";
 import { formatTrendsBlock } from "./hotTopicsSources.service";
 import { loadHotTopicsSystemTemplate, loadHotTopicsUserTemplate } from "./hotTopicsPromptFiles";
+import { disableDoubaoThinking } from "./openaiCompat";
 
 export type GeneratedHotTopic = {
   id: string;
@@ -38,6 +39,17 @@ export class HotTopicsAiService {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), HOT_TOPICS_AI_TIMEOUT_MS);
 
+    const body: Record<string, unknown> = {
+      model: OPENAI_MODEL,
+      temperature: 0.85,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    };
+    disableDoubaoThinking(body);
+
     let res: Response;
     try {
       res = await fetch(url, {
@@ -46,15 +58,7 @@ export class HotTopicsAiService {
           Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          model: OPENAI_MODEL,
-          temperature: 0.85,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: user },
-          ],
-        }),
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
     } catch (e: unknown) {

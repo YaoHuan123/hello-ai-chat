@@ -17,6 +17,7 @@ import { createMessagesRouter } from "./routes/messages.routes";
 import { createMolWorldRouter } from "./routes/molWorld.routes";
 import { createMyMolsRouter } from "./routes/myMols.routes";
 import { createMolSuggestRouter } from "./routes/molSuggest.routes";
+import { createRelationSuggestRouter } from "./routes/relationSuggest.routes";
 import { createGuardianRouter } from "./routes/guardian.routes";
 import { createMomentsRouter } from "./routes/moments.routes";
 import { GuardianAiService } from "./services/guardianAi.service";
@@ -111,6 +112,7 @@ app.use("/api/messages", createMessagesRouter(messagesService));
 app.use("/api/mol-world", createMolWorldRouter(molWorldService, userMolsService));
 app.use("/api/mol-mine", createMyMolsRouter(molWorldService, userMolsService));
 app.use("/api/mol", createMolSuggestRouter(aiReplyService, contactsService, userMolsService));
+app.use("/api/relation", createRelationSuggestRouter(aiReplyService, contactsService));
 app.use("/api/guardian", createGuardianRouter(guardianGroupsService));
 app.use("/api/moments", createMomentsRouter(momentsService, hotTopicsService));
 

@@ -4,11 +4,9 @@ import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
 import type { AiReplyService, SuggestLastMessage } from "../services/aiReply.service";
 import type { ContactsService } from "../services/contacts.service";
-import type { UserMolsService } from "../services/userMols.service";
 
 const bodySchema = z.object({
   peerUserId: z.string().min(1),
-  molId: z.string().min(1).optional(),
   userDraft: z.string().max(500).optional(),
   lastMessages: z
     .array(
@@ -22,54 +20,20 @@ const bodySchema = z.object({
     .optional(),
 });
 
-function appendMolPersonaLines(lines: string[], record: { name: string; summary: string; infoItems: { title: string; body: string; softRemoved?: boolean }[] }): void {
-  const items = record.infoItems.filter((it) => !it.softRemoved);
-  let addedItem = false;
-  for (const it of items) {
-    const title = it.title.trim();
-    const body = it.body.trim();
-    if (!title || !body || title === "示例") continue;
-    lines.push(`[${record.name}] ${title}: ${body}`);
-    addedItem = true;
-  }
-  if (addedItem) return;
-  const summary = record.summary.trim();
-  if (summary) {
-    lines.push(`[${record.name}] 简介: ${summary}`);
-    return;
-  }
-  const name = record.name.trim();
-  if (name) lines.push(`[${name}]`);
-}
-
-function buildPersonaBlock(userMols: UserMolsService, ownerUserId: string, molId?: string): string {
-  const owned = molId
-    ? (() => {
-        const detail = userMols.getDetailForOwner(ownerUserId, molId);
-        return detail ? [{ record: detail.record, source: detail.source }] : [];
-      })()
-    : userMols.listByOwnerWithMeta(ownerUserId);
-  const lines: string[] = [];
-  for (const { record } of owned) {
-    appendMolPersonaLines(lines, record);
-  }
-  return lines.join("\n");
-}
-
 function mapError(res: Response, error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const code = error.message;
-  logWarn("mol_suggest.error", { code });
+  logWarn("relation_suggest.error", { code });
   if (code === "NOT_FRIENDS") {
     res.status(403).json({ code, message: "双方不是联系人，无法生成建议" });
     return true;
   }
-  if (code === "AI_NOT_CONFIGURED") {
-    res.status(503).json({ code, message: "AI 服务未配置" });
+  if (code === "NO_RELATION") {
+    res.status(409).json({ code, message: "尚未设置关系，无法生成建议" });
     return true;
   }
-  if (code === "NO_USER_MOLS") {
-    res.status(409).json({ code, message: "尚未添加素颜，无法生成建议" });
+  if (code === "AI_NOT_CONFIGURED") {
+    res.status(503).json({ code, message: "AI 服务未配置" });
     return true;
   }
   if (code === "INVALID_PARAMS") {
@@ -95,11 +59,7 @@ function mapError(res: Response, error: unknown): boolean {
   return false;
 }
 
-export const createMolSuggestRouter = (
-  aiReply: AiReplyService,
-  contacts: ContactsService,
-  userMols: UserMolsService,
-): Router => {
+export const createRelationSuggestRouter = (aiReply: AiReplyService, contacts: ContactsService): Router => {
   const router = Router();
 
   router.post("/suggest", authMiddleware, async (req, res) => {
@@ -113,40 +73,28 @@ export const createMolSuggestRouter = (
       res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
       return;
     }
-    const { peerUserId, molId, lastMessages, userDraft } = parsed.data;
+    const { peerUserId, lastMessages, userDraft } = parsed.data;
 
     if (!contacts.areMutualContacts(user.userId, peerUserId)) {
       res.status(403).json({ code: "NOT_FRIENDS", message: "双方不是联系人，无法生成建议" });
       return;
     }
     const relationType = contacts.getRelation(user.userId, peerUserId);
+    if (!relationType) {
+      res.status(409).json({ code: "NO_RELATION", message: "尚未设置关系，无法生成建议" });
+      return;
+    }
     if (!aiReply.isConfigured()) {
       res.status(503).json({ code: "AI_NOT_CONFIGURED", message: "AI 服务未配置" });
-      return;
-    }
-
-    if (molId && !userMols.owns(user.userId, molId)) {
-      res.status(404).json({ code: "MOL_NOT_FOUND", message: "未找到该素颜" });
-      return;
-    }
-
-    const personaBlock = buildPersonaBlock(userMols, user.userId, molId);
-    if (!personaBlock.trim()) {
-      if (molId) {
-        res.status(409).json({ code: "MOL_PERSONA_EMPTY", message: "该素颜资料为空，无法生成建议" });
-      } else {
-        res.status(409).json({ code: "NO_USER_MOLS", message: "尚未添加素颜，无法生成建议" });
-      }
       return;
     }
 
     const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
 
     try {
-      const suggestions = await aiReply.suggestReplies({
-        personaBlock,
-        lastMessages: lm,
+      const suggestions = await aiReply.suggestRepliesByRelation({
         relationType,
+        lastMessages: lm,
         userDraft,
       });
       res.status(200).json({ suggestions, relationType });

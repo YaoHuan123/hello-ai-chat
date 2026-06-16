@@ -2,12 +2,27 @@ import fs from "fs";
 import path from "path";
 import { config as loadDotenv } from "dotenv";
 
-// 必须在读取 process.env 之前完成 .env 注入：本文件被任何 import 触发求值时立即生效，
-// 避免 `import { PORT } from "./config"` 早于 index.ts 里的 loadEnvFiles() 导致环境变量丢失。
-const backendEnv = path.resolve(process.cwd(), ".env");
-if (fs.existsSync(backendEnv)) {
-  loadDotenv({ path: backendEnv });
+// 必须在读取 process.env 之前完成 .env 注入：本文件被任何 import 触发求值时立即生效。
+// 先加载共享 .env（默认 E:\hello story2\backend\.env），再用本仓库 backend/.env 覆盖。
+const DEFAULT_SHARED_ENV = "E:\\hello story2\\backend\\.env";
+
+function loadEnvIfExists(filePath: string, override = false): void {
+  if (fs.existsSync(filePath)) {
+    loadDotenv({ path: filePath, override });
+  }
 }
+
+const sharedEnv = (process.env.BACKEND_SHARED_ENV?.trim() || DEFAULT_SHARED_ENV).trim();
+loadEnvIfExists(sharedEnv);
+loadEnvIfExists(path.resolve(process.cwd(), ".env"), true);
+
+// hello story2 与 hello chat 环境变量名差异：共享 .env 加载后做别名映射。
+function applySharedEnvAliases(): void {
+  if (!process.env.ALIYUN_SMS_DEV_MOCK?.trim() && process.env.ALIYUN_DYPNSAPI_DEV_MOCK?.trim()) {
+    process.env.ALIYUN_SMS_DEV_MOCK = process.env.ALIYUN_DYPNSAPI_DEV_MOCK;
+  }
+}
+applySharedEnvAliases();
 
 const resolveFromRoot = (...parts: string[]): string => path.resolve(process.cwd(), ...parts);
 

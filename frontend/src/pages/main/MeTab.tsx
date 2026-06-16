@@ -166,10 +166,13 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           >
             <ContactAvatar contact={avatarContact} className="me-tab__avatar me-tab__avatar--letter" />
           </button>
-          <div className="me-tab__hero-meta">
+          <button type="button" className="me-tab__hero-meta" onClick={openNicknameSheet} aria-label="设置昵称">
             <strong>{displayName}</strong>
             <span>{phoneMask}</span>
-          </div>
+          </button>
+          <span className="me-tab__hero-chev" aria-hidden>
+            ›
+          </span>
         </div>
 
         {err && !sheetOpen && !generateOpen ? <p className="aichat-form-msg err me-tab__err">{err}</p> : null}
@@ -190,15 +193,6 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
         </section>
 
         <section className="me-tab__group" aria-label="账号">
-          <button type="button" className="me-tab__row" onClick={openNicknameSheet}>
-            <span className="me-tab__row-body">
-              <b>昵称</b>
-              <span>{getNickname().trim() || "未设置"}</span>
-            </span>
-            <span className="me-tab__row-chev" aria-hidden>
-              ›
-            </span>
-          </button>
           <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("delete-account")}>
             <span className="me-tab__row-body">
               <b>注销账号</b>

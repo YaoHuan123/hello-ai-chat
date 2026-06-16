@@ -4328,14 +4328,24 @@ button.msg-chat-c1-placeholder:active {
 }
 
 .mol-composer-draft {
+  display: block;
+  width: 100%;
   margin-bottom: 8px;
   padding: 10px 12px;
   border-radius: 12px;
   background: var(--msg-accent-soft);
   border: 0.5px solid var(--msg-bubble-me-border, rgba(47, 158, 111, 0.25));
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.mol-composer-draft:active {
+  opacity: 0.88;
 }
 
 .mol-composer-draft__text {
+  display: block;
   margin: 0;
   font-size: 14px;
   line-height: 1.45;
@@ -4458,25 +4468,32 @@ button.msg-chat-c1-placeholder:active {
 }
 
 .mol-composer-foot {
-  padding: 8px 2px 4px;
-  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 2px 2px;
 }
 
-.mol-composer-foot button {
+.mol-composer-foot__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
   background: none;
   color: var(--aichat-muted, #8e8e93);
-  font-size: 12px;
-  font-family: inherit;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 0;
+  font-family: inherit;
 }
 
-.mol-composer-foot button:active:not(:disabled) {
+.mol-composer-foot__refresh:active:not(:disabled) {
   color: var(--msg-accent);
+  background: var(--msg-accent-soft, rgba(79, 109, 245, 0.08));
 }
 
-.mol-composer-foot button:disabled {
+.mol-composer-foot__refresh:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -8524,6 +8541,29 @@ button.msg-chat-c1-placeholder:active {
   background: var(--aichat-surface);
   border-radius: var(--aichat-radius-md);
   box-shadow: var(--aichat-shadow-card);
+}
+
+.me-tab__hero-meta {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.me-tab__hero-meta:active {
+  opacity: 0.88;
+}
+
+.me-tab__hero-chev {
+  flex-shrink: 0;
+  color: #c4c8cf;
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .me-tab__avatar {

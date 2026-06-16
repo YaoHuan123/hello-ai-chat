@@ -1,7 +1,7 @@
 import { postJson } from "./api";
 import { getAuthToken } from "./storage";
-
-export type MolSuggestLastMessage = { from: "me" | "peer"; text: string; ts: number };
+import type { RelationType } from "../constants/relationTypes";
+import type { MolSuggestLastMessage } from "./molSuggestApi";
 
 function authT(): string {
   const t = getAuthToken().trim();
@@ -9,19 +9,17 @@ function authT(): string {
   return t;
 }
 
-export async function suggestRepliesApi(
+export async function suggestRepliesByRelationApi(
   peerUserId: string,
   lastMessages: MolSuggestLastMessage[],
-  molId?: string,
   userDraft?: string,
   token?: string,
-): Promise<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }> {
-  return postJson<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }>(
-    "/api/mol/suggest",
+): Promise<{ suggestions: string[]; relationType: RelationType }> {
+  return postJson<{ suggestions: string[]; relationType: RelationType }>(
+    "/api/relation/suggest",
     {
       peerUserId,
       lastMessages,
-      ...(molId ? { molId } : {}),
       ...(userDraft?.trim() ? { userDraft: userDraft.trim() } : {}),
     },
     token ?? authT(),
