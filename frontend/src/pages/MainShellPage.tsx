@@ -5,9 +5,10 @@ import { MessagesTab } from "./main/MessagesTab";
 import { GroupsTab } from "./main/GroupsTab";
 import { MomentsTab } from "./main/MomentsTab";
 import { PersonaTab } from "./main/PersonaTab";
+import { YiyiTab } from "./yiyi/YiyiTab";
 import { MeTab } from "./main/MeTab";
 
-export type MainTabId = "messages" | "groups" | "moments" | "people" | "me";
+export type MainTabId = "messages" | "groups" | "moments" | "yiyi" | "people" | "me";
 
 type Props = {
   activeTab?: MainTabId;
@@ -28,11 +29,12 @@ const TAB_LABEL: Record<MainTabId, string> = {
   messages: "消息",
   groups: "群聊",
   moments: "朋友圈",
+  yiyi: "YiYi",
   people: "关系",
   me: "我的",
 };
 
-const TAB_ORDER: MainTabId[] = ["messages", "groups", "moments", "people", "me"];
+const TAB_ORDER: MainTabId[] = ["messages", "groups", "moments", "yiyi", "people", "me"];
 
 function TabIcon({ id }: { id: MainTabId }) {
   switch (id) {
@@ -59,6 +61,16 @@ function TabIcon({ id }: { id: MainTabId }) {
           <path d="M8 14s1.5 2 4 2 4-2 4-2" />
           <line x1="9" y1="9" x2="9.01" y2="9" />
           <line x1="15" y1="9" x2="15.01" y2="9" />
+        </svg>
+      );
+    case "yiyi":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v2" />
+          <path d="M12 15v2" />
+          <path d="M9 10h6" />
+          <path d="M8 14h8" />
         </svg>
       );
     case "people":
@@ -135,6 +147,7 @@ export function MainShellPage({
             />
           )}
           {tab === "moments" && <MomentsTab onOpenFriend={onOpenMomentsFriend} onNavigateFeature={onNavigateFeature} />}
+          {tab === "yiyi" && <YiyiTab onNavigateFeature={onNavigateFeature} />}
           {tab === "people" && (
             <PersonaTab
               onOpenChat={onOpenChatRoom}

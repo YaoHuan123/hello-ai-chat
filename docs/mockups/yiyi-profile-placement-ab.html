@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIChat · YiYi 画像入口 A/B 对比</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #14171a;
+      --muted: #6b7380;
+      --border: rgba(20, 23, 26, 0.08);
+      --accent: #4f6df5;
+      --yiyi: #7c5cff;
+      --yiyi-soft: rgba(124, 92, 255, 0.14);
+      --yiyi-grad: linear-gradient(145deg, #6366f1 0%, #8b5cf6 52%, #a78bfa 100%);
+      --danger-soft: rgba(214, 70, 70, 0.1);
+      --danger: #d64646;
+      --success: #2f9e6f;
+      --success-soft: rgba(47, 158, 111, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-card: 0 4px 14px rgba(20, 23, 26, 0.05);
+      --shadow-elevated: 0 12px 40px rgba(20, 23, 26, 0.1);
+      --phone-w: 390px;
+      --phone-h: 780px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e9ebf1;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .gallery { max-width: 1440px; margin: 0 auto; padding: 24px 20px 56px; }
+    .gallery__head { margin-bottom: 20px; }
+    .gallery__head h1 { margin: 0 0 8px; font-size: 22px; font-weight: 650; }
+    .gallery__head p { margin: 0; color: var(--muted); font-size: 14px; max-width: 820px; }
+
+    .gallery__nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .gallery__nav button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .gallery__nav button.active { background: var(--yiyi); border-color: var(--yiyi); color: #fff; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel__meta { margin-bottom: 16px; }
+    .panel__meta h2 { margin: 0 0 6px; font-size: 18px; }
+    .panel__meta p { margin: 0; color: var(--muted); font-size: 13px; max-width: 760px; }
+
+    .screen-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+
+    .phone-wrap { flex: 0 0 auto; }
+    .phone-wrap__label { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-align: center; font-weight: 600; }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      background: var(--bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow-elevated);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 8px solid #1a1d21;
+    }
+
+    .phone__status {
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .phone__nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 10px;
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .phone__nav h3 { flex: 1; margin: 0; font-size: 17px; font-weight: 650; text-align: center; }
+    .phone__nav-back { width: 48px; border: none; background: none; color: var(--accent); font-size: 15px; font-family: inherit; text-align: left; padding: 4px 0; }
+    .phone__nav-action { width: 48px; border: none; background: none; color: var(--accent); font-size: 14px; font-weight: 600; font-family: inherit; text-align: right; padding: 4px 0; }
+    .phone__nav-spacer { width: 48px; flex-shrink: 0; }
+
+    .phone__main { flex: 1; overflow-y: auto; padding: 0 14px 12px; }
+
+    .phone__tabbar {
+      display: flex;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 6px 0 10px;
+      flex-shrink: 0;
+    }
+    .phone__tab {
+      flex: 1; border: none; background: none;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 4px 0; font-size: 10px; color: var(--muted); font-family: inherit;
+    }
+    .phone__tab.active { color: var(--yiyi); font-weight: 600; }
+    .phone__tab-dot { width: 22px; height: 22px; border-radius: 6px; background: currentColor; opacity: 0.22; }
+    .phone__tab.active .phone__tab-dot { opacity: 0.55; background: var(--yiyi); }
+
+    .note-card {
+      flex: 1; min-width: 260px; max-width: 380px;
+      background: var(--surface); border-radius: var(--radius-md);
+      padding: 16px 18px; box-shadow: var(--shadow-card);
+      font-size: 13px; color: var(--muted);
+    }
+    .note-card h4 { margin: 0 0 10px; font-size: 14px; color: var(--text); }
+    .note-card ul { margin: 0; padding-left: 18px; }
+    .note-card li { margin-bottom: 6px; }
+    .note-card strong { color: var(--text); }
+
+    .yiyi-hero {
+      background: var(--yiyi-grad);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      color: #fff;
+      margin: 12px 0 14px;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.28);
+    }
+    .yiyi-hero__title { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+    .yiyi-hero__desc { margin: 0; font-size: 13px; opacity: 0.92; line-height: 1.5; }
+
+    .yiyi-section-label { font-size: 12px; color: var(--muted); margin: 0 0 8px 4px; font-weight: 600; }
+
+    .yiyi-row {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; padding: 14px; border: none;
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); margin-bottom: 10px;
+      text-align: left; font-family: inherit; cursor: default;
+    }
+    .yiyi-row--highlight { outline: 2px solid var(--yiyi); outline-offset: -2px; }
+
+    .yiyi-row__icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px; font-weight: 700;
+    }
+    .yiyi-row__icon--trash { background: var(--danger-soft); color: var(--danger); }
+    .yiyi-row__icon--avatar { background: var(--yiyi-soft); padding: 0; overflow: hidden; }
+    .yiyi-row__icon--avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 18%; }
+    .yiyi-row__icon--profile { background: var(--yiyi-soft); color: var(--yiyi); font-size: 20px; }
+    .yiyi-row__icon--msg { background: var(--success-soft); color: var(--success); }
+    .yiyi-row__icon--settings { background: rgba(79, 109, 245, 0.12); color: var(--accent); }
+
+    .yiyi-row__body { flex: 1; min-width: 0; }
+    .yiyi-row__title { display: block; font-size: 15px; font-weight: 650; margin-bottom: 2px; }
+    .yiyi-row__sub { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .yiyi-row__meta { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+    .yiyi-row__chev { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+
+    .yiyi-badge {
+      display: inline-block; font-size: 10px; font-weight: 650;
+      color: var(--yiyi); background: var(--yiyi-soft);
+      border-radius: var(--radius-pill); padding: 2px 7px; margin-left: 6px; vertical-align: middle;
+    }
+
+    .yiyi-intro { font-size: 13px; color: var(--muted); margin: 12px 0 14px; line-height: 1.5; }
+
+    .yiyi-dim {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); padding: 12px 14px; margin-bottom: 10px;
+    }
+    .yiyi-dim__label { display: block; font-size: 11px; font-weight: 650; color: var(--yiyi); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .yiyi-dim__value { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .yiyi-dim__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .yiyi-dim__chip { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--yiyi-soft); color: var(--yiyi); }
+
+    .yiyi-profile-inline {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); margin-bottom: 14px; overflow: hidden;
+    }
+    .yiyi-profile-inline--highlight { outline: 2px solid var(--yiyi); outline-offset: -2px; }
+    .yiyi-profile-inline__head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 14px 10px; border: none; background: none; width: 100%;
+      font-family: inherit; cursor: pointer; text-align: left;
+    }
+    .yiyi-profile-inline__head strong { font-size: 15px; display: block; margin-bottom: 4px; }
+    .yiyi-profile-inline__summary { font-size: 12px; color: var(--muted); }
+    .yiyi-profile-inline__toggle { font-size: 12px; color: var(--yiyi); font-weight: 600; flex-shrink: 0; margin-left: 8px; }
+    .yiyi-profile-inline__body { padding: 0 14px 14px; border-top: 1px solid var(--border); }
+    .yiyi-profile-inline__body .yiyi-dim { box-shadow: none; border: 1px solid var(--border); }
+    .yiyi-profile-inline__body .yiyi-dim:last-child { margin-bottom: 0; }
+
+    .yiyi-settings-group {
+      background: var(--surface); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card); overflow: hidden; margin-bottom: 14px;
+    }
+    .yiyi-settings-row {
+      display: flex; align-items: center; gap: 12px; padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .yiyi-settings-row:first-child { border-top: none; }
+    .yiyi-settings-row__body { flex: 1; min-width: 0; }
+    .yiyi-settings-row__body strong { display: block; font-size: 14px; margin-bottom: 3px; }
+    .yiyi-settings-row__body span { display: block; font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+    .yiyi-toggle {
+      width: 48px; height: 28px; border-radius: 14px; background: #d1d5db;
+      border: none; position: relative; flex-shrink: 0; padding: 0;
+    }
+    .yiyi-toggle--on { background: var(--yiyi); }
+    .yiyi-toggle::after {
+      content: ""; position: absolute; width: 22px; height: 22px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .yiyi-toggle--on::after { transform: translateX(20px); }
+
+    .yiyi-cta {
+      display: block; width: 100%; padding: 13px; border: none;
+      background: var(--yiyi-grad); color: #fff; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 650; font-family: inherit; margin-top: 8px;
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.28); cursor: default;
+    }
+
+    .removed-badge {
+      display: inline-block; font-size: 11px; font-weight: 650;
+      color: var(--danger); background: var(--danger-soft);
+      border-radius: var(--radius-pill); padding: 2px 8px; margin-left: 6px;
+    }
+
+    .footer-note {
+      margin-top: 24px; padding: 14px 16px;
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); font-size: 13px; color: var(--muted);
+    }
+    .footer-note strong { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <header class="gallery__head">
+      <h1>YiYi 画像入口 · A/B 对比</h1>
+      <p>「YiYi 了解到的你」从「权限与可见范围」页移出。下方切换方案 A / B，对照查看 Tab 入口与设置页差异。选定后告知 A 或 B，再接入产品。</p>
+    </header>
+
+    <nav class="gallery__nav" aria-label="方案切换">
+      <button type="button" class="active" data-panel="panel-a">方案 A · Tab 入口 + 独立页</button>
+      <button type="button" data-panel="panel-b">方案 B · Tab 内嵌画像</button>
+    </nav>
+
+    <!-- ========== 方案 A ========== -->
+    <section class="panel active" id="panel-a">
+      <div class="panel__meta">
+        <h2>方案 A · Tab 新增一行 → 独立画像页</h2>
+        <p>与产品原型⑤一致。Tab 只多一个入口；完整三维画像在二级页查看。设置页仅保留权限开关。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">A-1 · YiYi Tab（新增入口）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <span class="phone__nav-spacer"></span>
+              <h3>YiYi</h3>
+              <button type="button" class="phone__nav-action">设置</button>
+            </div>
+            <div class="phone__main">
+              <div class="yiyi-hero">
+                <h2 class="yiyi-hero__title">你的中间人 YiYi</h2>
+                <p class="yiyi-hero__desc">先和你聊清楚偏好与边界，再代表你参与对外沟通。</p>
+              </div>
+              <p class="yiyi-section-label">管理</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--trash">×</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">网络垃圾桶</strong>
+                  <span class="yiyi-row__sub">已屏蔽 4 类沟通方式</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">对话</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--avatar">
+                  <img src="../../frontend/public/yiyi-avatars/default.png" alt="" onerror="this.style.display='none';this.parentElement.textContent='Y'" />
+                </span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi <span class="yiyi-badge">中间人</span></strong>
+                  <span class="yiyi-row__sub">可以先从下面选一个话题…</span>
+                </span>
+                <span class="yiyi-row__meta">刚刚</span>
+              </div>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--msg">✉</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi 的消息</strong>
+                  <span class="yiyi-row__sub">查看 YiYi 之间的沟通结果</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <div class="yiyi-row yiyi-row--highlight">
+                <span class="yiyi-row__icon yiyi-row__icon--profile">◎</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi 了解到的你</strong>
+                  <span class="yiyi-row__sub">找考研搭子 · 偏 i 人 · 3 个标签</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">隐私</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--settings">👤</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">权限与可见范围</strong>
+                  <span class="yiyi-row__sub">沟通过程不可见 · 允许加好友</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+            </div>
+            <div class="phone__tabbar">
+              <span class="phone__tab">消息</span>
+              <span class="phone__tab">群聊</span>
+              <span class="phone__tab">朋友圈</span>
+              <span class="phone__tab active"><span class="phone__tab-dot"></span>YiYi</span>
+              <span class="phone__tab">联系人</span>
+              <span class="phone__tab">我</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">A-2 · 独立画像页</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back">返回</button>
+              <h3>YiYi 了解到的你</h3>
+              <span class="phone__nav-spacer"></span>
+            </div>
+            <div class="phone__main">
+              <p class="yiyi-intro">以下画像来自你与 YiYi 的对话，仅用于 YiYi 对外表达，不默认公开展示给陌生人。</p>
+              <div class="yiyi-dim">
+                <span class="yiyi-dim__label">关注方向</span>
+                <strong class="yiyi-dim__value">找考研搭子</strong>
+                <div class="yiyi-dim__chips">
+                  <span class="yiyi-dim__chip">考研</span>
+                  <span class="yiyi-dim__chip">线上打卡</span>
+                </div>
+              </div>
+              <div class="yiyi-dim">
+                <span class="yiyi-dim__label">性格</span>
+                <strong class="yiyi-dim__value">偏 i 人 · 慢热</strong>
+                <div class="yiyi-dim__chips">
+                  <span class="yiyi-dim__chip">慢热</span>
+                  <span class="yiyi-dim__chip">夜猫子</span>
+                </div>
+              </div>
+              <div class="yiyi-dim">
+                <span class="yiyi-dim__label">其它</span>
+                <strong class="yiyi-dim__value">兴趣与边界</strong>
+                <div class="yiyi-dim__chips">
+                  <span class="yiyi-dim__chip">独立音乐</span>
+                  <span class="yiyi-dim__chip">city walk</span>
+                </div>
+              </div>
+              <button type="button" class="yiyi-cta">继续和 YiYi 聊</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">A-3 · 设置页（已精简）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back">返回</button>
+              <h3>权限与可见范围</h3>
+              <span class="phone__nav-spacer"></span>
+            </div>
+            <div class="phone__main">
+              <p class="yiyi-intro">以下设置作用于你的 YiYi 与对方的 YiYi 沟通阶段，可随时修改。</p>
+              <section class="yiyi-settings-group">
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>允许对方查看沟通过程</strong>
+                    <span>开启后，对方主人可看到双方 YiYi 的完整对话。</span>
+                  </div>
+                  <span class="yiyi-toggle"></span>
+                </div>
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>允许对方添加好友</strong>
+                    <span>仅在出现有效沟通后生效。</span>
+                  </div>
+                  <span class="yiyi-toggle yiyi-toggle--on"></span>
+                </div>
+              </section>
+              <section class="yiyi-settings-group">
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>YiYi 对外活跃</strong>
+                    <span>关闭后 YiYi 暂停与其他 YiYi 建立新沟通。</span>
+                  </div>
+                  <span class="yiyi-toggle yiyi-toggle--on"></span>
+                </div>
+              </section>
+              <p class="yiyi-intro" style="color:var(--danger);font-size:12px;">此处已无「YiYi 了解到的你」<span class="removed-badge">已移出</span></p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="note-card">
+          <h4>方案 A 要点</h4>
+          <ul>
+            <li>Tab 在「对话」区末尾增加一行，副标题为画像摘要。</li>
+            <li>点击进入独立页，信息完整、层级清晰。</li>
+            <li>与现有「垃圾桶 / 对话 / 消息 / 权限」列表风格一致。</li>
+            <li>设置页职责单一，只管理可见性与活跃状态。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========== 方案 B ========== -->
+    <section class="panel" id="panel-b">
+      <div class="panel__meta">
+        <h2>方案 B · Tab 内嵌画像卡片</h2>
+        <p>不新增二级页。在 Tab 首页「对话」与「隐私」之间插入可折叠画像区，扫一眼即可看到 YiYi 记住了什么。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">B-1 · YiYi Tab（内嵌 · 展开）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <span class="phone__nav-spacer"></span>
+              <h3>YiYi</h3>
+              <button type="button" class="phone__nav-action">设置</button>
+            </div>
+            <div class="phone__main">
+              <div class="yiyi-hero">
+                <h2 class="yiyi-hero__title">你的中间人 YiYi</h2>
+                <p class="yiyi-hero__desc">先和你聊清楚偏好与边界，再代表你参与对外沟通。</p>
+              </div>
+              <p class="yiyi-section-label">管理</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--trash">×</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">网络垃圾桶</strong>
+                  <span class="yiyi-row__sub">已屏蔽 4 类沟通方式</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">对话</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--avatar">
+                  <img src="../../frontend/public/yiyi-avatars/default.png" alt="" onerror="this.style.display='none';this.parentElement.textContent='Y'" />
+                </span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi <span class="yiyi-badge">中间人</span></strong>
+                  <span class="yiyi-row__sub">可以先从下面选一个话题…</span>
+                </span>
+                <span class="yiyi-row__meta">刚刚</span>
+              </div>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--msg">✉</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi 的消息</strong>
+                  <span class="yiyi-row__sub">查看 YiYi 之间的沟通结果</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">画像</p>
+              <div class="yiyi-profile-inline yiyi-profile-inline--highlight" id="inline-expanded">
+                <button type="button" class="yiyi-profile-inline__head" onclick="toggleInline(false)">
+                  <span>
+                    <strong>YiYi 了解到的你</strong>
+                    <span class="yiyi-profile-inline__summary">找考研搭子 · 偏 i 人 · 3 个标签</span>
+                  </span>
+                  <span class="yiyi-profile-inline__toggle">收起</span>
+                </button>
+                <div class="yiyi-profile-inline__body">
+                  <div class="yiyi-dim" style="margin-top:12px">
+                    <span class="yiyi-dim__label">关注方向</span>
+                    <strong class="yiyi-dim__value">找考研搭子</strong>
+                    <div class="yiyi-dim__chips">
+                      <span class="yiyi-dim__chip">考研</span>
+                      <span class="yiyi-dim__chip">线上打卡</span>
+                    </div>
+                  </div>
+                  <div class="yiyi-dim">
+                    <span class="yiyi-dim__label">性格</span>
+                    <strong class="yiyi-dim__value">偏 i 人 · 慢热</strong>
+                    <div class="yiyi-dim__chips">
+                      <span class="yiyi-dim__chip">慢热</span>
+                      <span class="yiyi-dim__chip">夜猫子</span>
+                    </div>
+                  </div>
+                  <div class="yiyi-dim">
+                    <span class="yiyi-dim__label">其它</span>
+                    <strong class="yiyi-dim__value">兴趣与边界</strong>
+                    <div class="yiyi-dim__chips">
+                      <span class="yiyi-dim__chip">独立音乐</span>
+                      <span class="yiyi-dim__chip">city walk</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="yiyi-section-label">隐私</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--settings">👤</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">权限与可见范围</strong>
+                  <span class="yiyi-row__sub">沟通过程不可见 · 允许加好友</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+            </div>
+            <div class="phone__tabbar">
+              <span class="phone__tab">消息</span>
+              <span class="phone__tab">群聊</span>
+              <span class="phone__tab">朋友圈</span>
+              <span class="phone__tab active"><span class="phone__tab-dot"></span>YiYi</span>
+              <span class="phone__tab">联系人</span>
+              <span class="phone__tab">我</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">B-1 · YiYi Tab（内嵌 · 收起）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <span class="phone__nav-spacer"></span>
+              <h3>YiYi</h3>
+              <button type="button" class="phone__nav-action">设置</button>
+            </div>
+            <div class="phone__main">
+              <div class="yiyi-hero">
+                <h2 class="yiyi-hero__title">你的中间人 YiYi</h2>
+                <p class="yiyi-hero__desc">先和你聊清楚偏好与边界，再代表你参与对外沟通。</p>
+              </div>
+              <p class="yiyi-section-label">管理</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--trash">×</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">网络垃圾桶</strong>
+                  <span class="yiyi-row__sub">已屏蔽 4 类沟通方式</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">对话</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--avatar">
+                  <img src="../../frontend/public/yiyi-avatars/default.png" alt="" onerror="this.style.display='none';this.parentElement.textContent='Y'" />
+                </span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi <span class="yiyi-badge">中间人</span></strong>
+                  <span class="yiyi-row__sub">可以先从下面选一个话题…</span>
+                </span>
+                <span class="yiyi-row__meta">刚刚</span>
+              </div>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--msg">✉</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">YiYi 的消息</strong>
+                  <span class="yiyi-row__sub">查看 YiYi 之间的沟通结果</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+              <p class="yiyi-section-label">画像</p>
+              <div class="yiyi-profile-inline yiyi-profile-inline--highlight">
+                <button type="button" class="yiyi-profile-inline__head">
+                  <span>
+                    <strong>YiYi 了解到的你</strong>
+                    <span class="yiyi-profile-inline__summary">找考研搭子 · 偏 i 人 · 3 个标签</span>
+                  </span>
+                  <span class="yiyi-profile-inline__toggle">展开</span>
+                </button>
+              </div>
+              <p class="yiyi-section-label">隐私</p>
+              <div class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--settings">👤</span>
+                <span class="yiyi-row__body">
+                  <strong class="yiyi-row__title">权限与可见范围</strong>
+                  <span class="yiyi-row__sub">沟通过程不可见 · 允许加好友</span>
+                </span>
+                <span class="yiyi-row__chev">›</span>
+              </div>
+            </div>
+            <div class="phone__tabbar">
+              <span class="phone__tab">消息</span>
+              <span class="phone__tab">群聊</span>
+              <span class="phone__tab">朋友圈</span>
+              <span class="phone__tab active"><span class="phone__tab-dot"></span>YiYi</span>
+              <span class="phone__tab">联系人</span>
+              <span class="phone__tab">我</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">B-2 · 设置页（已精简）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back">返回</button>
+              <h3>权限与可见范围</h3>
+              <span class="phone__nav-spacer"></span>
+            </div>
+            <div class="phone__main">
+              <p class="yiyi-intro">以下设置作用于你的 YiYi 与对方的 YiYi 沟通阶段，可随时修改。</p>
+              <section class="yiyi-settings-group">
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>允许对方查看沟通过程</strong>
+                    <span>开启后，对方主人可看到双方 YiYi 的完整对话。</span>
+                  </div>
+                  <span class="yiyi-toggle"></span>
+                </div>
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>允许对方添加好友</strong>
+                    <span>仅在出现有效沟通后生效。</span>
+                  </div>
+                  <span class="yiyi-toggle yiyi-toggle--on"></span>
+                </div>
+              </section>
+              <section class="yiyi-settings-group">
+                <div class="yiyi-settings-row">
+                  <div class="yiyi-settings-row__body">
+                    <strong>YiYi 对外活跃</strong>
+                    <span>关闭后 YiYi 暂停与其他 YiYi 建立新沟通。</span>
+                  </div>
+                  <span class="yiyi-toggle yiyi-toggle--on"></span>
+                </div>
+              </section>
+              <p class="yiyi-intro" style="color:var(--danger);font-size:12px;">此处已无「YiYi 了解到的你」<span class="removed-badge">已移出</span></p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="note-card">
+          <h4>方案 B 要点</h4>
+          <ul>
+            <li>画像直接出现在 Tab 首页，减少一次跳转。</li>
+            <li>默认展开；可收起为摘要行，节省纵向空间。</li>
+            <li>Tab 内容变长，小屏需滚动。</li>
+            <li>设置页同样只保留权限，与 A 相同。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      <strong>下一步：</strong>浏览后回复选 <strong>A</strong> 或 <strong>B</strong>，我再改前端代码并从设置页移除画像块。
+      高亮紫框标注本次改动位置。
+    </p>
+  </div>
+
+  <script>
+    document.querySelectorAll(".gallery__nav button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".gallery__nav button").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.panel).classList.add("active");
+      });
+    });
+
+    function toggleInline(expanded) {
+      const el = document.getElementById("inline-expanded");
+      if (!el) return;
+      const body = el.querySelector(".yiyi-profile-inline__body");
+      const toggle = el.querySelector(".yiyi-profile-inline__toggle");
+      if (expanded) {
+        body.style.display = "";
+        toggle.textContent = "收起";
+      } else {
+        body.style.display = "none";
+        toggle.textContent = "展开";
+      }
+    }
+  </script>
+</body>
+</html>

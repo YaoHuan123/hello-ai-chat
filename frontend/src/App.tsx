@@ -25,6 +25,11 @@ import { AssistMolDataPage } from "./pages/ai/AssistMolDataPage";
 import { MyMomentsPage } from "./pages/ai/MyMomentsPage";
 import { MomentsHotTopicsPage } from "./pages/ai/MomentsHotTopicsPage";
 import { MomentsExploreChatPage } from "./pages/ai/MomentsExploreChatPage";
+import { YiyiTrashPage } from "./pages/yiyi/YiyiTrashPage";
+import { YiyiChatPage } from "./pages/yiyi/YiyiChatPage";
+import { YiyiMessagesPage } from "./pages/yiyi/YiyiMessagesPage";
+import { YiyiProfilePage } from "./pages/yiyi/YiyiProfilePage";
+import { YiyiSettingsPage } from "./pages/yiyi/YiyiSettingsPage";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
 import { CreateGuardianGroupFeaturePage } from "./pages/guardian/CreateGuardianGroupFeaturePage";
@@ -183,6 +188,16 @@ function App() {
       }
       if (route === "moments-hot") {
         setMainTab("moments");
+        setRoute("main");
+        return true;
+      }
+      if (route === "yiyi-chat") {
+        setMainTab("yiyi");
+        setRoute("yiyi-profile");
+        return true;
+      }
+      if (route === "yiyi-trash" || route === "yiyi-messages" || route === "yiyi-profile" || route === "yiyi-settings") {
+        setMainTab("yiyi");
         setRoute("main");
         return true;
       }
@@ -495,6 +510,62 @@ function App() {
         onBack={() => {
           setMomentsFriendContact(null);
           setMainTab("moments");
+          setRoute("main");
+        }}
+      />
+    );
+  }
+
+  if (route === "yiyi-trash") {
+    return (
+      <YiyiTrashPage
+        onBack={() => {
+          setMainTab("yiyi");
+          setRoute("main");
+        }}
+      />
+    );
+  }
+
+  if (route === "yiyi-chat") {
+    return (
+      <YiyiChatPage
+        onBack={() => {
+          setMainTab("yiyi");
+          setRoute("yiyi-profile");
+        }}
+      />
+    );
+  }
+
+  if (route === "yiyi-messages") {
+    return (
+      <YiyiMessagesPage
+        onBack={() => {
+          setMainTab("yiyi");
+          setRoute("main");
+        }}
+      />
+    );
+  }
+
+  if (route === "yiyi-profile") {
+    return (
+      <YiyiProfilePage
+        onBack={() => {
+          setMainTab("yiyi");
+          setRoute("main");
+        }}
+        onContinueChat={() => setRoute("yiyi-chat")}
+      />
+    );
+  }
+
+  if (route === "yiyi-settings") {
+    return (
+      <YiyiSettingsPage
+        onBack={() => {
+          setMainTab("yiyi");
           setRoute("main");
         }}
       />

@@ -271,6 +271,38 @@ export const initDb = (): DatabaseSync => {
     );
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS yiyi_user_state (
+      user_id TEXT PRIMARY KEY,
+      trash_json TEXT NOT NULL,
+      permissions_json TEXT NOT NULL,
+      profile_json TEXT NOT NULL,
+      owner_chat_json TEXT NOT NULL DEFAULT '[]',
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS yiyi_bridge_sessions (
+      id TEXT PRIMARY KEY,
+      user_a_id TEXT NOT NULL,
+      user_b_id TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('effective', 'blocked')),
+      summary TEXT NOT NULL,
+      tags_json TEXT NOT NULL DEFAULT '[]',
+      blocked_reason TEXT,
+      transcript_json TEXT NOT NULL DEFAULT '[]',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      UNIQUE (user_a_id, user_b_id),
+      FOREIGN KEY (user_a_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_b_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+  db.exec("CREATE INDEX IF NOT EXISTS idx_yiyi_bridge_user_a ON yiyi_bridge_sessions (user_a_id, updated_at DESC);");
+  db.exec("CREATE INDEX IF NOT EXISTS idx_yiyi_bridge_user_b ON yiyi_bridge_sessions (user_b_id, updated_at DESC);");
+
   ensureDir(MOL_WORLD_DIR);
   for (const cat of MOL_PRIMARY_CATEGORIES) {
     ensureDir(path.join(MOL_WORLD_DIR, cat));

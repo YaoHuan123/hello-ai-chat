@@ -20,6 +20,7 @@ import { createMolSuggestRouter } from "./routes/molSuggest.routes";
 import { createRelationSuggestRouter } from "./routes/relationSuggest.routes";
 import { createGuardianRouter } from "./routes/guardian.routes";
 import { createMomentsRouter } from "./routes/moments.routes";
+import { createYiyiRouter } from "./routes/yiyi.routes";
 import { GuardianAiService } from "./services/guardianAi.service";
 import { GuardianGroupsService } from "./services/guardianGroups.service";
 import { HotTopicsAiService } from "./services/hotTopicsAi.service";
@@ -32,6 +33,8 @@ import { MessagesService } from "./services/messages.service";
 import { MolWorldService } from "./services/molWorld.service";
 import { UserMolsService } from "./services/userMols.service";
 import { AiReplyService } from "./services/aiReply.service";
+import { YiyiAiService } from "./services/yiyiAi.service";
+import { YiyiService } from "./services/yiyi.service";
 import { errorToMeta, logError, logInfo, logWarn } from "./logger";
 import { attachWs } from "./ws/wsServer";
 
@@ -63,6 +66,8 @@ const avatarText2ImgService = new AvatarText2ImgService();
 const contactsService = new ContactsService(db);
 const friendRequestsService = new FriendRequestsService(db, contactsService);
 const messagesService = new MessagesService(contactsService);
+const yiyiAiService = new YiyiAiService();
+const yiyiService = new YiyiService(db, yiyiAiService);
 const aiReplyService = new AiReplyService();
 const guardianAiService = new GuardianAiService();
 const guardianGroupsService = new GuardianGroupsService(db, contactsService, guardianAiService);
@@ -115,6 +120,7 @@ app.use("/api/mol", createMolSuggestRouter(aiReplyService, contactsService, user
 app.use("/api/relation", createRelationSuggestRouter(aiReplyService, contactsService));
 app.use("/api/guardian", createGuardianRouter(guardianGroupsService));
 app.use("/api/moments", createMomentsRouter(momentsService, hotTopicsService));
+app.use("/api/yiyi", createYiyiRouter(yiyiService));
 
 app.use((_req, res) => {
   res.status(404).json({ code: "NOT_FOUND", message: "未找到接口" });
