@@ -6,9 +6,10 @@ import { GroupsTab } from "./main/GroupsTab";
 import { MomentsTab } from "./main/MomentsTab";
 import { PersonaTab } from "./main/PersonaTab";
 import { YiyiTab } from "./yiyi/YiyiTab";
+import { DailyTab } from "./main/DailyTab";
 import { MeTab } from "./main/MeTab";
 
-export type MainTabId = "messages" | "groups" | "moments" | "yiyi" | "people" | "me";
+export type MainTabId = "messages" | "groups" | "moments" | "yiyi" | "daily" | "people" | "me";
 
 type Props = {
   activeTab?: MainTabId;
@@ -30,11 +31,12 @@ const TAB_LABEL: Record<MainTabId, string> = {
   groups: "群聊",
   moments: "朋友圈",
   yiyi: "YiYi",
+  daily: "日常",
   people: "关系",
   me: "我的",
 };
 
-const TAB_ORDER: MainTabId[] = ["messages", "groups", "moments", "yiyi", "people", "me"];
+const TAB_ORDER: MainTabId[] = ["messages", "groups", "moments", "yiyi", "daily", "people", "me"];
 
 function TabIcon({ id }: { id: MainTabId }) {
   switch (id) {
@@ -71,6 +73,15 @@ function TabIcon({ id }: { id: MainTabId }) {
           <path d="M12 15v2" />
           <path d="M9 10h6" />
           <path d="M8 14h8" />
+        </svg>
+      );
+    case "daily":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <rect x="4" y="3" width="16" height="18" rx="2.5" />
+          <path d="M8 7h8" />
+          <path d="M8 11h8" />
+          <path d="M8 15h5" />
         </svg>
       );
     case "people":
@@ -148,6 +159,7 @@ export function MainShellPage({
           )}
           {tab === "moments" && <MomentsTab onOpenFriend={onOpenMomentsFriend} onNavigateFeature={onNavigateFeature} />}
           {tab === "yiyi" && <YiyiTab onNavigateFeature={onNavigateFeature} />}
+          {tab === "daily" && <DailyTab />}
           {tab === "people" && (
             <PersonaTab
               onOpenChat={onOpenChatRoom}
@@ -166,6 +178,7 @@ export function MainShellPage({
               key={id}
               type="button"
               className={`aichat-tabbar__btn ${tab === id ? "aichat-tabbar__btn--active" : ""}`}
+              data-tab={id}
               onClick={() => setTab(id)}
               aria-current={tab === id ? "page" : undefined}
             >

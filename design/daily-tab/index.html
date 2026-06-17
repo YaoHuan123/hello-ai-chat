@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>日常 Tab · 方案索引</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #14171a;
+      --muted: #6b7280;
+      --accent: #0d9488;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 20px 40px;
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 8px; font-size: 15px; }
+    .note {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+    }
+    .note strong { color: var(--text); }
+    ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    a {
+      display: block;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      text-decoration: none;
+      color: inherit;
+      border: 0.5px solid rgba(20, 23, 26, 0.08);
+      box-shadow: 0 4px 16px rgba(20, 23, 26, 0.04);
+    }
+    a strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--accent); }
+    a span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>日常 Tab · 布局方案</h1>
+  <p class="lead">新增底部 Tab「日常」：上半为发布入口（拍照 / 拍视频 / 写文字 / 语音），下半为已发布的日常记录流。</p>
+  <div class="note">
+    <strong>与「朋友圈 · 我的动态」的区别：</strong>「日常」侧重多媒体生活记录与快速发布；「我的动态」侧重文字观点供好友探索引用。以下均为 390px 手机原型，含底部 Tab 栏示意。
+  </div>
+  <ul>
+    <li>
+      <a href="variant-a-top-icons.html">
+        <strong>方案 A · 顶部四图标横排</strong>
+        <span>发布区白底卡片 + 图标标签，下方按日分组记录流。结构清晰，适合作为主方案。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-b-publish-grid.html">
+        <strong>方案 B · 2×2 发布网格</strong>
+        <span>大触控区、类型说明更醒目；记录区混排图文 / 视频 / 语音卡片。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-c-bottom-dock.html">
+        <strong>方案 C · 底部发布 Dock</strong>
+        <span>记录流占满屏，发布入口固定在 Tab 栏上方；单手操作友好。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-d-list-entry.html">
+        <strong>方案 D · 列表式入口</strong>
+        <span>与现有「朋友圈」入口列表风格一致，四行发布类型 + 下方记录。</span>
+      </a>
+    </li>
+    <li>
+      <a href="variant-e-empty-states.html">
+        <strong>空状态 · 3 款对比</strong>
+        <span>尚无记录时的引导文案与发布入口形态。</span>
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

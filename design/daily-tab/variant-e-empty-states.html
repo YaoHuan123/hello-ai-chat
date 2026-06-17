@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>空状态 · 3 款对比</title>
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .gallery {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 12px 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .gallery-head {
+      grid-column: 1 / -1;
+      padding: 8px 4px 0;
+    }
+    .gallery-head h1 { font-size: 20px; margin: 0 0 6px; }
+    .gallery-head p { margin: 0; font-size: 14px; color: var(--muted); }
+    .phone { height: 680px; }
+    .empty--large {
+      margin-top: 24px;
+      padding: 48px 24px;
+    }
+    .empty__icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+    .empty__cta {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .empty-chip {
+      border: none;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .publish-strip { margin: 12px 14px 0; padding: 16px 12px; background: var(--surface); border-radius: 18px; border: 0.5px solid var(--border); }
+    .publish-strip__row { display: flex; justify-content: space-between; }
+    .publish-btn { flex: 1; border: none; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; font-family: inherit; }
+    .publish-btn__label { font-size: 12px; font-weight: 600; }
+    .empty-inline {
+      margin: 16px 14px;
+      padding: 28px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 方案索引</a>
+  <div class="gallery">
+    <div class="gallery-head">
+      <h1>空状态 · 3 款对比</h1>
+      <p>尚无日常记录时的引导形态，可与方案 A / B / C 组合使用。</p>
+    </div>
+
+    <!-- Empty A: centered with chips -->
+    <div>
+      <p class="mock-label">空状态 A · 居中引导 + 快捷入口</p>
+      <div class="phone-wrap" style="padding: 0">
+        <div class="phone">
+          <header class="tab-topbar"><h1 class="tab-topbar__title">日常</h1></header>
+          <div class="tab-scroll">
+            <div class="empty empty--large">
+              <div class="empty__icon" aria-hidden>📔</div>
+              <p>还没有日常记录<br />选一种方式，记下今天的第一条</p>
+              <div class="empty__cta">
+                <button type="button" class="empty-chip">拍照</button>
+                <button type="button" class="empty-chip">拍视频</button>
+                <button type="button" class="empty-chip">写文字</button>
+                <button type="button" class="empty-chip">语音</button>
+              </div>
+            </div>
+          </div>
+          <nav class="tabbar" aria-label="主导航">
+            <button type="button" class="tabbar__btn tabbar__btn--active"><span class="tabbar__label">日常</span></button>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty B: publish strip + inline hint -->
+    <div>
+      <p class="mock-label">空状态 B · 保留发布区 + 下方提示</p>
+      <div class="phone-wrap" style="padding: 0">
+        <div class="phone">
+          <header class="tab-topbar"><h1 class="tab-topbar__title">日常</h1></header>
+          <div class="tab-scroll">
+            <div class="publish-strip">
+              <div class="publish-strip__row">
+                <button type="button" class="publish-btn"><span class="pub-icon pub-icon--photo">📷</span><span class="publish-btn__label">拍照</span></button>
+                <button type="button" class="publish-btn"><span class="pub-icon pub-icon--video">🎬</span><span class="publish-btn__label">拍视频</span></button>
+                <button type="button" class="publish-btn"><span class="pub-icon pub-icon--text">✏️</span><span class="publish-btn__label">写文字</span></button>
+                <button type="button" class="publish-btn"><span class="pub-icon pub-icon--voice">🎙</span><span class="publish-btn__label">语音</span></button>
+              </div>
+            </div>
+            <div class="section-head"><h2>我的记录</h2></div>
+            <p class="empty-inline">暂无记录。你发布的内容会出现在这里。</p>
+          </div>
+          <nav class="tabbar" aria-label="主导航">
+            <button type="button" class="tabbar__btn tabbar__btn--active"><span class="tabbar__label">日常</span></button>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty C: bottom dock only -->
+    <div>
+      <p class="mock-label">空状态 C · 全屏留白 + 底部 Dock（配方案 C）</p>
+      <div class="phone-wrap" style="padding: 0">
+        <div class="phone">
+          <header class="tab-topbar"><h1 class="tab-topbar__title">日常</h1></header>
+          <div class="tab-scroll" style="padding-bottom: calc(var(--tabbar-h) + 72px + var(--safe-bottom))">
+            <div class="section-head"><h2>我的记录</h2></div>
+            <div class="empty">
+              <p>从下方选择发布方式，开始记录日常。</p>
+            </div>
+          </div>
+          <div class="publish-dock" style="position:absolute;left:0;right:0;bottom:calc(var(--tabbar-h) + var(--safe-bottom));padding:10px 14px;background:rgba(255,255,255,0.94);border-top:0.5px solid var(--border);display:flex;gap:6px">
+            <button type="button" class="dock-btn" style="flex:1;border:none;background:var(--bg);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;cursor:pointer">
+              <span class="pub-icon pub-icon--photo" style="width:36px;height:36px;font-size:18px">📷</span>
+              <span style="font-size:11px;font-weight:600">拍照</span>
+            </button>
+            <button type="button" class="dock-btn" style="flex:1;border:none;background:var(--bg);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;cursor:pointer">
+              <span class="pub-icon pub-icon--video" style="width:36px;height:36px;font-size:18px">🎬</span>
+              <span style="font-size:11px;font-weight:600">拍视频</span>
+            </button>
+            <button type="button" class="dock-btn" style="flex:1;border:none;background:var(--bg);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;cursor:pointer">
+              <span class="pub-icon pub-icon--text" style="width:36px;height:36px;font-size:18px">✏️</span>
+              <span style="font-size:11px;font-weight:600">写文字</span>
+            </button>
+            <button type="button" class="dock-btn" style="flex:1;border:none;background:var(--bg);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;cursor:pointer">
+              <span class="pub-icon pub-icon--voice" style="width:36px;height:36px;font-size:18px">🎙</span>
+              <span style="font-size:11px;font-weight:600">语音</span>
+            </button>
+          </div>
+          <nav class="tabbar" aria-label="主导航">
+            <button type="button" class="tabbar__btn tabbar__btn--active"><span class="tabbar__label">日常</span></button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
