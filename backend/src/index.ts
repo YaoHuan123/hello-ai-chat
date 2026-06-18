@@ -37,6 +37,9 @@ import { YiyiAiService } from "./services/yiyiAi.service";
 import { YiyiService } from "./services/yiyi.service";
 import { errorToMeta, logError, logInfo, logWarn } from "./logger";
 import { attachWs } from "./ws/wsServer";
+import { ensureSettingsFilesSeeded } from "./services/settingsRuntime.service";
+
+ensureSettingsFilesSeeded();
 
 if ((process.env.JWT_SECRET ?? "").trim() === "" || process.env.JWT_SECRET === "replace-this-in-production") {
   logWarn("config.jwt_secret", {
@@ -56,6 +59,7 @@ molWorldService.seedMissingMols();
 molWorldService.purgeOrphanSeedFiles();
 molWorldService.syncSeedCatalogFromDefs();
 molWorldService.backfillEmptyPersonas();
+molWorldService.syncSeedPersonasFromSettings();
 molWorldService.stripExampleInfoItems();
 
 const aliyunSmsService = new AliyunSmsService();

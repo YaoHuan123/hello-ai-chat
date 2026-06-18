@@ -18,6 +18,7 @@ import {
   setAvatarCache,
   setNicknameCache,
 } from "../../services/storage";
+import { clearAllLocalChatRecords } from "../../services/clearAllLocalChatRecords";
 
 type Props = {
   onNavigateFeature: (route: RouteName) => void;
@@ -42,6 +43,8 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
   const [generating, setGenerating] = useState(false);
   const [err, setErr] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   function applyMeProfile(me: Awaited<ReturnType<typeof getMeApi>>) {
     setNicknameCache(me.nickname);
@@ -68,6 +71,17 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
       cancelled = true;
     };
   }, []);
+
+  async function onConfirmClearChat() {
+    setClearing(true);
+    try {
+      clearAllLocalChatRecords();
+      setClearConfirmOpen(false);
+      window.setTimeout(() => window.location.reload(), 400);
+    } finally {
+      setClearing(false);
+    }
+  }
 
   function openNicknameSheet() {
     setDraft(getNickname());
@@ -193,6 +207,15 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
         </section>
 
         <section className="me-tab__group" aria-label="账号">
+          <button type="button" className="me-tab__row" onClick={() => setClearConfirmOpen(true)}>
+            <span className="me-tab__row-body">
+              <b>清空聊天记录</b>
+              <span>仅删除本机私聊、群聊与 YiYi 对话</span>
+            </span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
           <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("delete-account")}>
             <span className="me-tab__row-body">
               <b>注销账号</b>
@@ -302,6 +325,26 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {clearConfirmOpen ? (
+        <div className="contacts-sheet-overlay" role="presentation" onClick={() => !clearing && setClearConfirmOpen(false)}>
+          <div className="contacts-sheet" role="dialog" aria-modal="true" aria-labelledby="me-clear-chat-title" onClick={(ev) => ev.stopPropagation()}>
+            <div className="contacts-sheet__handle" aria-hidden />
+            <h2 id="me-clear-chat-title" className="contacts-sheet__title">
+              清空本机聊天记录
+            </h2>
+            <p className="me-tab__clear-desc">将删除本机全部私聊、群聊与 YiYi 对话记录，不可恢复。</p>
+            <div className="contacts-sheet__actions">
+              <button className="aichat-btn-ghost contacts-sheet__btn" type="button" disabled={clearing} onClick={() => setClearConfirmOpen(false)}>
+                取消
+              </button>
+              <button className="aichat-btn-primary contacts-sheet__btn me-tab__clear-confirm" type="button" disabled={clearing} onClick={() => void onConfirmClearChat()}>
+                {clearing ? "处理中…" : "清空"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

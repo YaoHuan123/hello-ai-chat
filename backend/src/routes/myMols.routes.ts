@@ -4,7 +4,6 @@ import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
 import type { MolWorldFile } from "../services/molWorld.service";
 import type { MolWorldService } from "../services/molWorld.service";
-import { isPrivateMolId } from "../services/molWorld.service";
 import type { UserMolsService } from "../services/userMols.service";
 
 const importBodySchema = z.object({
@@ -33,10 +32,6 @@ function mapError(res: Response, error: unknown): boolean {
   }
   if (code === "INVALID_CATEGORY") {
     res.status(400).json({ code, message: "场景类型无效" });
-    return true;
-  }
-  if (code === "MOL_PRIVATE_LIMIT_EXCEEDED") {
-    res.status(429).json({ code, message: "自建素颜数量已达上限" });
     return true;
   }
   if (code === "FORBIDDEN") {
@@ -180,11 +175,7 @@ export const createMyMolsRouter = (molWorld: MolWorldService, userMols: UserMols
       return;
     }
     try {
-      const detail = userMols.getDetailForOwner(user.userId, molWorldId);
       userMols.removeFromMine(user.userId, molWorldId);
-      if (detail?.source === "created" && isPrivateMolId(molWorldId)) {
-        molWorld.deleteById(molWorldId, user.userId);
-      }
       res.status(200).json({ ok: true as const });
     } catch (error) {
       if (mapError(res, error)) return;

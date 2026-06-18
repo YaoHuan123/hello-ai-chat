@@ -78,6 +78,7 @@ export function MolWorldPage({ onBack }: Props) {
   }, [items, search]);
 
   const emptySearch = !loading && filteredList.length === 0 && search.trim().length > 0;
+  const emptyCatalog = !loading && items.length === 0 && !search.trim();
   const fallbackSugs = useMemo(
     () => getSearchFallbackSuggestions(items, search, SEARCH_SUGGESTION_CHIPS),
     [items, search],
@@ -133,6 +134,13 @@ export function MolWorldPage({ onBack }: Props) {
                   {c}
                 </button>
               ))}
+          </div>
+        ) : null}
+
+        {emptyCatalog ? (
+          <div className="mol-world-a-empty">
+            <p className="mol-world-a-empty__t">暂无{SUYAN.name}</p>
+            <p className="mol-world-a-empty__d">请返回后重新进入，或稍后再试</p>
           </div>
         ) : null}
 

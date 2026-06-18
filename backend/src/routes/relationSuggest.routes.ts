@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { pickSuggestChatContext } from "../constants/suggestChatContext";
 import type { AiReplyService, SuggestLastMessage } from "../services/aiReply.service";
 import type { ContactsService } from "../services/contacts.service";
 
@@ -89,7 +90,7 @@ export const createRelationSuggestRouter = (aiReply: AiReplyService, contacts: C
       return;
     }
 
-    const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
+    const lm: SuggestLastMessage[] = pickSuggestChatContext(lastMessages ?? []);
 
     try {
       const suggestions = await aiReply.suggestRepliesByRelation({

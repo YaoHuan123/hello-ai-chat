@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { MOL_PRIVATE_DIR, MOL_WORLD_DIR } from "../config";
+import { MOL_WORLD_DIR } from "../config";
 import { isValidPrimaryCategory, MOL_PRIMARY_CATEGORIES, type MolPrimaryCategory } from "../constants/molWorld";
 import {
   PLACEHOLDER_MOL_SUMMARY,
@@ -15,12 +15,6 @@ import { logWarn } from "../logger";
 
 const SCHEMA_VERSION = 1;
 const MAX_UPLOADS_PER_USER = 20;
-const MAX_PRIVATE_MOLS_PER_USER = 20;
-const PRIVATE_ID_PREFIX = "mp-";
-
-export function isPrivateMolId(molWorldId: string): boolean {
-  return molWorldId.startsWith(PRIVATE_ID_PREFIX);
-}
 
 export type MolWorldInfoItem = {
   id: string;
@@ -103,19 +97,16 @@ function filePathFor(category: string, id: string): string {
   return path.join(MOL_WORLD_DIR, category, `${id}.json`);
 }
 
-function privateFilePath(ownerUserId: string, id: string): string {
-  return path.join(MOL_PRIVATE_DIR, ownerUserId, `${id}.json`);
-}
-
-function ensurePrivateUserDir(ownerUserId: string): void {
-  const dir = path.join(MOL_PRIVATE_DIR, ownerUserId);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+function ensureMolWorldDirs(): void {
+  fs.mkdirSync(MOL_WORLD_DIR, { recursive: true });
+  for (const cat of MOL_PRIMARY_CATEGORIES) {
+    fs.mkdirSync(path.join(MOL_WORLD_DIR, cat), { recursive: true });
   }
 }
 
 function atomicWriteJson(filePath: string, data: unknown): void {
   const dir = path.dirname(filePath);
+  fs.mkdirSync(dir, { recursive: true });
   const tmp = path.join(dir, `.tmp-${nanoid(12)}.json`);
   const json = `${JSON.stringify(data, null, 2)}\n`;
   fs.writeFileSync(tmp, json, "utf8");
@@ -169,28 +160,6 @@ const SEED_MOL_DEFS: {
     recommended: true,
   },
   {
-    id: "mw-seed-neihan",
-    name: "内涵段子",
-    primaryCategory: "朋友社交",
-    taskTags: ["延续聊天", "破冰", "表达感谢", "邀约"],
-    toneTags: ["幽默", "轻松"],
-    relationshipTags: ["朋友"],
-    abilityTags: ["会接话", "会润色"],
-    popularityScore: 770,
-    recommended: true,
-  },
-  {
-    id: "mw-seed-zhihu",
-    name: "之乎者也",
-    primaryCategory: "内容表达",
-    taskTags: ["延续聊天", "表达感谢", "维护边界", "邀约"],
-    toneTags: ["文雅", "克制"],
-    relationshipTags: ["朋友", "同事"],
-    abilityTags: ["会润色"],
-    popularityScore: 760,
-    recommended: true,
-  },
-  {
     id: "mw-seed-doubao",
     name: "豆包体",
     primaryCategory: "朋友社交",
@@ -199,39 +168,6 @@ const SEED_MOL_DEFS: {
     relationshipTags: ["朋友", "同事"],
     abilityTags: ["会接话", "会润色", "会多步引导"],
     popularityScore: 785,
-    recommended: true,
-  },
-  {
-    id: "mw-seed-mabao",
-    name: "专业妈宝",
-    primaryCategory: "家庭亲友",
-    taskTags: ["安慰", "延续聊天", "表达感谢", "维护边界"],
-    toneTags: ["软", "幽默"],
-    relationshipTags: ["家人", "朋友"],
-    abilityTags: ["会接话", "擅长安慰"],
-    popularityScore: 755,
-    recommended: true,
-  },
-  {
-    id: "mw-seed-yaoyao",
-    name: "遥遥领先",
-    primaryCategory: "职场沟通",
-    taskTags: ["谈合作", "催进度", "表达感谢", "延续聊天"],
-    toneTags: ["自信", "直接"],
-    relationshipTags: ["同事", "客户", "朋友"],
-    abilityTags: ["会润色", "会接话"],
-    popularityScore: 748,
-    recommended: true,
-  },
-  {
-    id: "mw-seed-kongmen",
-    name: "遁入空门",
-    primaryCategory: "朋友社交",
-    taskTags: ["婉拒", "维护边界", "延续聊天", "安慰"],
-    toneTags: ["淡", "克制"],
-    relationshipTags: ["朋友"],
-    abilityTags: ["擅长拒绝", "会接话"],
-    popularityScore: 742,
     recommended: true,
   },
   {
@@ -254,6 +190,105 @@ const SEED_MOL_DEFS: {
     relationshipTags: ["同事", "同学", "客户"],
     abilityTags: ["会润色", "会多步引导"],
     popularityScore: 732,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-chaoyou",
+    name: "超级油腻",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "破冰", "推进关系", "表达感谢"],
+    toneTags: ["幽默", "活泼"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "会润色"],
+    popularityScore: 728,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-haiwang",
+    name: "我是海王",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "推进关系", "安慰", "破冰"],
+    toneTags: ["幽默", "轻松"],
+    relationshipTags: ["朋友", "暧昧中"],
+    abilityTags: ["会接话", "会润色"],
+    popularityScore: 725,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-bazong",
+    name: "霸道总裁",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "推进关系", "安慰", "维护边界"],
+    toneTags: ["直接", "克制"],
+    relationshipTags: ["朋友", "暧昧中", "恋人"],
+    abilityTags: ["会接话", "会润色", "会多步引导"],
+    popularityScore: 722,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-muolaohu",
+    name: "一只母老虎",
+    primaryCategory: "家庭亲友",
+    taskTags: ["安慰", "延续聊天", "维护边界", "邀约", "表达感谢"],
+    toneTags: ["直接", "温和"],
+    relationshipTags: ["家人", "恋人", "朋友"],
+    abilityTags: ["会接话", "擅长安慰", "擅长拒绝"],
+    popularityScore: 720,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-wenrou",
+    name: "温柔体贴",
+    primaryCategory: "朋友社交",
+    taskTags: ["安慰", "延续聊天", "表达感谢", "邀约", "维护边界"],
+    toneTags: ["温和", "清楚"],
+    relationshipTags: ["朋友", "恋人", "家人"],
+    abilityTags: ["会接话", "擅长安慰", "会润色"],
+    popularityScore: 718,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-taigang",
+    name: "国家一级抬杠运动员",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "破冰", "表达感谢", "维护边界", "邀约"],
+    toneTags: ["幽默", "直接"],
+    relationshipTags: ["朋友", "同学"],
+    abilityTags: ["会接话", "会润色"],
+    popularityScore: 715,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-lianainao",
+    name: "恋爱脑",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "邀约", "推进关系", "安慰", "表达感谢"],
+    toneTags: ["温和", "活泼"],
+    relationshipTags: ["朋友", "暧昧中", "恋人"],
+    abilityTags: ["会接话", "会润色", "擅长安慰"],
+    popularityScore: 712,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-dusheguimi",
+    name: "毒舌闺蜜",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "安慰", "维护边界", "表达感谢", "破冰"],
+    toneTags: ["幽默", "直接"],
+    relationshipTags: ["朋友", "同学"],
+    abilityTags: ["会接话", "会润色", "擅长安慰"],
+    popularityScore: 710,
+    recommended: true,
+  },
+  {
+    id: "mw-seed-poxi",
+    name: "婆媳和谐",
+    primaryCategory: "家庭亲友",
+    taskTags: ["安慰", "延续聊天", "维护边界", "表达感谢", "邀约"],
+    toneTags: ["温和", "克制"],
+    relationshipTags: ["家人"],
+    abilityTags: ["会接话", "会润色", "擅长安慰"],
+    popularityScore: 708,
     recommended: true,
   },
 ];
@@ -304,26 +339,13 @@ function resolvePersonaOnCreate(
 export class MolWorldService {
   private purgeUserRefs: (molWorldId: string) => void = () => {};
 
-  constructor() {
-    if (!fs.existsSync(MOL_PRIVATE_DIR)) {
-      fs.mkdirSync(MOL_PRIVATE_DIR, { recursive: true });
-    }
-  }
-
   attachPurgeHandler(fn: (molWorldId: string) => void): void {
     this.purgeUserRefs = fn;
   }
 
   seedIfEmpty(): void {
-    let count = 0;
-    for (const cat of MOL_PRIMARY_CATEGORIES) {
-      const dir = path.join(MOL_WORLD_DIR, cat);
-      if (!fs.existsSync(dir)) continue;
-      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (ent.isFile() && ent.name.endsWith(".json") && !ent.name.startsWith(".")) count += 1;
-      }
-    }
-    if (count > 0) return;
+    ensureMolWorldDirs();
+    if (this.listAllRaw().length > 0) return;
     const now = Date.now();
     const uploader = { userId: "__seed__", phoneMask: "----" };
     for (const def of SEED_MOL_DEFS) {
@@ -335,6 +357,7 @@ export class MolWorldService {
 
   /** 补种 SEED 中尚未存在的素颜（不影响已有条目）。 */
   seedMissingMols(): void {
+    ensureMolWorldDirs();
     const now = Date.now();
     const uploader = { userId: "__seed__", phoneMask: "----" };
     for (const def of SEED_MOL_DEFS) {
@@ -417,21 +440,30 @@ export class MolWorldService {
       const found = this.findFilePathById(rec.id);
       if (found) touch(found.filePath, rec);
     }
-    if (!fs.existsSync(MOL_PRIVATE_DIR)) return;
-    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
-      if (!ent.isDirectory()) continue;
-      const dir = path.join(MOL_PRIVATE_DIR, ent.name);
-      for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (!f.isFile() || !f.name.endsWith(".json")) continue;
-        const fp = path.join(dir, f.name);
-        try {
-          const raw = fs.readFileSync(fp, "utf8");
-          const parsed = parseMolFile(raw, fp);
-          if (parsed) touch(fp, parsed);
-        } catch {
-          /* skip */
-        }
+  }
+
+  /** 从 settings 同步系统 seed 素颜的人格资料（仅 __seed__ 条目）。 */
+  syncSeedPersonasFromSettings(): void {
+    const now = Date.now();
+    const allowed = new Set(SEED_MOL_DEFS.map((d) => d.id));
+    for (const rec of this.listAllRaw()) {
+      if (rec.uploader.userId !== "__seed__" || !allowed.has(rec.id)) continue;
+      const found = this.findFilePathById(rec.id);
+      if (!found) continue;
+      let summary: string;
+      let infoItems: MolWorldInfoItem[];
+      try {
+        summary = defaultSummaryForMol(rec.id, rec.primaryCategory);
+        infoItems = defaultInfoItemsForMol(rec.id, rec.primaryCategory, now);
+      } catch {
+        continue;
       }
+      const summarySame = rec.summary.trim() === summary.trim();
+      const itemsSame =
+        rec.infoItems.length === infoItems.length &&
+        rec.infoItems.every((it, i) => it.title === infoItems[i]?.title && it.body === infoItems[i]?.body);
+      if (summarySame && itemsSame) continue;
+      atomicWriteJson(found.filePath, { ...rec, summary, infoItems, updatedAt: now });
     }
   }
 
@@ -446,38 +478,12 @@ export class MolWorldService {
       const found = this.findFilePathById(rec.id);
       if (found) touch(found.filePath, rec);
     }
-    if (!fs.existsSync(MOL_PRIVATE_DIR)) return;
-    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
-      if (!ent.isDirectory()) continue;
-      const dir = path.join(MOL_PRIVATE_DIR, ent.name);
-      for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (!f.isFile() || !f.name.endsWith(".json")) continue;
-        const fp = path.join(dir, f.name);
-        try {
-          const raw = fs.readFileSync(fp, "utf8");
-          const parsed = parseMolFile(raw, fp);
-          if (parsed) touch(fp, parsed);
-        } catch {
-          /* skip */
-        }
-      }
-    }
   }
 
   countUploadsByUser(userId: string): number {
     let n = 0;
     for (const rec of this.listAllRaw()) {
       if (rec.uploader.userId === userId) n += 1;
-    }
-    return n;
-  }
-
-  countPrivateByUser(userId: string): number {
-    const dir = path.join(MOL_PRIVATE_DIR, userId);
-    if (!fs.existsSync(dir)) return 0;
-    let n = 0;
-    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (ent.isFile() && ent.name.endsWith(".json") && !ent.name.startsWith(".")) n += 1;
     }
     return n;
   }
@@ -503,38 +509,14 @@ export class MolWorldService {
     return out;
   }
 
-  private findPrivateFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile; ownerUserId: string } | null {
-    if (!isPrivateMolId(molWorldId) || !fs.existsSync(MOL_PRIVATE_DIR)) return null;
-    for (const ent of fs.readdirSync(MOL_PRIVATE_DIR, { withFileTypes: true })) {
-      if (!ent.isDirectory()) continue;
-      const fp = path.join(MOL_PRIVATE_DIR, ent.name, `${molWorldId}.json`);
-      if (!fs.existsSync(fp)) continue;
-      try {
-        const raw = fs.readFileSync(fp, "utf8");
-        const parsed = parseMolFile(raw, fp);
-        if (parsed && parsed.id === molWorldId) {
-          return { filePath: fp, record: parsed, ownerUserId: ent.name };
-        }
-      } catch {
-        /* skip */
-      }
-    }
-    return null;
-  }
-
-  findFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile; isPrivate: boolean } | null {
-    if (isPrivateMolId(molWorldId)) {
-      const found = this.findPrivateFilePathById(molWorldId);
-      if (!found) return null;
-      return { filePath: found.filePath, record: found.record, isPrivate: true };
-    }
+  findFilePathById(molWorldId: string): { filePath: string; record: MolWorldFile } | null {
     for (const cat of MOL_PRIMARY_CATEGORIES) {
       const fp = filePathFor(cat, molWorldId);
       if (!fs.existsSync(fp)) continue;
       try {
         const raw = fs.readFileSync(fp, "utf8");
         const parsed = parseMolFile(raw, fp);
-        if (parsed && parsed.id === molWorldId) return { filePath: fp, record: parsed, isPrivate: false };
+        if (parsed && parsed.id === molWorldId) return { filePath: fp, record: parsed };
       } catch {
         /* skip */
       }
@@ -598,57 +580,10 @@ export class MolWorldService {
     return record;
   }
 
-  /** 用户自建 Mol：仅写入私有目录，不出现在 Mol 世界。 */
-  createPrivate(ownerUserId: string, ownerPhone: string, body: unknown): MolWorldFile {
-    const parsed = createBodySchema.safeParse(body);
-    if (!parsed.success) {
-      throw new Error("INVALID_PARAMS");
-    }
-    const data = parsed.data;
-    if (!isValidPrimaryCategory(data.primaryCategory)) {
-      throw new Error("INVALID_CATEGORY");
-    }
-    if (this.countPrivateByUser(ownerUserId) >= MAX_PRIVATE_MOLS_PER_USER) {
-      throw new Error("MOL_PRIVATE_LIMIT_EXCEEDED");
-    }
-    const id = `${PRIVATE_ID_PREFIX}${Date.now()}-${nanoid(8)}`;
-    const now = Date.now();
-    const infoItemsDraft: MolWorldInfoItem[] = (data.initialInfo ?? []).map((row, i) => ({
-      id: row.id?.trim() || `inf-${now}-${i}-${nanoid(6)}`,
-      title: row.title,
-      body: row.body,
-      source: row.source ?? "custom",
-      softRemoved: row.softRemoved,
-    }));
-    const { summary, infoItems } = resolvePersonaOnCreate(id, data.primaryCategory, data.summary, infoItemsDraft, now);
-    const record: MolWorldFile = {
-      id,
-      schemaVersion: SCHEMA_VERSION,
-      name: data.name.trim(),
-      summary,
-      primaryCategory: data.primaryCategory,
-      taskTags: data.taskTags ?? [],
-      toneTags: data.toneTags ?? [],
-      relationshipTags: data.relationshipTags ?? [],
-      abilityTags: data.abilityTags ?? [],
-      price: 0,
-      popularityScore: 0,
-      recommended: false,
-      uploader: { userId: ownerUserId, phoneMask: maskPhone(ownerPhone) },
-      createdAt: now,
-      updatedAt: now,
-      infoItems,
-    };
-    ensurePrivateUserDir(ownerUserId);
-    const fp = privateFilePath(ownerUserId, id);
-    atomicWriteJson(fp, record);
-    return record;
-  }
-
   updateById(molWorldId: string, uploaderUserId: string, body: unknown): MolWorldFile {
     const found = this.findFilePathById(molWorldId);
     if (!found) throw new Error("NOT_FOUND");
-    const { filePath, record, isPrivate } = found;
+    const { filePath, record } = found;
     if (record.uploader.userId !== uploaderUserId) throw new Error("FORBIDDEN");
     const parsed = patchBodySchema.safeParse(body);
     if (!parsed.success) throw new Error("INVALID_PARAMS");
@@ -677,18 +612,6 @@ export class MolWorldService {
       popularityScore: record.popularityScore,
       recommended: record.recommended,
     };
-    if (isPrivate) {
-      const newPath = privateFilePath(uploaderUserId, molWorldId);
-      atomicWriteJson(newPath, next);
-      if (newPath !== filePath) {
-        try {
-          fs.unlinkSync(filePath);
-        } catch {
-          /* ignore */
-        }
-      }
-      return next;
-    }
     const newPath = filePathFor(next.primaryCategory, molWorldId);
     if (newPath !== filePath && fs.existsSync(newPath)) {
       throw new Error("INVALID_PARAMS");

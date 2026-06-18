@@ -97,7 +97,7 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
   }, [messages]);
 
   const getLastMessagesForSuggest = useCallback((): MolSuggestLastMessage[] => {
-    return messagesRef.current.slice(-12).map((m) => ({
+    return messagesRef.current.map((m) => ({
       from: m.from === "me" ? ("me" as const) : ("peer" as const),
       text: m.text,
       ts: m.ts,

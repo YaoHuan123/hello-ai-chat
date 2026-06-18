@@ -8970,6 +8970,17 @@ span:has(> .contact-avatar__img) {
   color: var(--aichat-text);
 }
 
+.me-tab__clear-desc {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--aichat-muted);
+}
+
+.me-tab__clear-confirm {
+  color: #fff;
+}
+
 @media (min-width: 768px) {
   :root {
     --aichat-screen-max: 100%;

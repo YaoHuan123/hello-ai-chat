@@ -52,12 +52,6 @@ export class UserMolsService {
     this.insertStmt!.run(ownerUserId, molWorldId, source, Date.now());
   }
 
-  createPrivateMol(ownerUserId: string, ownerPhone: string, body: unknown): MolWorldFile {
-    const rec = this.molWorld.createPrivate(ownerUserId, ownerPhone, body);
-    this.insertStmt!.run(ownerUserId, rec.id, "created", Date.now());
-    return rec;
-  }
-
   removeFromMine(ownerUserId: string, molWorldId: string): void {
     const info = this.deleteStmt!.run(ownerUserId, molWorldId);
     if (info.changes === 0) throw new Error("NOT_OWNED");

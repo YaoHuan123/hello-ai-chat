@@ -432,6 +432,7 @@ export class GuardianGroupsService {
           protectedName,
           lastMessages: chatLines,
           latestPeerText: triggerMessage.text,
+          groupId,
         });
       } catch {
         continue;

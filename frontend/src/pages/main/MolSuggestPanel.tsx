@@ -1,6 +1,7 @@
 import { SUYAN } from "../../constants/suyanCopy";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type RelationType } from "../../constants/relationTypes";
+import { pickSuggestChatContext } from "../../lib/suggestChatContext";
 import { suggestRepliesApi, type MolSuggestLastMessage } from "../../services/molSuggestApi";
 import { suggestRepliesByRelationApi } from "../../services/relationSuggestApi";
 import { RelationTag } from "../../components/RelationTag";
@@ -64,7 +65,7 @@ export function MolSuggestPanel({
   }, [draftText, getDraftText]);
 
   const buildLastMessages = useCallback(() => {
-    return getLastMessages().slice(-12);
+    return pickSuggestChatContext(getLastMessages());
   }, [getLastMessages]);
 
   const load = useCallback(async () => {

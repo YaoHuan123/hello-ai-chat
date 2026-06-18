@@ -4,6 +4,7 @@ import type { GuardianRoleDef } from "../constants/guardianCatalog";
 import { GUARDIAN_STANCE_LABEL } from "../constants/guardianCatalog";
 import { loadGuardianProactiveSystemTemplate, loadGuardianProactiveUserTemplate } from "./guardianPromptFiles";
 import { disableDoubaoThinking } from "./openaiCompat";
+import { newAiReplyTraceId, writeAiReplyTrace } from "./aiReplyTrace";
 
 export type GuardianChatLine = {
   from: "owner" | "peer" | "guardian";
@@ -15,6 +16,7 @@ export type GuardianChatLine = {
 const MAX_ROLE_CHARS = 2000;
 const MAX_HISTORY_CHARS = 2400;
 const MAX_LINE_LEN = 160;
+const GUARDIAN_TEMPERATURE = 0.75;
 
 export class GuardianAiService {
   isConfigured(): boolean {
@@ -41,6 +43,7 @@ export class GuardianAiService {
     protectedName: string;
     lastMessages: GuardianChatLine[];
     latestPeerText: string;
+    groupId?: string;
   }): Promise<string | null> {
     if (!this.shouldTryProactive(args.latestPeerText)) {
       return null;
@@ -66,13 +69,27 @@ export class GuardianAiService {
       throw new Error("AI_PROMPT_EMPTY");
     }
 
+    const traceId = newAiReplyTraceId();
+    const traceBase = {
+      id: traceId,
+      ts: new Date().toISOString(),
+      kind: "guardian_proactive" as const,
+      groupId: args.groupId?.trim() || undefined,
+      guardianRoleId: args.role.id,
+      guardianRoleName: args.role.name,
+      latestPeerText: args.latestPeerText.trim() || undefined,
+      model: OPENAI_MODEL,
+      temperature: GUARDIAN_TEMPERATURE,
+      input: { system, user },
+    };
+
     const url = `${OPENAI_BASE_URL}/chat/completions`;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
     const body: Record<string, unknown> = {
       model: OPENAI_MODEL,
-      temperature: 0.75,
+      temperature: GUARDIAN_TEMPERATURE,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: system },
@@ -81,6 +98,7 @@ export class GuardianAiService {
     };
     disableDoubaoThinking(body);
 
+    const t0 = Date.now();
     let res: Response;
     try {
       res = await fetch(url, {
@@ -94,9 +112,20 @@ export class GuardianAiService {
       });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "AbortError") {
+        writeAiReplyTrace({
+          ...traceBase,
+          durationMs: Date.now() - t0,
+          error: "AI_TIMEOUT",
+        });
         throw new Error("AI_TIMEOUT");
       }
-      logWarn("guardian_ai.fetch_failed", { message: e instanceof Error ? e.message : String(e) });
+      const message = e instanceof Error ? e.message : String(e);
+      logWarn("guardian_ai.fetch_failed", { message });
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        error: `AI_PROVIDER_ERROR: ${message}`,
+      });
       throw new Error("AI_PROVIDER_ERROR");
     } finally {
       clearTimeout(timer);
@@ -104,38 +133,91 @@ export class GuardianAiService {
 
     const raw = (await res.json().catch(() => ({}))) as Record<string, unknown>;
     if (!res.ok) {
+      const msg = typeof raw.error === "object" && raw.error !== null ? String((raw.error as { message?: string }).message ?? "") : "";
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        error: `AI_PROVIDER_ERROR: HTTP ${res.status} ${msg}`.trim(),
+      });
       throw new Error("AI_PROVIDER_ERROR");
     }
 
     const choices = raw.choices as unknown;
     if (!Array.isArray(choices) || choices.length < 1) {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        error: "AI_PARSE_ERROR: missing choices",
+      });
       throw new Error("AI_PARSE_ERROR");
     }
     const content = (choices[0] as { message?: { content?: string } })?.message?.content;
     if (typeof content !== "string" || !content.trim()) {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        error: "AI_PARSE_ERROR: empty content",
+      });
       throw new Error("AI_PARSE_ERROR");
     }
 
-    let parsed: unknown;
+    let parsed: Record<string, unknown>;
     try {
-      parsed = JSON.parse(content.trim());
+      parsed = JSON.parse(content.trim()) as Record<string, unknown>;
     } catch {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        output: { raw: content.trim(), parsed: null },
+        error: "AI_PARSE_ERROR: invalid JSON",
+      });
       throw new Error("AI_PARSE_ERROR");
     }
     if (!parsed || typeof parsed !== "object") {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        output: { raw: content.trim(), parsed },
+        error: "AI_PARSE_ERROR: not an object",
+      });
       throw new Error("AI_PARSE_ERROR");
     }
-    const speak = (parsed as { speak?: unknown }).speak;
-    const line = (parsed as { line?: unknown }).line;
+
+    const speak = parsed.speak;
+    const lineRaw = parsed.line;
     if (speak !== true) {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        output: { raw: content.trim(), parsed },
+      });
       return null;
     }
-    if (typeof line !== "string") {
+    if (typeof lineRaw !== "string") {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        output: { raw: content.trim(), parsed },
+        error: "AI_PARSE_ERROR: missing line",
+      });
       throw new Error("AI_PARSE_ERROR");
     }
-    const t = line.replace(/\r\n/g, "\n").trim();
-    if (!t) return null;
-    return t.length > MAX_LINE_LEN ? t.slice(0, MAX_LINE_LEN) : t;
+    const t = lineRaw.replace(/\r\n/g, "\n").trim();
+    if (!t) {
+      writeAiReplyTrace({
+        ...traceBase,
+        durationMs: Date.now() - t0,
+        output: { raw: content.trim(), parsed, line: "" },
+      });
+      return null;
+    }
+    const line = t.length > MAX_LINE_LEN ? t.slice(0, MAX_LINE_LEN) : t;
+    writeAiReplyTrace({
+      ...traceBase,
+      durationMs: Date.now() - t0,
+      output: { raw: content.trim(), parsed, line },
+    });
+    return line;
   }
 
   /** 轻量规则：明显寒暄可跳过，节省调用。 */

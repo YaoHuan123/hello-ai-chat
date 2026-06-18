@@ -48,6 +48,10 @@ export const OPENAI_TIMEOUT_MS = Math.min(
   Math.max(1000, Number.parseInt(process.env.OPENAI_TIMEOUT_MS?.trim() || "15000", 10) || 15_000),
 );
 
+/** AI 交互 trace：是否写入 data/ai-traces（默认开启，设 AI_REPLY_TRACE=false 关闭） */
+export const AI_REPLY_TRACE_ENABLED = process.env.AI_REPLY_TRACE?.trim().toLowerCase() !== "false";
+export const AI_REPLY_TRACE_DIR = path.join(DATA_ROOT, "ai-traces");
+
 /** 朋友圈热点：抓取微博/知乎/抖音热搜并经 LLM 生成问题；缓存目录与刷新间隔 */
 export const HOT_TOPICS_DIR = path.join(DATA_ROOT, "hot-topics");
 export const HOT_TOPICS_REFRESH_MS = Math.min(

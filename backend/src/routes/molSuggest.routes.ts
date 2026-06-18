@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { pickSuggestChatContext } from "../constants/suggestChatContext";
 import type { AiReplyService, SuggestLastMessage } from "../services/aiReply.service";
 import type { ContactsService } from "../services/contacts.service";
 import type { UserMolsService } from "../services/userMols.service";
@@ -140,7 +141,7 @@ export const createMolSuggestRouter = (
       return;
     }
 
-    const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
+    const lm: SuggestLastMessage[] = pickSuggestChatContext(lastMessages ?? []);
 
     try {
       const suggestions = await aiReply.suggestReplies({
@@ -148,6 +149,7 @@ export const createMolSuggestRouter = (
         lastMessages: lm,
         relationType,
         userDraft,
+        molId,
       });
       res.status(200).json({ suggestions, relationType });
     } catch (error) {
