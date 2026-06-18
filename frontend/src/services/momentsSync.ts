@@ -4,7 +4,7 @@ import { syncMomentsItemsApi } from "./momentsApi";
 let timer: ReturnType<typeof setTimeout> | null = null;
 let pending: PassiveCloneItem[] | null = null;
 
-/** 将本地「我的日常」同步到服务端，供好友探索时 LLM 引用。 */
+/** 将本地「我的动态」同步到服务端，供好友探索时 LLM 引用。 */
 export function scheduleMomentsSync(items: PassiveCloneItem[]): void {
   pending = items;
   if (timer) clearTimeout(timer);

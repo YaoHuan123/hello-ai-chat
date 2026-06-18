@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIChat · YiYi Tab 产品原型</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #14171a;
+      --muted: #6b7380;
+      --border: rgba(20, 23, 26, 0.08);
+      --accent: #4f6df5;
+      --accent-soft: rgba(79, 109, 245, 0.12);
+      --yiyi: #7c5cff;
+      --yiyi-soft: rgba(124, 92, 255, 0.14);
+      --yiyi-grad: linear-gradient(145deg, #6366f1 0%, #8b5cf6 52%, #a78bfa 100%);
+      --danger: #d64646;
+      --danger-soft: rgba(214, 70, 70, 0.1);
+      --success: #2f9e6f;
+      --success-soft: rgba(47, 158, 111, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-card: 0 4px 14px rgba(20, 23, 26, 0.05);
+      --shadow-elevated: 0 12px 40px rgba(20, 23, 26, 0.1);
+      --phone-w: 390px;
+      --phone-h: 780px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e9ebf1;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .gallery {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 20px 56px;
+    }
+
+    .gallery__head { margin-bottom: 24px; }
+    .gallery__head h1 { margin: 0 0 8px; font-size: 22px; font-weight: 650; }
+    .gallery__head p { margin: 0; color: var(--muted); font-size: 14px; max-width: 820px; }
+
+    .gallery__nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .gallery__nav button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .gallery__nav button.active {
+      background: var(--yiyi);
+      border-color: var(--yiyi);
+      color: #fff;
+    }
+
+    .screen-panel { display: none; }
+    .screen-panel.active { display: block; }
+
+    .screen-panel__meta { margin-bottom: 16px; }
+    .screen-panel__meta h2 { margin: 0 0 6px; font-size: 18px; }
+    .screen-panel__meta p { margin: 0; color: var(--muted); font-size: 13px; max-width: 720px; }
+
+    .screen-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    .phone-wrap { flex: 0 0 auto; }
+    .phone-wrap__label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      background: var(--bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow-elevated);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 8px solid #1a1d21;
+    }
+
+    .phone__status {
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .phone__nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 10px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .phone__nav h3 {
+      flex: 1;
+      margin: 0;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+
+    .phone__nav-back,
+    .phone__nav-action {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font-size: 22px;
+      line-height: 1;
+      cursor: default;
+      border-radius: var(--radius-sm);
+    }
+
+    .phone__nav-action {
+      font-size: 13px;
+      width: auto;
+      padding: 0 4px;
+      color: var(--muted);
+    }
+
+    .phone__main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 14px 12px;
+    }
+
+    .phone__tabbar {
+      display: flex;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+      flex-shrink: 0;
+    }
+
+    .phone__tab {
+      flex: 1;
+      border: none;
+      background: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 4px 0;
+      font-size: 10px;
+      color: var(--muted);
+      font-family: inherit;
+    }
+
+    .phone__tab.active { color: var(--yiyi); font-weight: 600; }
+
+    .phone__tab-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: currentColor;
+      opacity: 0.22;
+    }
+
+    .phone__tab.active .phone__tab-dot {
+      opacity: 0.55;
+      background: var(--yiyi);
+    }
+
+    .note-card {
+      flex: 1;
+      min-width: 280px;
+      max-width: 420px;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-card);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .note-card h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .note-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .note-card li { margin-bottom: 6px; }
+
+    .note-card strong { color: var(--text); }
+
+    /* YiYi Tab list */
+    .yiyi-hero {
+      background: var(--yiyi-grad);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      color: #fff;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.28);
+    }
+
+    .yiyi-hero__title {
+      margin: 0 0 4px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .yiyi-hero__desc {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.92;
+      line-height: 1.5;
+    }
+
+    .yiyi-section-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 8px 4px;
+      font-weight: 600;
+    }
+
+    .yiyi-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 14px;
+      border: none;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 10px;
+      text-align: left;
+      font-family: inherit;
+      cursor: default;
+    }
+
+    .yiyi-row:active { opacity: 0.92; }
+
+    .yiyi-row__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    .yiyi-row__icon--trash {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .yiyi-row__icon--avatar {
+      background: var(--yiyi-soft);
+      overflow: hidden;
+    }
+
+    .yiyi-row__icon--msg {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .yiyi-row__icon--settings {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .yiyi-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--yiyi-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .yiyi-row__body { flex: 1; min-width: 0; }
+
+    .yiyi-row__title {
+      display: block;
+      font-size: 15px;
+      font-weight: 650;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .yiyi-row__sub {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yiyi-row__meta {
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .yiyi-row__chev {
+      color: #c4c8cf;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .yiyi-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* Trash can */
+    .trash-intro {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-card);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .trash-group {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .trash-group__head {
+      padding: 12px 14px 8px;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+
+    .trash-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .trash-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--yiyi);
+      flex-shrink: 0;
+    }
+
+    .trash-item label {
+      flex: 1;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .trash-item__hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .trash-add {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .trash-add input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--surface);
+    }
+
+    .trash-add button {
+      border: none;
+      background: var(--yiyi);
+      color: #fff;
+      border-radius: var(--radius-md);
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+    }
+
+    /* Chat */
+    .chat-banner {
+      background: var(--yiyi-soft);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .chat-msgs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 8px;
+    }
+
+    .chat-bubble-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-bubble-row--me {
+      flex-direction: row-reverse;
+    }
+
+    .chat-bubble-row .yiyi-avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+
+    .chat-bubble {
+      max-width: 76%;
+      padding: 10px 13px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .chat-bubble--yiyi {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-bubble--me {
+      background: var(--accent);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-topics {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin: 4px 0 12px 40px;
+      box-shadow: var(--shadow-card);
+      border: 1px dashed rgba(124, 92, 255, 0.35);
+    }
+
+    .chat-topics__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .chat-topics__head span {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--yiyi);
+    }
+
+    .chat-topics__refresh {
+      border: none;
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-topic-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chat-topic-chip {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius-pill);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      text-align: left;
+      line-height: 1.35;
+    }
+
+    .chat-topic-chip.selected {
+      border-color: var(--yiyi);
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+      font-weight: 600;
+    }
+
+    .chat-composer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 8px 12px 10px;
+      flex-shrink: 0;
+    }
+
+    .chat-composer__row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .chat-composer__refresh {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+      border-radius: 50%;
+      font-size: 16px;
+      flex-shrink: 0;
+      font-family: inherit;
+    }
+
+    .chat-composer__input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 9px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      min-height: 36px;
+      background: var(--bg);
+      color: var(--muted);
+    }
+
+    .chat-composer__send {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--yiyi);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* YiYi messages */
+    .bridge-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .bridge-card__head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bridge-card__avatars {
+      display: flex;
+      align-items: center;
+    }
+
+    .bridge-card__avatars .yiyi-avatar {
+      width: 36px;
+      height: 36px;
+      font-size: 13px;
+      border: 2px solid var(--surface);
+    }
+
+    .bridge-card__avatars .yiyi-avatar + .yiyi-avatar {
+      margin-left: -10px;
+    }
+
+    .bridge-card__title {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .bridge-card__status {
+      font-size: 11px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .bridge-card__preview {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .bridge-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .bridge-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--bg);
+      color: var(--muted);
+    }
+
+    /* Flow diagram */
+    .flow-diagram {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 14px;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .flow-step:last-child { margin-bottom: 0; }
+
+    .flow-step__num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .flow-step__body h5 {
+      margin: 0 0 4px;
+      font-size: 14px;
+    }
+
+    .flow-step__body p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .profile-dims {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-dim {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .profile-dim__label {
+      font-size: 11px;
+      font-weight: 650;
+      color: var(--yiyi);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .profile-dim__value {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .profile-dim__detail {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .profile-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .profile-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--yiyi-soft);
+      color: var(--yiyi);
+    }
+
+    /* Settings toggles */
+    .settings-group {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-row:first-child { border-top: none; }
+
+    .settings-row__body { flex: 1; min-width: 0; }
+
+    .settings-row__title {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .settings-row__desc {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 28px;
+      border-radius: 14px;
+      background: #d1d5db;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .toggle.on { background: var(--yiyi); }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+
+    .toggle.on::after { transform: translateX(20px); }
+
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .arch-table th,
+    .arch-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .arch-table th {
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .wide-panel {
+      max-width: 960px;
+    }
+
+    .wide-panel .flow-diagram {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    @media (max-width: 900px) {
+      .wide-panel .flow-diagram { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <header class="gallery__head">
+      <h1>YiYi Tab · 产品方案原型</h1>
+      <p>
+        YiYi 是用户的中间人分身：先与用户对话了解偏好与边界，再代表用户与其他人的 YiYi 试探性沟通。
+        本页供评审信息架构、核心流程与权限设计；可在浏览器直接切换各屏查看。
+      </p>
+    </header>
+
+    <nav class="gallery__nav" aria-label="原型导航">
+      <button type="button" class="active" data-panel="p1">① YiYi Tab 首页</button>
+      <button type="button" data-panel="p2">② 网络垃圾桶</button>
+      <button type="button" data-panel="p3">③ 与 YiYi 对话</button>
+      <button type="button" data-panel="p4">④ YiYi 的消息</button>
+      <button type="button" data-panel="p5">⑤ 连接机制</button>
+      <button type="button" data-panel="p6">⑥ 权限设置</button>
+      <button type="button" data-panel="p7">⑦ 方案总览</button>
+    </nav>
+
+    <!-- Panel 1: YiYi Tab home -->
+    <section class="screen-panel active" id="p1">
+      <div class="screen-panel__meta">
+        <h2>① YiYi Tab 首页</h2>
+        <p>新增独立 Tab，聚合边界设置、与 YiYi 对话入口、跨 YiYi 沟通成果与权限入口。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">YiYi Tab · 列表页</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <span class="phone__nav-back" aria-hidden></span>
+              <h3>YiYi</h3>
+              <button type="button" class="phone__nav-action">设置</button>
+            </div>
+            <div class="phone__main">
+              <div class="yiyi-hero">
+                <p class="yiyi-hero__title">你的中间人 YiYi</p>
+                <p class="yiyi-hero__desc">先和你聊清楚方向与边界，再替你去认识合适的人。</p>
+              </div>
+
+              <p class="yiyi-section-label">管理</p>
+              <button type="button" class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--trash" aria-hidden>🗑</span>
+                <span class="yiyi-row__body">
+                  <span class="yiyi-row__title">网络垃圾桶</span>
+                  <span class="yiyi-row__sub">已屏蔽 4 类沟通方式</span>
+                </span>
+                <span class="yiyi-row__chev" aria-hidden>›</span>
+              </button>
+
+              <p class="yiyi-section-label">对话</p>
+              <button type="button" class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--avatar">
+                  <span class="yiyi-avatar">Y</span>
+                </span>
+                <span class="yiyi-row__body">
+                  <span class="yiyi-row__title">YiYi<span class="yiyi-badge">中间人</span></span>
+                  <span class="yiyi-row__sub">你更倾向找考研搭子，还是同频聊友？</span>
+                </span>
+                <span class="yiyi-row__meta">刚刚</span>
+              </button>
+
+              <button type="button" class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--msg" aria-hidden>✓</span>
+                <span class="yiyi-row__body">
+                  <span class="yiyi-row__title">YiYi 的消息</span>
+                  <span class="yiyi-row__sub">2 条有效沟通待查看</span>
+                </span>
+                <span class="yiyi-row__meta">2</span>
+                <span class="yiyi-row__chev" aria-hidden>›</span>
+              </button>
+
+              <p class="yiyi-section-label">隐私</p>
+              <button type="button" class="yiyi-row">
+                <span class="yiyi-row__icon yiyi-row__icon--settings" aria-hidden>⚙</span>
+                <span class="yiyi-row__body">
+                  <span class="yiyi-row__title">权限与可见范围</span>
+                  <span class="yiyi-row__sub">沟通过程可见 · 暂不允许直接加好友</span>
+                </span>
+                <span class="yiyi-row__chev" aria-hidden>›</span>
+              </button>
+            </div>
+            <nav class="phone__tabbar" aria-label="主导航">
+              <button type="button" class="phone__tab"><span class="phone__tab-dot"></span>消息</button>
+              <button type="button" class="phone__tab"><span class="phone__tab-dot"></span>群聊</button>
+              <button type="button" class="phone__tab"><span class="phone__tab-dot"></span>朋友圈</button>
+              <button type="button" class="phone__tab active"><span class="phone__tab-dot"></span>YiYi</button>
+              <button type="button" class="phone__tab"><span class="phone__tab-dot"></span>关系</button>
+              <button type="button" class="phone__tab"><span class="phone__tab-dot"></span>我的</button>
+            </nav>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>信息架构说明</h4>
+          <ul>
+            <li><strong>网络垃圾桶</strong>：用户主动声明「不要什么」，YiYi 对外沟通时硬性过滤。</li>
+            <li><strong>YiYi 对话行</strong>：类似消息列表，展示最近一条 YiYi 问话，点击进入私聊。</li>
+            <li><strong>YiYi 的消息</strong>：仅展示「双方 YiYi 判定为有效」的沟通摘要，不是全量聊天记录。</li>
+            <li><strong>权限入口</strong>：控制对方主人能否看过程、能否加好友；默认保守。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 2: Trash can -->
+    <section class="screen-panel" id="p2">
+      <div class="screen-panel__meta">
+        <h2>② 网络垃圾桶</h2>
+        <p>系统预设 + 用户自定义。勾选内容写入 YiYi 的「拒绝清单」，对外沟通时自动规避。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">网络垃圾桶</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back" aria-hidden>‹</button>
+              <h3>网络垃圾桶</h3>
+              <span class="phone__nav-action"></span>
+            </div>
+            <div class="phone__main">
+              <p class="trash-intro">
+                勾选你排斥的沟通方式与内容。YiYi 在对外交流时会主动避开这些表达，并在遇到时结束或升级给你确认。
+              </p>
+
+              <div class="trash-group">
+                <div class="trash-group__head">系统推荐</div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t1" checked />
+                  <label for="t1">色情<div class="trash-item__hint">含露骨暗示、索要私密内容</div></label>
+                </div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t2" checked />
+                  <label for="t2">骚扰<div class="trash-item__hint">反复纠缠、不受欢迎的私信</div></label>
+                </div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t3" checked />
+                  <label for="t3">没有边界<div class="trash-item__hint">过度打探隐私、强行越界</div></label>
+                </div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t4" checked />
+                  <label for="t4">没有礼貌<div class="trash-item__hint">辱骂、歧视、阴阳怪气</div></label>
+                </div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t5" />
+                  <label for="t5">推销与广告<div class="trash-item__hint">硬广、引流、理财课程</div></label>
+                </div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t6" />
+                  <label for="t6">情感操控<div class="trash-item__hint">PUA 话术、 guilt tripping</div></label>
+                </div>
+              </div>
+
+              <div class="trash-group">
+                <div class="trash-group__head">自定义</div>
+                <div class="trash-item">
+                  <input type="checkbox" id="t7" checked />
+                  <label for="t7">一上来就喊老婆/老公</label>
+                </div>
+              </div>
+
+              <div class="trash-add">
+                <input type="text" placeholder="添加排斥的沟通方式…" />
+                <button type="button">添加</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>产品规则</h4>
+          <ul>
+            <li>默认勾选 4 项：色情、骚扰、没有边界、没有礼貌。</li>
+            <li>自定义条目支持编辑与删除；上限建议 20 条。</li>
+            <li>清单同步至 YiYi 对外 persona，用户可随时修改。</li>
+            <li>对方 YiYi 触发垃圾桶规则时，对话标记为「未通过」，不进入「YiYi 的消息」。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 3: Chat with YiYi -->
+    <section class="screen-panel" id="p3">
+      <div class="screen-panel__meta">
+        <h2>③ 与 YiYi 对话</h2>
+        <p>用户可自由输入，也可点刷新获取推荐问题。YiYi 据此更新社交画像，用于对外匹配。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">与 YiYi 私聊</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back" aria-hidden>‹</button>
+              <h3>YiYi</h3>
+              <span class="phone__nav-action"></span>
+            </div>
+            <div class="phone__main">
+              <div class="chat-banner">
+                YiYi 是你的中间人。聊得越多，越能替你在网络上找到合适的人。
+              </div>
+              <div class="chat-msgs">
+                <div class="chat-bubble-row">
+                  <span class="yiyi-avatar">Y</span>
+                  <div class="chat-bubble chat-bubble--yiyi">你好，我是 YiYi。接下来我会问你几个方向性的问题，方便之后替你去认识合适的人。</div>
+                </div>
+                <div class="chat-bubble-row chat-bubble-row--me">
+                  <div class="chat-bubble chat-bubble--me">好呀</div>
+                </div>
+                <div class="chat-bubble-row">
+                  <span class="yiyi-avatar">Y</span>
+                  <div>
+                    <div class="chat-bubble chat-bubble--yiyi">你最近更想找哪类连接？可以选一个，也可以用自己的话说。</div>
+                    <div class="chat-topics">
+                      <div class="chat-topics__head">
+                        <span>推荐问题</span>
+                        <button type="button" class="chat-topics__refresh">↻ 换一批</button>
+                      </div>
+                      <div class="chat-topic-chips">
+                        <button type="button" class="chat-topic-chip selected">想找一个靠谱的男朋友</button>
+                        <button type="button" class="chat-topic-chip">想找考研搭子，互相监督</button>
+                        <button type="button" class="chat-topic-chip">想找有共同感悟的人聊聊</button>
+                        <button type="button" class="chat-topic-chip">暂时只想扩列，不急着见面</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-bubble-row chat-bubble-row--me">
+                  <div class="chat-bubble chat-bubble--me">我更想找考研搭子，最好是同专业</div>
+                </div>
+                <div class="chat-bubble-row">
+                  <span class="yiyi-avatar">Y</span>
+                  <div class="chat-bubble chat-bubble--yiyi">收到。你平时自习喜欢早起还是夜猫子？这会影响我帮你匹配的节奏。</div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-composer">
+              <div class="chat-composer__row">
+                <button type="button" class="chat-composer__refresh" title="刷新推荐问题" aria-label="刷新推荐问题">↻</button>
+                <div class="chat-composer__input">你想和 YiYi 说点啥。也可以点击刷新按钮，选一些感兴趣的话题。</div>
+                <button type="button" class="chat-composer__send" aria-label="发送">↑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>交互要点</h4>
+          <ul>
+            <li>输入框占位符即需求原文，降低学习成本。</li>
+            <li>刷新按钮在 composer 与话题卡片两处均可触发，换一批问题。</li>
+            <li>点选 chip 等同于发送该句，YiYi 继续追问细节。</li>
+            <li>对话数据沉淀为「社交方向 / 性格 / 其它」三维画像（见⑤）。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 4: YiYi messages -->
+    <section class="screen-panel" id="p4">
+      <div class="screen-panel__meta">
+        <h2>④ YiYi 的消息</h2>
+        <p>只展示双方 YiYi 判定「有效沟通」的摘要，帮助用户快速决定是否进一步认识。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">YiYi 的消息</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back" aria-hidden>‹</button>
+              <h3>YiYi 的消息</h3>
+              <span class="phone__nav-action"></span>
+            </div>
+            <div class="phone__main">
+              <div class="bridge-card">
+                <div class="bridge-card__head">
+                  <div class="bridge-card__avatars">
+                    <span class="yiyi-avatar">Y</span>
+                    <span class="yiyi-avatar" style="background: linear-gradient(145deg,#f472b6,#fb7185)">Y</span>
+                  </div>
+                  <div>
+                    <div class="bridge-card__title">你的 YiYi ↔ 小林的 YiYi</div>
+                    <div class="bridge-card__status">有效沟通 · 2 小时前</div>
+                  </div>
+                </div>
+                <p class="bridge-card__preview">
+                  双方都在准备 2027 考研，目标专业相近；作息偏夜猫子，倾向线上互相打卡。未触发垃圾桶规则。
+                </p>
+                <div class="bridge-card__tags">
+                  <span class="bridge-tag">考研搭子</span>
+                  <span class="bridge-tag">同专业方向</span>
+                  <span class="bridge-tag">夜猫子</span>
+                </div>
+              </div>
+
+              <div class="bridge-card">
+                <div class="bridge-card__head">
+                  <div class="bridge-card__avatars">
+                    <span class="yiyi-avatar">Y</span>
+                    <span class="yiyi-avatar" style="background: linear-gradient(145deg,#34d399,#10b981)">Y</span>
+                  </div>
+                  <div>
+                    <div class="bridge-card__title">你的 YiYi ↔ 阿哲的 YiYi</div>
+                    <div class="bridge-card__status">有效沟通 · 昨天</div>
+                  </div>
+                </div>
+                <p class="bridge-card__preview">
+                  都喜欢独立音乐与 city walk，聊天节奏偏慢热。对方 YiYi 未越界，双方愿意继续了解。
+                </p>
+                <div class="bridge-card__tags">
+                  <span class="bridge-tag">同频聊友</span>
+                  <span class="bridge-tag">慢热</span>
+                </div>
+              </div>
+
+              <div class="bridge-card" style="opacity:0.55">
+                <div class="bridge-card__head">
+                  <div class="bridge-card__avatars">
+                    <span class="yiyi-avatar">Y</span>
+                    <span class="yiyi-avatar" style="background:#9ca3af">Y</span>
+                  </div>
+                  <div>
+                    <div class="bridge-card__title">你的 YiYi ↔ 匿名 YiYi</div>
+                    <div class="bridge-card__status" style="color:var(--muted)">未通过 · 已拦截</div>
+                  </div>
+                </div>
+                <p class="bridge-card__preview">触发「没有边界」规则，YiYi 已终止对话，未向对方透露你的信息。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>「有效沟通」判定（建议）</h4>
+          <ul>
+            <li>未触发任一方垃圾桶规则。</li>
+            <li>至少一个共同意图维度匹配（如搭子 / 恋爱 / 聊友）。</li>
+            <li>双方 YiYi 置信度 ≥ 阈值，且对话轮次 ≥ 3。</li>
+            <li>点击进入可看<strong>摘要 + 关键引用</strong>，完整过程受权限控制。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 5: Connection mechanism -->
+    <section class="screen-panel" id="p5">
+      <div class="screen-panel__meta">
+        <h2>⑤ YiYi 之间如何建立沟通</h2>
+        <p>用户与自己的 YiYi 对话 → 生成画像 → 系统匹配 → 双方 YiYi 试探沟通 → 有效则推送至「YiYi 的消息」。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">YiYi 画像（对话沉淀）</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back" aria-hidden>‹</button>
+              <h3>YiYi 了解到的你</h3>
+              <span class="phone__nav-action"></span>
+            </div>
+            <div class="phone__main">
+              <div class="flow-diagram">
+                <div class="flow-step">
+                  <span class="flow-step__num">1</span>
+                  <div class="flow-step__body">
+                    <h5>你与自己的 YiYi 对话</h5>
+                    <p>自由聊天 + 推荐问题，持续更新画像。</p>
+                  </div>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-step__num">2</span>
+                  <div class="flow-step__body">
+                    <h5>生成三维数据</h5>
+                    <p>社交方向、性格、其它标签，供匹配与对外表达。</p>
+                  </div>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-step__num">3</span>
+                  <div class="flow-step__body">
+                    <h5>YiYi ↔ YiYi 试探</h5>
+                    <p>双方中间人先聊，用户默认不可见过程（可授权）。</p>
+                  </div>
+                </div>
+              </div>
+
+              <p class="yiyi-section-label">当前画像</p>
+              <div class="profile-dims">
+                <div class="profile-dim">
+                  <div class="profile-dim__label">社交方向</div>
+                  <div class="profile-dim__value">找考研搭子</div>
+                  <div class="profile-dim__detail">目标 2027 研，希望同专业或相近方向，线上互相监督为主。</div>
+                  <div class="profile-chips">
+                    <span class="profile-chip">考研</span>
+                    <span class="profile-chip">线上打卡</span>
+                  </div>
+                </div>
+                <div class="profile-dim">
+                  <div class="profile-dim__label">性格</div>
+                  <div class="profile-dim__value">偏 i 人 · 慢热</div>
+                  <div class="profile-dim__detail">熟悉后话多，不喜欢一上来就视频或线下见面。</div>
+                  <div class="profile-chips">
+                    <span class="profile-chip">慢热</span>
+                    <span class="profile-chip">夜猫子</span>
+                  </div>
+                </div>
+                <div class="profile-dim">
+                  <div class="profile-dim__label">其它</div>
+                  <div class="profile-dim__value">兴趣与边界</div>
+                  <div class="profile-dim__detail">喜欢独立音乐；排斥推销、越界打探；周末可短 city walk。</div>
+                  <div class="profile-chips">
+                    <span class="profile-chip">独立音乐</span>
+                    <span class="profile-chip">city walk</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>画像维度（V1）</h4>
+          <ul>
+            <li><strong>社交方向</strong>：恋爱 / 搭子 / 同频聊友 / 扩列等，可多选但有主方向。</li>
+            <li><strong>性格</strong>：内外向、节奏快慢、线上/线下偏好。</li>
+            <li><strong>其它</strong>：兴趣、雷点（联动垃圾桶）、可用时间段等。</li>
+            <li>画像仅用于 YiYi 对外表达，<strong>不默认公开展示给陌生人</strong>。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 6: Permissions -->
+    <section class="screen-panel" id="p6">
+      <div class="screen-panel__meta">
+        <h2>⑥ 权限与可见范围</h2>
+        <p>用户控制对方主人在「YiYi 沟通过程」上的可见性与后续是否可加好友。默认保护隐私。</p>
+      </div>
+      <div class="screen-row">
+        <div class="phone-wrap">
+          <div class="phone-wrap__label">权限设置</div>
+          <div class="phone">
+            <div class="phone__status">9:41</div>
+            <div class="phone__nav">
+              <button type="button" class="phone__nav-back" aria-hidden>‹</button>
+              <h3>权限与可见范围</h3>
+              <span class="phone__nav-action"></span>
+            </div>
+            <div class="phone__main">
+              <p class="trash-intro">
+                以下设置作用于「你的 YiYi 与对方的 YiYi 沟通」阶段。你可以随时修改，不影响已与 YiYi 的对话记录。
+              </p>
+
+              <div class="settings-group">
+                <div class="settings-row">
+                  <div class="settings-row__body">
+                    <span class="settings-row__title">允许对方查看沟通过程</span>
+                    <span class="settings-row__desc">开启后，对方主人可看到双方 YiYi 的完整对话记录；关闭时仅双方 YiYi 可见，你仍会在「YiYi 的消息」收到摘要。</span>
+                  </div>
+                  <div class="toggle" role="switch" aria-checked="false"></div>
+                </div>
+                <div class="settings-row">
+                  <div class="settings-row__body">
+                    <span class="settings-row__title">允许对方添加好友</span>
+                    <span class="settings-row__desc">仅在出现「有效沟通」后生效。开启后对方可申请加你为联系人；你仍可拒绝或拉黑。</span>
+                  </div>
+                  <div class="toggle on" role="switch" aria-checked="true"></div>
+                </div>
+              </div>
+
+              <div class="settings-group">
+                <div class="settings-row">
+                  <div class="settings-row__body">
+                    <span class="settings-row__title">YiYi 对外活跃</span>
+                    <span class="settings-row__desc">关闭后 YiYi 暂停与其他 YiYi 建立新沟通，已有会话不受影响。</span>
+                  </div>
+                  <div class="toggle on" role="switch" aria-checked="true"></div>
+                </div>
+              </div>
+
+              <p class="yiyi-section-label" style="margin-top:16px">推荐默认值</p>
+              <div class="trash-intro" style="margin-bottom:0">
+                沟通过程：<strong>不可见</strong> · 添加好友：<strong>允许</strong> · YiYi 活跃：<strong>开启</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="note-card">
+          <h4>权限策略建议</h4>
+          <ul>
+            <li><strong>查看过程</strong>：默认关，避免社交压力；高意向用户可手动打开。</li>
+            <li><strong>添加好友</strong>：默认开，否则匹配无法转化；需与「有效沟通」联动。</li>
+            <li>单次会话可覆盖全局默认（高级版本能力）。</li>
+            <li>任意时刻用户可「收回授权」，历史摘要仍保留。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Panel 7: Overview -->
+    <section class="screen-panel wide-panel" id="p7">
+      <div class="screen-panel__meta">
+        <h2>⑦ 方案总览（评审用）</h2>
+        <p>一页汇总 Tab 结构、核心闭环与 MVP 范围，便于老板快速决策。</p>
+      </div>
+
+      <div class="flow-diagram" style="display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:20px;">
+        <div class="profile-dim" style="margin:0">
+          <div class="profile-dim__label">Step 1</div>
+          <div class="profile-dim__value">设置边界</div>
+          <div class="profile-dim__detail">网络垃圾桶 · 默认 4 项勾选</div>
+        </div>
+        <div class="profile-dim" style="margin:0">
+          <div class="profile-dim__label">Step 2</div>
+          <div class="profile-dim__value">训练 YiYi</div>
+          <div class="profile-dim__detail">私聊 + 刷新问题 · 沉淀画像</div>
+        </div>
+        <div class="profile-dim" style="margin:0">
+          <div class="profile-dim__label">Step 3</div>
+          <div class="profile-dim__value">YiYi 互聊</div>
+          <div class="profile-dim__detail">中间人试探 · 过滤无效连接</div>
+        </div>
+        <div class="profile-dim" style="margin:0">
+          <div class="profile-dim__label">Step 4</div>
+          <div class="profile-dim__value">有效沟通</div>
+          <div class="profile-dim__detail">摘要推送 · 可选加好友</div>
+        </div>
+      </div>
+
+      <table class="arch-table">
+        <thead>
+          <tr>
+            <th>模块</th>
+            <th>用户价值</th>
+            <th>MVP 范围</th>
+            <th>后续迭代</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>YiYi Tab</strong></td>
+            <td>统一入口，降低功能分散感</td>
+            <td>6 Tab 新增 YiYi；列表 4 行</td>
+            <td>未读角标、YiYi 状态指示</td>
+          </tr>
+          <tr>
+            <td><strong>网络垃圾桶</strong></td>
+            <td>明确「不要什么」，提升安全感</td>
+            <td>预设 + 自定义；同步 YiYi</td>
+            <td>场景化模板、敏感词建议</td>
+          </tr>
+          <tr>
+            <td><strong>与 YiYi 对话</strong></td>
+            <td>低压力表达需求，无需直接社交</td>
+            <td>自由输入 + 刷新问题 chip</td>
+            <td>语音输入、多轮记忆可视化</td>
+          </tr>
+          <tr>
+            <td><strong>YiYi 的消息</strong></td>
+            <td>只看结果，不被过程打扰</td>
+            <td>有效/未通过摘要卡片</td>
+            <td>一键发起真人聊天</td>
+          </tr>
+          <tr>
+            <td><strong>权限开关</strong></td>
+            <td>用户掌控隐私与转化节奏</td>
+            <td>2 项核心开关 + YiYi 活跃</td>
+            <td>按会话授权、黑名单联动</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    document.querySelectorAll(".gallery__nav button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".gallery__nav button").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".screen-panel").forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.panel).classList.add("active");
+      });
+    });
+
+    document.querySelectorAll(".chat-topic-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("selected");
+      });
+    });
+  </script>
+</body>
+</html>

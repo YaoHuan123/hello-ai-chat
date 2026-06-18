@@ -46,6 +46,15 @@ function formatMessageTime(ts: number): string {
   return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
 }
 
+function pickNextGuardianRoleId(
+  guardianRoleIds: string[],
+  messages: GuardianGroupMessage[],
+): string | null {
+  if (guardianRoleIds.length === 0) return null;
+  const guardianCount = messages.filter((m) => m.senderKind === "guardian").length;
+  return guardianRoleIds[guardianCount % guardianRoleIds.length] ?? null;
+}
+
 function contactForMember(
   contactById: Map<string, ContactItem>,
   userId: string,
@@ -89,13 +98,20 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   const [sending, setSending] = useState(false);
   const [latestHint, setLatestHint] = useState<GuardianOwnerHint | null>(null);
   const [membersOpen, setMembersOpen] = useState(false);
+  const [guardianSpeaking, setGuardianSpeaking] = useState<{ roleId: string } | null>(null);
+  const [revealingGuardianId, setRevealingGuardianId] = useState<number | null>(null);
   const scRef = useRef<HTMLDivElement>(null);
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesRef = useRef<GuardianGroupMessage[]>(messages);
+  const groupRef = useRef<GuardianGroup | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    groupRef.current = group;
+  }, [group]);
 
   const contactById = useMemo(() => new Map(contacts.map((c) => [c.contactUserId, c])), [contacts]);
 
@@ -115,6 +131,21 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
     for (const it of items) {
       seenIdsRef.current.add(it.id);
     }
+  };
+
+  const startGuardianSpeakingAfterPeerMessage = () => {
+    const g = groupRef.current;
+    if (!g?.guardianRoleIds?.length) return;
+    const roleId = pickNextGuardianRoleId(g.guardianRoleIds, messagesRef.current);
+    if (roleId) setGuardianSpeaking({ roleId });
+  };
+
+  const finishGuardianSpeaking = (messageId: number) => {
+    setGuardianSpeaking(null);
+    setRevealingGuardianId(messageId);
+    window.setTimeout(() => {
+      setRevealingGuardianId((current) => (current === messageId ? null : current));
+    }, 500);
   };
 
   useEffect(() => {
@@ -161,7 +192,15 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
         if (msg.payload.groupId !== groupId) return;
         const m = msg.payload.message as GuardianGroupMessage;
         if (seenIdsRef.current.has(m.id)) return;
-        appendMessages({ ...(m as GuardianGroupMessage), groupId });
+        if (m.senderKind === "guardian") {
+          finishGuardianSpeaking(m.id);
+          appendMessages({ ...m, groupId });
+          return;
+        }
+        appendMessages({ ...m, groupId });
+        if (m.senderKind === "peer") {
+          startGuardianSpeakingAfterPeerMessage();
+        }
         return;
       }
       if (msg.type === "guardian_owner_hint") {
@@ -180,7 +219,13 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   useEffect(() => {
     const el = scRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
+  }, [messages, guardianSpeaking]);
+
+  useEffect(() => {
+    if (!guardianSpeaking) return;
+    const timeout = window.setTimeout(() => setGuardianSpeaking(null), 45_000);
+    return () => clearTimeout(timeout);
+  }, [guardianSpeaking]);
 
   useChatViewportScroll(scRef);
 
@@ -194,6 +239,9 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       const { message: m } = await sendGuardianGroupMessageApi(groupId, text, messagesRef.current);
       if (!seenIdsRef.current.has(m.id)) {
         appendMessages(m);
+        if (m.senderKind === "peer") {
+          startGuardianSpeakingAfterPeerMessage();
+        }
       }
     } catch (e: unknown) {
       setLoadErr(e instanceof Error ? e.message : String(e));
@@ -211,6 +259,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   const title =
     group?.name?.trim() ||
     (humanMembers.length > 0 ? `群聊(${humanMembers.length})` : "群聊");
+  const speakingRole = guardianSpeaking ? roles.get(guardianSpeaking.roleId) : undefined;
 
   if (membersOpen && group) {
     return (
@@ -266,7 +315,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       ) : null}
 
       <div ref={scRef} className="msg-chat-scroll msg-chat-c1-scroll">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !guardianSpeaking ? (
           <p className="msg-chat-c1-empty">暂无消息</p>
         ) : (
           <ul className="msg-chat-list msg-chat-c1-list" aria-label="群消息">
@@ -275,9 +324,10 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
               const role = m.guardianRoleId ? roles.get(m.guardianRoleId) : undefined;
               const member = humanMembers.find((x) => x.userId === m.fromUserId);
               const isMe = kind === "me";
+              const guardianName = role?.name ?? "搭子";
               const senderLabel =
                 kind === "guardian"
-                  ? (role?.name ?? "搭子")
+                  ? guardianName
                   : kind === "peer" && showPeerSender && member
                     ? memberDisplayName(member.userId, member.phone)
                     : null;
@@ -299,13 +349,48 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
                     />
                   ) : null}
                   <div className="msg-chat-c1-col">
-                    {senderLabel ? <span className="guardian-group-msg-name">{senderLabel}</span> : null}
-                    <div className={`msg-chat-c1-bubble msg-chat-c1-bubble--${isMe ? "me" : "other"}`}>{m.text}</div>
+                    {senderLabel ? (
+                      <span
+                        className={`guardian-group-msg-name${
+                          kind === "guardian" ? " guardian-group-msg-name--guardian" : ""
+                        }`}
+                      >
+                        {senderLabel}
+                      </span>
+                    ) : null}
+                    <div
+                      className={`msg-chat-c1-bubble msg-chat-c1-bubble--${isMe ? "me" : "other"}${
+                        kind === "guardian" ? " msg-chat-c1-bubble--guardian" : ""
+                      }${m.id === revealingGuardianId ? " msg-chat-c1-bubble--guardian-reveal" : ""}`}
+                    >
+                      {m.text}
+                    </div>
                     <span className="msg-chat-c1-meta">{formatMessageTime(m.ts)}</span>
                   </div>
                 </li>
               );
             })}
+            {guardianSpeaking && speakingRole ? (
+              <li className="msg-chat-c1-row guardian-group-speaking-row" aria-live="polite">
+                <span className="guardian-group-avatar-glow is-speaking">
+                  <GuardianAvatar
+                    role={speakingRole}
+                    className="msg-chat-c1-avatar msg-chat-c1-avatar--guardian"
+                    alt=""
+                  />
+                </span>
+                <div className="msg-chat-c1-col">
+                  <span className="guardian-group-msg-name guardian-group-msg-name--guardian">
+                    {speakingRole.name}
+                  </span>
+                  <div className="guardian-group-typing-dots" aria-label="搭子正在回复">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              </li>
+            ) : null}
           </ul>
         )}
       </div>

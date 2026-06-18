@@ -83,7 +83,6 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
   const [myUserId, setMyUserId] = useState("");
   const [loadErr, setLoadErr] = useState("");
   const [molPanelOpen, setMolPanelOpen] = useState(false);
-  const [molDraftText, setMolDraftText] = useState("");
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [relationSheetOpen, setRelationSheetOpen] = useState(false);
   const [myMols, setMyMols] = useState<MolInMyCollection[]>([]);
@@ -99,7 +98,7 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
   }, [messages]);
 
   const getLastMessagesForSuggest = useCallback((): MolSuggestLastMessage[] => {
-    return messagesRef.current.slice(-12).map((m) => ({
+    return messagesRef.current.map((m) => ({
       from: m.from === "me" ? ("me" as const) : ("peer" as const),
       text: m.text,
       ts: m.ts,
@@ -183,7 +182,6 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
 
   const closeMolPanel = useCallback(() => {
     setMolPanelOpen(false);
-    setMolDraftText("");
   }, []);
 
   useEffect(() => {
@@ -239,13 +237,12 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
       closeMolPanel();
       return;
     }
-    setMolDraftText(input.trim());
-    setInput("");
     setMolPanelOpen(true);
   }
 
   function pickSuggestion(text: string) {
     closeMolPanel();
+    setInput("");
     void sendText(text);
   }
 
@@ -333,9 +330,14 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
           molName={activeMol?.name ?? null}
           relationType={contact.relationType}
           getLastMessages={getLastMessagesForSuggest}
-          draftText={molDraftText}
+          draftText={input.trim()}
+          getDraftText={() => inputRef.current?.value.trim() ?? input.trim()}
           onPick={pickSuggestion}
           onClose={closeMolPanel}
+          onSetRelation={() => {
+            closeMolPanel();
+            setRelationSheetOpen(true);
+          }}
           onManageMols={
             onManageMols
               ? () => {

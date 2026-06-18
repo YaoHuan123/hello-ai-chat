@@ -2,7 +2,6 @@ import { Router, type Response } from "express";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
 import type { MolWorldService } from "../services/molWorld.service";
-import { isPrivateMolId } from "../services/molWorld.service";
 import type { UserMolsService } from "../services/userMols.service";
 
 function mapMolWorldError(res: Response, error: unknown): boolean {
@@ -92,7 +91,7 @@ export const createMolWorldRouter = (molWorld: MolWorldService, userMols: UserMo
     }
     try {
       const rec = molWorld.getById(id);
-      if (!rec || isPrivateMolId(id)) {
+      if (!rec) {
         res.status(404).json({ code: "NOT_FOUND", message: "未找到该素颜" });
         return;
       }

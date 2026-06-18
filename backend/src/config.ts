@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { config as loadDotenv } from "dotenv";
 
-// 必须在读取 process.env 之前完成 .env 注入：本文件被 any import 触发求值时立即生效。
+// 必须在读取 process.env 之前完成 .env 注入：本文件被任何 import 触发求值时立即生效。
 // 先加载共享 .env（默认 E:\hello story2\backend\.env），再用本仓库 backend/.env 覆盖。
 const DEFAULT_SHARED_ENV = "E:\\hello story2\\backend\\.env";
 
@@ -47,6 +47,10 @@ export const OPENAI_TIMEOUT_MS = Math.min(
   120_000,
   Math.max(1000, Number.parseInt(process.env.OPENAI_TIMEOUT_MS?.trim() || "15000", 10) || 15_000),
 );
+
+/** AI 交互 trace：是否写入 data/ai-traces（默认开启，设 AI_REPLY_TRACE=false 关闭） */
+export const AI_REPLY_TRACE_ENABLED = process.env.AI_REPLY_TRACE?.trim().toLowerCase() !== "false";
+export const AI_REPLY_TRACE_DIR = path.join(DATA_ROOT, "ai-traces");
 
 /** 朋友圈热点：抓取微博/知乎/抖音热搜并经 LLM 生成问题；缓存目录与刷新间隔 */
 export const HOT_TOPICS_DIR = path.join(DATA_ROOT, "hot-topics");

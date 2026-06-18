@@ -12,7 +12,8 @@ export type AppIconName =
   | "suyanHorn"
   | "explore"
   | "mine"
-  | "hot";
+  | "hot"
+  | "refresh";
 
 type Props = {
   name: AppIconName;
@@ -106,6 +107,15 @@ function IconPaths({ name }: { name: AppIconName }) {
       );
     case "hot":
       return <path d="M12 22c4-2.5 6-5.5 6-9a6 6 0 0 0-10.5-4 6 6 0 0 0-1.5 8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.5-1 2.8-2.5 3.5" />;
+    case "refresh":
+      return (
+        <>
+          <path d="M21 12a9 9 0 0 0-15-6.7" />
+          <path d="M3 12a9 9 0 0 0 15 6.7" />
+          <path d="M17 3v4h4" />
+          <path d="M7 21v-4H3" />
+        </>
+      );
   }
 }
 

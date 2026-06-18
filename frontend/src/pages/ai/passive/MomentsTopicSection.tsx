@@ -144,7 +144,7 @@ export function MomentsTopicSection({ title, topics, onCollected, variant = "def
             />
             <div className="aichat-moldt-info-form__act moments-topic-answer-form__act">
               <button type="button" className="aichat-btn-primary aichat-btn-fit moments-topic-answer-form__submit" onClick={submitAnswer}>
-                添加到我的日常
+                添加到我的动态
               </button>
             </div>
           </div>

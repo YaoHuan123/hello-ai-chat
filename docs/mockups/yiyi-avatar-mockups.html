@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIChat · YiYi 头像参考 · 豆包风格</title>
+  <style>
+    :root {
+      --bg: #f3f4f8;
+      --surface: #fff;
+      --text: #1c1f26;
+      --muted: #6f7785;
+      --border: rgba(20, 23, 30, 0.08);
+      --accent: #7c5cff;
+      --accent-soft: rgba(124, 92, 255, 0.1);
+      --radius: 20px;
+      --shadow: 0 10px 36px rgba(40, 40, 80, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .page { max-width: 1080px; margin: 0 auto; padding: 32px 20px 72px; }
+    .page__head { margin-bottom: 28px; }
+    .page__head h1 { margin: 0 0 10px; font-size: 24px; font-weight: 650; }
+    .page__head p { margin: 0; color: var(--muted); font-size: 14px; max-width: 760px; }
+
+    .brief {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 720px) { .brief { grid-template-columns: 1fr; } }
+
+    .brief__box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .brief__box h3 { margin: 0 0 10px; font-size: 14px; font-weight: 650; }
+    .brief__box ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+    .brief__box li { margin-bottom: 4px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card__hero {
+      background: linear-gradient(165deg, #faf8ff 0%, #f0ecff 50%, #ebe6ff 100%);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .av {
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 12px 40px rgba(80, 60, 140, 0.18), 0 0 0 5px #fff;
+    }
+    .av--xl { width: 140px; height: 140px; }
+    .av--md { width: 48px; height: 48px; box-shadow: 0 4px 14px rgba(80,60,140,0.15), 0 0 0 2px #fff; }
+    .av--sm { width: 32px; height: 32px; box-shadow: 0 2px 8px rgba(80,60,140,0.12), 0 0 0 2px #fff; }
+
+    .card__tag {
+      font-size: 11px;
+      font-weight: 650;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+    .card__title { margin: 0; font-size: 17px; font-weight: 650; text-align: center; }
+    .card__desc {
+      margin: 0;
+      padding: 0 22px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .card__body {
+      padding: 0 20px 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .preview {
+      background: #f7f8fc;
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .preview__label { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .chat { display: flex; align-items: flex-start; gap: 8px; }
+    .bubble {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px 14px 14px 4px;
+      padding: 9px 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 240px;
+    }
+
+    .sizes {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: flex-end;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .sizes div { text-align: center; }
+    .sizes img { display: block; margin: 0 auto 4px; }
+
+    .note {
+      margin-top: 24px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .note strong { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="page__head">
+      <h1>YiYi 头像参考 · 豆包风格</h1>
+      <p>按豆包思路：短发女生、亲和拟人、无 AI 科技元素（无光环、发光瞳、耳麦、电路）。像一位会听你说话、替你出面沟通的朋友，而不是机器人。</p>
+    </header>
+
+    <div class="brief">
+      <div class="brief__box">
+        <h3>对齐豆包的视觉原则</h3>
+        <ul>
+          <li>具象女生头像，产品一打开就像在和「人」说话</li>
+          <li>短发 / 齐肩发，干净刘海，轮廓圆润</li>
+          <li>自然瞳色、柔和表情，日常服装（针织、卫衣、T 恤）</li>
+          <li>3D 软萌插画或半写实，温暖光感</li>
+        </ul>
+      </div>
+      <div class="brief__box">
+        <h3>YiYi 需避免的元素</h3>
+        <ul>
+          <li>紫色发光眼、星形高光、旋转光环</li>
+          <li>AI 耳麦、电路、数据屏、叠影分身</li>
+          <li>过度 Q 版或程序感 SVG 线条</li>
+          <li>科技蓝冷色调主导（与豆包暖感相反）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <article class="card">
+        <div class="card__hero">
+          <span class="card__tag">推荐 A · 默认</span>
+          <img class="av av--xl" src="yiyi-avatars/yiyi-avatar-a.png" alt="YiYi 方案 A" />
+          <h2 class="card__title">标准微笑</h2>
+        </div>
+        <p class="card__desc">最接近豆包默认气质：短发、针织、开朗笑。适合 YiYi 主头像与欢迎语。</p>
+        <div class="card__body">
+          <div class="preview">
+            <div class="preview__label">聊天预览</div>
+            <div class="chat">
+              <img class="av av--sm" src="yiyi-avatars/yiyi-avatar-a.png" alt="" />
+              <div class="bubble">你好，我是 YiYi。想先听听你的想法。</div>
+            </div>
+          </div>
+          <div class="sizes">
+            <div><img class="av av--md" src="yiyi-avatars/yiyi-avatar-a.png" alt="" />48px</div>
+            <div><img class="av av--sm" src="yiyi-avatars/yiyi-avatar-a.png" alt="" />32px</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card__hero">
+          <span class="card__tag">B · 倾听</span>
+          <img class="av av--xl" src="yiyi-avatars/yiyi-avatar-b.png" alt="YiYi 方案 B" />
+          <h2 class="card__title">侧头倾听</h2>
+        </div>
+        <p class="card__desc">微侧头、浅笑，像在认真听用户说话。适合对话中、推荐问题等待回复时。</p>
+        <div class="card__body">
+          <div class="preview">
+            <div class="chat">
+              <img class="av av--sm" src="yiyi-avatars/yiyi-avatar-b.png" alt="" />
+              <div class="bubble">嗯，我在听。你可以继续说说。</div>
+            </div>
+          </div>
+          <div class="sizes">
+            <div><img class="av av--md" src="yiyi-avatars/yiyi-avatar-b.png" alt="" />48px</div>
+            <div><img class="av av--sm" src="yiyi-avatars/yiyi-avatar-b.png" alt="" />32px</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card__hero">
+          <span class="card__tag">C · 思考</span>
+          <img class="av av--xl" src="yiyi-avatars/yiyi-avatar-c.png" alt="YiYi 方案 C" />
+          <h2 class="card__title">安静思考</h2>
+        </div>
+        <p class="card__desc">发夹 + 卫衣，表情更内敛。适合「正在更新画像」「匹配中」等等待态。</p>
+        <div class="card__body">
+          <div class="preview">
+            <div class="chat">
+              <img class="av av--sm" src="yiyi-avatars/yiyi-avatar-c.png" alt="" />
+              <div class="bubble">收到，我在整理你的偏好。</div>
+            </div>
+          </div>
+          <div class="sizes">
+            <div><img class="av av--md" src="yiyi-avatars/yiyi-avatar-c.png" alt="" />48px</div>
+            <div><img class="av av--sm" src="yiyi-avatars/yiyi-avatar-c.png" alt="" />32px</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card__hero">
+          <span class="card__tag">D · 元气</span>
+          <img class="av av--xl" src="yiyi-avatars/yiyi-avatar-d.png" alt="YiYi 方案 D" />
+          <h2 class="card__title">元气露齿</h2>
+        </div>
+        <p class="card__desc">更开朗、头身比略 Q。适合 Tab 入口或偏年轻向，但仍保持豆包式「真人感」。</p>
+        <div class="card__body">
+          <div class="preview">
+            <div class="chat">
+              <img class="av av--sm" src="yiyi-avatars/yiyi-avatar-d.png" alt="" />
+              <div class="bubble">选个感兴趣的问题，或者直接跟我说～</div>
+            </div>
+          </div>
+          <div class="sizes">
+            <div><img class="av av--md" src="yiyi-avatars/yiyi-avatar-d.png" alt="" />48px</div>
+            <div><img class="av av--sm" src="yiyi-avatars/yiyi-avatar-d.png" alt="" />32px</div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="note">
+      <strong>下一步：</strong>
+      选定主方案（建议 <strong>A</strong> 作默认，<strong>B/C</strong> 作状态切换）后，可让插画师按同一角色出正式资产包（512×512 PNG + 32/44 小图），或我按选定方案继续生成「拒绝 / 匹配完成」等表情并接入 <code>YiyiAvatar</code>。
+      图片位于 <code>docs/mockups/yiyi-avatars/</code>。
+    </p>
+  </div>
+</body>
+</html>

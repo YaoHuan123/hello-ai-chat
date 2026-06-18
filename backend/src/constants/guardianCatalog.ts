@@ -70,7 +70,7 @@ export const GUARDIAN_CATALOG: GuardianRoleDef[] = [
     forbidden: ["骂街", "替用户做感情决定", "替用户表白或拒绝"],
     sampleProactiveLines: [
       "哎等等，你这话听着耳熟，咱先说说你打算怎么尊重人家时间安排？",
-      "林小姐插一句，喜欢一个人不用逼对方当场表态。",
+      "喜欢一个人不用逼对方当场表态。",
     ],
     avatarColor: "#3a3348",
   },

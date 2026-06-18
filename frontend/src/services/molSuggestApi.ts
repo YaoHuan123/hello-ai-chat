@@ -13,11 +13,17 @@ export async function suggestRepliesApi(
   peerUserId: string,
   lastMessages: MolSuggestLastMessage[],
   molId?: string,
+  userDraft?: string,
   token?: string,
 ): Promise<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }> {
   return postJson<{ suggestions: string[]; relationType?: import("../constants/relationTypes").RelationType | null }>(
     "/api/mol/suggest",
-    { peerUserId, lastMessages, ...(molId ? { molId } : {}) },
+    {
+      peerUserId,
+      lastMessages,
+      ...(molId ? { molId } : {}),
+      ...(userDraft?.trim() ? { userDraft: userDraft.trim() } : {}),
+    },
     token ?? authT(),
   );
 }

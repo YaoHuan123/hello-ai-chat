@@ -146,7 +146,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
                   <span className="moments-tab-entry__ico" aria-hidden>
                     <AppIcon name="mine" className="app-icon app-icon--sm app-icon--purple" />
                   </span>
-                  <span className="moments-tab-entry__title">我的日常</span>
+                  <span className="moments-tab-entry__title">我的动态</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›

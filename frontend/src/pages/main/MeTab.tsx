@@ -19,6 +19,7 @@ import {
   setNicknameCache,
 } from "../../services/storage";
 import { formatAppVersion, getAppVersion } from "../../platform/appVersion";
+import { clearAllLocalChatRecords } from "../../services/clearAllLocalChatRecords";
 
 type Props = {
   onNavigateFeature: (route: RouteName) => void;
@@ -44,6 +45,8 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
   const [err, setErr] = useState("");
   const [versionLabel, setVersionLabel] = useState("—");
   const fileRef = useRef<HTMLInputElement>(null);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   function applyMeProfile(me: Awaited<ReturnType<typeof getMeApi>>) {
     setNicknameCache(me.nickname);
@@ -84,6 +87,17 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
       cancelled = true;
     };
   }, []);
+
+  async function onConfirmClearChat() {
+    setClearing(true);
+    try {
+      clearAllLocalChatRecords();
+      setClearConfirmOpen(false);
+      window.setTimeout(() => window.location.reload(), 400);
+    } finally {
+      setClearing(false);
+    }
+  }
 
   function openNicknameSheet() {
     setDraft(getNickname());
@@ -182,10 +196,13 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           >
             <ContactAvatar contact={avatarContact} className="me-tab__avatar me-tab__avatar--letter" />
           </button>
-          <div className="me-tab__hero-meta">
+          <button type="button" className="me-tab__hero-meta" onClick={openNicknameSheet} aria-label="设置昵称">
             <strong>{displayName}</strong>
             <span>{phoneMask}</span>
-          </div>
+          </button>
+          <span className="me-tab__hero-chev" aria-hidden>
+            ›
+          </span>
         </div>
 
         {err && !sheetOpen && !generateOpen ? <p className="aichat-form-msg err me-tab__err">{err}</p> : null}
@@ -206,10 +223,10 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
         </section>
 
         <section className="me-tab__group" aria-label="账号">
-          <button type="button" className="me-tab__row" onClick={openNicknameSheet}>
+          <button type="button" className="me-tab__row" onClick={() => setClearConfirmOpen(true)}>
             <span className="me-tab__row-body">
-              <b>昵称</b>
-              <span>{getNickname().trim() || "未设置"}</span>
+              <b>清空聊天记录</b>
+              <span>仅删除本机私聊、群聊与 YiYi 对话</span>
             </span>
             <span className="me-tab__row-chev" aria-hidden>
               ›
@@ -333,6 +350,26 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {clearConfirmOpen ? (
+        <div className="contacts-sheet-overlay" role="presentation" onClick={() => !clearing && setClearConfirmOpen(false)}>
+          <div className="contacts-sheet" role="dialog" aria-modal="true" aria-labelledby="me-clear-chat-title" onClick={(ev) => ev.stopPropagation()}>
+            <div className="contacts-sheet__handle" aria-hidden />
+            <h2 id="me-clear-chat-title" className="contacts-sheet__title">
+              清空本机聊天记录
+            </h2>
+            <p className="me-tab__clear-desc">将删除本机全部私聊、群聊与 YiYi 对话记录，不可恢复。</p>
+            <div className="contacts-sheet__actions">
+              <button className="aichat-btn-ghost contacts-sheet__btn" type="button" disabled={clearing} onClick={() => setClearConfirmOpen(false)}>
+                取消
+              </button>
+              <button className="aichat-btn-primary contacts-sheet__btn me-tab__clear-confirm" type="button" disabled={clearing} onClick={() => void onConfirmClearChat()}>
+                {clearing ? "处理中…" : "清空"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

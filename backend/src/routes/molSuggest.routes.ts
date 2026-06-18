@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { pickSuggestChatContext } from "../constants/suggestChatContext";
 import type { AiReplyService, SuggestLastMessage } from "../services/aiReply.service";
 import type { ContactsService } from "../services/contacts.service";
 import type { UserMolsService } from "../services/userMols.service";
@@ -9,6 +10,7 @@ import type { UserMolsService } from "../services/userMols.service";
 const bodySchema = z.object({
   peerUserId: z.string().min(1),
   molId: z.string().min(1).optional(),
+  userDraft: z.string().max(500).optional(),
   lastMessages: z
     .array(
       z.object({
@@ -112,7 +114,7 @@ export const createMolSuggestRouter = (
       res.status(400).json({ code: "INVALID_PARAMS", message: parsed.error.issues[0]?.message ?? "请求参数无效" });
       return;
     }
-    const { peerUserId, molId, lastMessages } = parsed.data;
+    const { peerUserId, molId, lastMessages, userDraft } = parsed.data;
 
     if (!contacts.areMutualContacts(user.userId, peerUserId)) {
       res.status(403).json({ code: "NOT_FRIENDS", message: "双方不是联系人，无法生成建议" });
@@ -139,10 +141,16 @@ export const createMolSuggestRouter = (
       return;
     }
 
-    const lm: SuggestLastMessage[] = (lastMessages ?? []).slice(-12);
+    const lm: SuggestLastMessage[] = pickSuggestChatContext(lastMessages ?? []);
 
     try {
-      const suggestions = await aiReply.suggestReplies({ personaBlock, lastMessages: lm, relationType });
+      const suggestions = await aiReply.suggestReplies({
+        personaBlock,
+        lastMessages: lm,
+        relationType,
+        userDraft,
+        molId,
+      });
       res.status(200).json({ suggestions, relationType });
     } catch (error) {
       if (mapError(res, error)) return;

@@ -2,6 +2,7 @@ import { OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, OPENAI_TIMEOUT_MS } from
 import { logWarn } from "../logger";
 import type { MomentItem } from "./moments.service";
 import { loadMomentsExploreSystemTemplate, loadMomentsExploreUserTemplate } from "./momentsPromptFiles";
+import { disableDoubaoThinking } from "./openaiCompat";
 
 export type ExploreChatLine = { from: "explorer" | "clone"; text: string; ts: number };
 
@@ -62,6 +63,17 @@ export class MomentsAiService {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
+    const body: Record<string, unknown> = {
+      model: OPENAI_MODEL,
+      temperature: 0.75,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    };
+    disableDoubaoThinking(body);
+
     let res: Response;
     try {
       res = await fetch(url, {
@@ -70,15 +82,7 @@ export class MomentsAiService {
           Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          model: OPENAI_MODEL,
-          temperature: 0.75,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: user },
-          ],
-        }),
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
     } catch (e: unknown) {

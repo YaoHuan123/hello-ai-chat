@@ -44,7 +44,7 @@ export function relationLabel(type: RelationType | null | undefined): string | n
 }
 
 /** 关系 → 素颜场景分类，用于推荐默认素颜 */
-export const RELATION_MOL_CATEGORY: Partial<Record<RelationType, string>> = {
+export const RELATION_SUYAN_SCENE: Partial<Record<RelationType, string>> = {
   lover: "亲密关系",
   ambiguous: "亲密关系",
   parent: "家庭亲友",
@@ -58,3 +58,6 @@ export const RELATION_MOL_CATEGORY: Partial<Record<RelationType, string>> = {
   client: "职场沟通",
   acquaintance: "陌生人破冰",
 };
+
+/** @deprecated 使用 RELATION_SUYAN_SCENE */
+export const RELATION_MOL_CATEGORY = RELATION_SUYAN_SCENE;
