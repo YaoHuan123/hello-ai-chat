@@ -5,9 +5,10 @@ import type { RouteName } from "../../types/routes";
 
 type Props = {
   onNavigateFeature: (route: RouteName) => void;
+  onBack?: () => void;
 };
 
-export function YiyiTab({ onNavigateFeature }: Props) {
+export function YiyiTab({ onNavigateFeature, onBack }: Props) {
   const [state, setState] = useState<YiyiUserState | null>(null);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
@@ -39,7 +40,13 @@ export function YiyiTab({ onNavigateFeature }: Props) {
   return (
     <div className="aichat-main-shell-tab yiyi-tab">
       <header className="aichat-topbar aichat-topbar-flex yiyi-tab__topbar">
-        <span className="yiyi-tab__topbar-spacer" aria-hidden />
+        {onBack ? (
+          <button type="button" className="aichat-btn-ghost yiyi-tab__topbar-back" onClick={onBack}>
+            返回
+          </button>
+        ) : (
+          <span className="yiyi-tab__topbar-spacer" aria-hidden />
+        )}
         <div className="aichat-stage-head">
           <h1>YiYi</h1>
         </div>

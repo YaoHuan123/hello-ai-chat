@@ -14,11 +14,13 @@ export type RouteName =
   | "moments-my"
   | "moments-hot"
   | "moments-friend"
+  | "yiyi-home"
   | "yiyi-trash"
   | "yiyi-chat"
   | "yiyi-messages"
   | "yiyi-profile"
   | "yiyi-settings"
+  | "daily-home"
   | "mol-world"
   | "mol-mine"
   | "mol-detail"
@@ -41,7 +43,9 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   "moments-my": { title: "我的动态", phase: "朋友圈" },
   "moments-hot": { title: "热点", phase: "朋友圈" },
   "moments-friend": { title: "朋友圈探索", phase: "朋友圈" },
+  "yiyi-home": { title: "YiYi", phase: "YiYi" },
   "yiyi-trash": { title: "网络垃圾桶", phase: "YiYi" },
+  "daily-home": { title: "日常", phase: "日常" },
   "yiyi-chat": { title: "YiYi", phase: "YiYi" },
   "yiyi-messages": { title: "YiYi 的消息", phase: "YiYi" },
   "yiyi-profile": { title: "YiYi", phase: "YiYi" },

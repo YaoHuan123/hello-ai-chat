@@ -30,6 +30,8 @@ import { YiyiChatPage } from "./pages/yiyi/YiyiChatPage";
 import { YiyiMessagesPage } from "./pages/yiyi/YiyiMessagesPage";
 import { YiyiProfilePage } from "./pages/yiyi/YiyiProfilePage";
 import { YiyiSettingsPage } from "./pages/yiyi/YiyiSettingsPage";
+import { YiyiTab } from "./pages/yiyi/YiyiTab";
+import { DailyTab } from "./pages/main/DailyTab";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
 import { CreateGuardianGroupFeaturePage } from "./pages/guardian/CreateGuardianGroupFeaturePage";
@@ -192,12 +194,15 @@ function App() {
         return true;
       }
       if (route === "yiyi-chat") {
-        setMainTab("yiyi");
         setRoute("yiyi-profile");
         return true;
       }
       if (route === "yiyi-trash" || route === "yiyi-messages" || route === "yiyi-profile" || route === "yiyi-settings") {
-        setMainTab("yiyi");
+        setRoute("yiyi-home");
+        return true;
+      }
+      if (route === "yiyi-home" || route === "daily-home") {
+        setMainTab("me");
         setRoute("main");
         return true;
       }
@@ -516,12 +521,41 @@ function App() {
     );
   }
 
+  if (route === "yiyi-home") {
+    return (
+      <div className="aichat-shell">
+        <YiyiTab
+          onBack={() => {
+            setMainTab("me");
+            setRoute("main");
+          }}
+          onNavigateFeature={(r) => {
+            setFeatureReturnRoute("yiyi-home");
+            setRoute(r);
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (route === "daily-home") {
+    return (
+      <div className="aichat-shell">
+        <DailyTab
+          onBack={() => {
+            setMainTab("me");
+            setRoute("main");
+          }}
+        />
+      </div>
+    );
+  }
+
   if (route === "yiyi-trash") {
     return (
       <YiyiTrashPage
         onBack={() => {
-          setMainTab("yiyi");
-          setRoute("main");
+          setRoute("yiyi-home");
         }}
       />
     );
@@ -531,7 +565,6 @@ function App() {
     return (
       <YiyiChatPage
         onBack={() => {
-          setMainTab("yiyi");
           setRoute("yiyi-profile");
         }}
       />
@@ -542,8 +575,7 @@ function App() {
     return (
       <YiyiMessagesPage
         onBack={() => {
-          setMainTab("yiyi");
-          setRoute("main");
+          setRoute("yiyi-home");
         }}
       />
     );
@@ -553,8 +585,7 @@ function App() {
     return (
       <YiyiProfilePage
         onBack={() => {
-          setMainTab("yiyi");
-          setRoute("main");
+          setRoute("yiyi-home");
         }}
         onContinueChat={() => setRoute("yiyi-chat")}
       />
@@ -565,8 +596,7 @@ function App() {
     return (
       <YiyiSettingsPage
         onBack={() => {
-          setMainTab("yiyi");
-          setRoute("main");
+          setRoute("yiyi-home");
         }}
       />
     );

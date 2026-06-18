@@ -9258,6 +9258,26 @@ span:has(> .contact-avatar__img) {
   background: rgba(214, 70, 70, 0.1);
 }
 
+.me-tab__row-icon--yiyi {
+  background: rgba(124, 92, 255, 0.14);
+  color: #7c5cff;
+}
+
+.me-tab__row-icon--daily {
+  background: rgba(13, 148, 136, 0.12);
+  color: #0d9488;
+}
+
+.me-tab__row-icon-svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .me-tab__row-body {
   flex: 1;
   min-width: 0;
@@ -9838,6 +9858,14 @@ html.aichat-native-app .contacts-sheet {
 .yiyi-tab__topbar-spacer {
   width: 48px;
   flex-shrink: 0;
+}
+
+.yiyi-tab__topbar-back {
+  flex-shrink: 0;
+  min-width: 48px;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .yiyi-tab__topbar-link {

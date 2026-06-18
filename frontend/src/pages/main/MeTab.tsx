@@ -222,6 +222,36 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           </button>
         </section>
 
+        <section className="me-tab__group" aria-label="功能">
+          <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("yiyi-home")}>
+            <span className="me-tab__row-icon me-tab__row-icon--yiyi" aria-hidden>
+              <AppIcon name="user" className="app-icon app-icon--sm app-icon--purple" />
+            </span>
+            <span className="me-tab__row-body">
+              <b>YiYi</b>
+              <span>偏好与边界，对外沟通中间人</span>
+            </span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
+          <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("daily-home")}>
+            <span className="me-tab__row-icon me-tab__row-icon--daily" aria-hidden>
+              <svg viewBox="0 0 24 24" className="me-tab__row-icon-svg" aria-hidden>
+                <rect x="4" y="3" width="16" height="18" rx="2.5" />
+                <path d="M8 7h8M8 11h8M8 15h5" />
+              </svg>
+            </span>
+            <span className="me-tab__row-body">
+              <b>日常</b>
+              <span>本机生活记录，不对他人展示</span>
+            </span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
+        </section>
+
         <section className="me-tab__group" aria-label="账号">
           <button type="button" className="me-tab__row" onClick={() => setClearConfirmOpen(true)}>
             <span className="me-tab__row-body">

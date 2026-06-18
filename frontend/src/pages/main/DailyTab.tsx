@@ -53,7 +53,7 @@ function DockIcon({ kind }: { kind: (typeof DOCK_ITEMS)[number]["kind"] }) {
   }
 }
 
-export function DailyTab() {
+export function DailyTab({ onBack }: { onBack?: () => void }) {
   const [items, setItems] = useState(() => getDailyEntries());
 
   const bump = useCallback(() => setItems(getDailyEntries()), []);
@@ -101,7 +101,13 @@ export function DailyTab() {
   return (
     <div className="aichat-main-shell-tab daily-tab">
       <header className="aichat-topbar aichat-topbar-flex daily-tab__topbar">
-        <span className="yiyi-tab__topbar-spacer" aria-hidden />
+        {onBack ? (
+          <button type="button" className="aichat-btn-ghost yiyi-tab__topbar-back" onClick={onBack}>
+            返回
+          </button>
+        ) : (
+          <span className="yiyi-tab__topbar-spacer" aria-hidden />
+        )}
         <div className="aichat-stage-head">
           <h1>日常</h1>
         </div>
