@@ -50,7 +50,7 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   "daily-home": { title: "日常", phase: "日常" },
   "yiyi-chat": { title: "YiYi", phase: "YiYi" },
   "yiyi-messages": { title: "YiYi 的消息", phase: "YiYi" },
-  "yiyi-profile": { title: "YiYi", phase: "YiYi" },
+  "yiyi-profile": { title: "我的画像", phase: "YiYi" },
   "yiyi-settings": { title: "权限与可见范围", phase: "YiYi" },
   "mol-world": { title: "素颜世界", phase: "阶段 5" },
   "mol-mine": { title: "我的素颜", phase: "阶段 5" },

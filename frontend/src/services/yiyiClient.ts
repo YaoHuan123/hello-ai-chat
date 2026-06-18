@@ -143,3 +143,27 @@ export function profileSummaryFrom(profile: YiyiProfile): string {
   if (parts.length === 0) return "暂未形成画像，多和 YiYi 聊聊";
   return parts.slice(0, 3).join(" · ");
 }
+
+const PROFILE_EMPTY = "待了解";
+
+function isProfileDimFilled(value: string, tags: string[]): boolean {
+  return value !== PROFILE_EMPTY || tags.length > 0;
+}
+
+export function profileDimStatus(value: string, tags: string[]): { text: string; filled: boolean } {
+  if (!isProfileDimFilled(value, tags)) {
+    return { text: "暂无", filled: false };
+  }
+  if (value !== PROFILE_EMPTY) {
+    return { text: value, filled: true };
+  }
+  return { text: tags.slice(0, 2).join("、"), filled: true };
+}
+
+export function profileCompletenessFrom(profile: YiyiProfile): number {
+  let filled = 0;
+  if (isProfileDimFilled(profile.socialDirection, profile.tags.social)) filled += 1;
+  if (isProfileDimFilled(profile.personality, profile.tags.personality)) filled += 1;
+  if (isProfileDimFilled(profile.other, profile.tags.other)) filled += 1;
+  return Math.round((filled / 3) * 100);
+}

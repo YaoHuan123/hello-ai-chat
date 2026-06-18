@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppIcon } from "../../components/AppIcons";
 import { YiyiAvatar } from "../../components/YiyiAvatar";
+import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
 import { loadYiyiState, pickYiyiTopic, refreshYiyiTopics, sendYiyiChat } from "../../services/yiyiClient";
 import type { YiyiChatMessage } from "../../types/yiyi";
 
@@ -9,6 +10,7 @@ type Props = {
 };
 
 const INPUT_PLACEHOLDER = "回答 YiYi 的问题，或直接说说你的想法。";
+const INPUT_MAX_HEIGHT = 120;
 
 export function YiyiChatPage({ onBack }: Props) {
   const [messages, setMessages] = useState<YiyiChatMessage[]>([]);
@@ -19,6 +21,9 @@ export function YiyiChatPage({ onBack }: Props) {
   const [refreshingTopics, setRefreshingTopics] = useState(false);
   const refreshLockRef = useRef(false);
   const scRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useChatViewportScroll(scRef);
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -32,6 +37,17 @@ export function YiyiChatPage({ onBack }: Props) {
   useEffect(() => {
     reload();
   }, [reload]);
+
+  const syncInputHeight = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, INPUT_MAX_HEIGHT)}px`;
+  }, []);
+
+  useEffect(() => {
+    syncInputHeight();
+  }, [input, syncInputHeight]);
 
   useEffect(() => {
     const el = scRef.current;
@@ -85,7 +101,7 @@ export function YiyiChatPage({ onBack }: Props) {
   }
 
   return (
-    <div className="aichat-shell yiyi-chat-page">
+    <div className="aichat-shell yiyi-subpage yiyi-chat-shell">
       <header className="aichat-topbar aichat-topbar-flex yiyi-subpage__topbar">
         <button type="button" className="aichat-btn-ghost" onClick={onBack}>
           返回
@@ -96,12 +112,11 @@ export function YiyiChatPage({ onBack }: Props) {
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
 
-      <div className="yiyi-chat-banner">YiYi 是你的中间人。多聊几句，我会更了解如何代表你。</div>
-
-      {err ? <p className="aichat-form-msg err yiyi-chat-error">{err}</p> : null}
-      {loading && messages.length === 0 ? <p className="yiyi-empty">加载中…</p> : null}
-
       <div className="yiyi-chat-msgs" ref={scRef}>
+        <p className="yiyi-chat-banner">YiYi 是你的中间人。多聊几句，我会更了解如何代表你。</p>
+        {err ? <p className="aichat-form-msg err yiyi-chat-error">{err}</p> : null}
+        {loading && messages.length === 0 ? <p className="yiyi-empty yiyi-chat-empty">加载中…</p> : null}
+
         {messages.map((m) =>
           m.from === "me" ? (
             <div key={m.id} className="yiyi-chat-row yiyi-chat-row--me">
@@ -155,6 +170,7 @@ export function YiyiChatPage({ onBack }: Props) {
             <AppIcon name="refresh" className={`app-icon app-icon--sm${refreshingTopics ? " app-icon--spin" : ""}`} />
           </button>
           <textarea
+            ref={inputRef}
             className="yiyi-chat-composer__input"
             rows={1}
             value={input}

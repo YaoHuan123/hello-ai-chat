@@ -33,18 +33,16 @@ export function YiyiProfilePage({ onBack, onContinueChat }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>YiYi</h1>
+          <h1>我的画像</h1>
         </div>
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
 
       <div className="aichat-main yiyi-subpage__main">
         {err ? <p className="aichat-form-msg err">{err}</p> : null}
-        {loading ? <p className="yiyi-empty">加载中…</p> : null}
-
+        {loading && !profile ? <p className="yiyi-empty">加载中…</p> : null}
         {profile ? (
           <>
-            <p className="yiyi-intro">以下画像来自你与 YiYi 的对话，仅用于 YiYi 对外表达，不默认公开展示给陌生人。</p>
             <YiyiProfileBlock profile={profile} />
             <button type="button" className="yiyi-cta" onClick={onContinueChat}>
               继续和 YiYi 聊
