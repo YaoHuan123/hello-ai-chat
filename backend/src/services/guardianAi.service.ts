@@ -211,7 +211,8 @@ export class GuardianAiService {
       });
       return null;
     }
-    const line = t.length > MAX_LINE_LEN ? t.slice(0, MAX_LINE_LEN) : t;
+    const stripped = stripGuardianSelfIntro(t, args.role.name);
+    const line = stripped.length > MAX_LINE_LEN ? stripped.slice(0, MAX_LINE_LEN) : stripped;
     writeAiReplyTrace({
       ...traceBase,
       durationMs: Date.now() - t0,
@@ -237,4 +238,14 @@ export class GuardianAiService {
 function truncate(s: string, max: number): string {
   if (s.length <= max) return s;
   return s.slice(0, max);
+}
+
+/** 去掉「林小姐插一句，」类自称前缀（界面已展示发言人）。 */
+function stripGuardianSelfIntro(line: string, roleName: string): string {
+  const name = roleName.trim();
+  if (!name) return line.trim();
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return line
+    .replace(new RegExp(`^${escaped}(插一句|说一句|提醒一下|申请插播)[，,：:\\s]*`), "")
+    .trim();
 }

@@ -1,6 +1,7 @@
 import { SUYAN } from "../../constants/suyanCopy";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type RelationType } from "../../constants/relationTypes";
+import { streamText, type StreamHandle } from "../../data/polishMock";
 import { pickSuggestChatContext } from "../../lib/suggestChatContext";
 import { suggestRepliesApi, type MolSuggestLastMessage } from "../../services/molSuggestApi";
 import { suggestRepliesByRelationApi } from "../../services/relationSuggestApi";
@@ -20,6 +21,14 @@ type Props = {
   onClose: () => void;
   onManageMols?: () => void;
   onSetRelation?: () => void;
+};
+
+type SuggestSlot = {
+  id: string;
+  fullText: string;
+  displayText: string;
+  done: boolean;
+  streaming: boolean;
 };
 
 function mapSuggestError(e: unknown): { msg: string; code: string } {
@@ -49,15 +58,23 @@ export function MolSuggestPanel({
   onSetRelation,
 }: Props) {
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<string[]>([]);
+  const [slots, setSlots] = useState<SuggestSlot[]>([]);
   const [err, setErr] = useState("");
   const [errCode, setErrCode] = useState("");
   const requestGenRef = useRef(0);
+  const streamGenRef = useRef(0);
+  const streamHandleRef = useRef<StreamHandle>({ cancelled: false });
 
   const hasMol = Boolean(molId && molName);
   const hasRelation = Boolean(relationType);
   const canSuggest = hasMol || hasRelation;
   const useMolPath = hasMol;
+
+  const cancelStream = useCallback(() => {
+    streamHandleRef.current.cancelled = true;
+    streamGenRef.current += 1;
+  }, []);
+
   const resolveDraft = useCallback(() => {
     const fromGetter = getDraftText?.().trim() ?? "";
     if (fromGetter) return fromGetter;
@@ -68,42 +85,96 @@ export function MolSuggestPanel({
     return pickSuggestChatContext(getLastMessages());
   }, [getLastMessages]);
 
+  const startSequentialStream = useCallback((texts: string[], requestGen: number) => {
+    cancelStream();
+    const streamGen = streamGenRef.current;
+    const handle: StreamHandle = { cancelled: false };
+    streamHandleRef.current = handle;
+
+    setSlots(
+      texts.map((fullText, i) => ({
+        id: `${requestGen}-${i}`,
+        fullText,
+        displayText: "",
+        done: false,
+        streaming: false,
+      })),
+    );
+
+    const runSlot = (idx: number) => {
+      if (handle.cancelled || streamGen !== streamGenRef.current) return;
+      const full = texts[idx];
+      if (!full) return;
+
+      setSlots((prev) =>
+        prev.map((s, i) => (i === idx ? { ...s, streaming: true } : s)),
+      );
+
+      streamText(full, (sofar, done) => {
+        if (handle.cancelled || streamGen !== streamGenRef.current) return;
+        setSlots((prev) =>
+          prev.map((s, i) =>
+            i === idx ? { ...s, displayText: sofar, done, streaming: !done } : s,
+          ),
+        );
+        if (done && idx + 1 < texts.length) {
+          window.setTimeout(() => runSlot(idx + 1), 220);
+        }
+      }, handle);
+    };
+
+    runSlot(0);
+  }, [cancelStream]);
+
   const load = useCallback(async () => {
     if (!canSuggest) return;
 
     const gen = ++requestGenRef.current;
     const draft = resolveDraft();
+    cancelStream();
     setLoading(true);
     setErr("");
     setErrCode("");
-    setItems([]);
+    setSlots([]);
     try {
       const lastMessages = buildLastMessages();
+      let suggestions: string[] = [];
       if (useMolPath) {
-        const { suggestions } = await suggestRepliesApi(
+        const res = await suggestRepliesApi(
           peerUserId,
           lastMessages,
           molId ?? undefined,
           draft || undefined,
         );
-        if (gen !== requestGenRef.current) return;
-        setItems(suggestions.slice(0, 3));
+        suggestions = res.suggestions;
       } else if (hasRelation) {
-        const { suggestions } = await suggestRepliesByRelationApi(peerUserId, lastMessages, draft || undefined);
-        if (gen !== requestGenRef.current) return;
-        setItems(suggestions.slice(0, 3));
+        const res = await suggestRepliesByRelationApi(peerUserId, lastMessages, draft || undefined);
+        suggestions = res.suggestions;
+      }
+      if (gen !== requestGenRef.current) return;
+      const texts = suggestions.slice(0, 3);
+      setLoading(false);
+      if (texts.length > 0) {
+        startSequentialStream(texts, gen);
       }
     } catch (e: unknown) {
       if (gen !== requestGenRef.current) return;
       const mapped = mapSuggestError(e);
       setErr(mapped.msg);
       setErrCode(mapped.code);
-    } finally {
-      if (gen === requestGenRef.current) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
-  }, [buildLastMessages, canSuggest, hasRelation, molId, peerUserId, resolveDraft, useMolPath]);
+  }, [
+    buildLastMessages,
+    cancelStream,
+    canSuggest,
+    hasRelation,
+    molId,
+    peerUserId,
+    resolveDraft,
+    startSequentialStream,
+    useMolPath,
+  ]);
 
   const loadRef = useRef(load);
   loadRef.current = load;
@@ -111,8 +182,9 @@ export function MolSuggestPanel({
   useEffect(() => {
     if (!open) {
       requestGenRef.current += 1;
+      cancelStream();
       setLoading(false);
-      setItems([]);
+      setSlots([]);
       setErr("");
       setErrCode("");
       return;
@@ -121,18 +193,25 @@ export function MolSuggestPanel({
     queueMicrotask(() => {
       void loadRef.current();
     });
-  }, [open, canSuggest, peerUserId]);
+  }, [open, canSuggest, peerUserId, cancelStream]);
+
+  useEffect(() => () => cancelStream(), [cancelStream]);
 
   const draft = resolveDraft();
 
   if (!open) return null;
 
-  const showSuggestions = canSuggest && !loading && !err && items.length > 0;
-  const showEmptySuggest = canSuggest && !loading && !err && items.length === 0;
-  const showFoot = canSuggest && !err && !loading;
+  const showEmptySuggest = canSuggest && !loading && !err && slots.length === 0;
+  const showSlots = canSuggest && !err && (loading || slots.length > 0);
+  const streamBusy = slots.some((s) => !s.done);
+  const showFoot = canSuggest && !err && (loading || slots.length > 0);
 
   return (
-    <div className="mol-composer-panel" role="region" aria-label={SUYAN.suggest}>
+    <div
+      className="mol-composer-panel mol-composer-panel--stream-d"
+      role="region"
+      aria-label={SUYAN.suggest}
+    >
       {draft ? (
         <button
           type="button"
@@ -180,9 +259,7 @@ export function MolSuggestPanel({
         </div>
       )}
 
-      {canSuggest && loading ? (
-        <p className="mol-composer-status">生成中…</p>
-      ) : canSuggest && err ? (
+      {canSuggest && err ? (
         <div className="mol-composer-status-block">
           <p className="mol-composer-status mol-composer-status--err">{err}</p>
           {errCode === "NO_USER_MOLS" ? (
@@ -203,22 +280,45 @@ export function MolSuggestPanel({
         </div>
       ) : showEmptySuggest ? (
         <p className="mol-composer-status">暂无建议</p>
-      ) : showSuggestions ? (
-        <ul className="mol-composer-suggest" aria-label="回复建议">
-          {items.map((text, i) => (
-            <li key={`${i}-${text.slice(0, 12)}`}>
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  onPick(text);
-                  onClose();
-                }}
-              >
-                {text}
-              </button>
-            </li>
-          ))}
+      ) : showSlots ? (
+        <ul
+          className="mol-composer-suggest"
+          aria-label="回复建议"
+          aria-busy={loading || streamBusy}
+        >
+          {loading && slots.length === 0
+            ? [0, 1, 2].map((i) => (
+                <li key={`placeholder-${i}`}>
+                  <div className="mol-composer-suggest__placeholder" aria-hidden />
+                </li>
+              ))
+            : slots.map((slot) => {
+                const pickable = slot.done && slot.fullText.trim().length > 0;
+                return (
+                  <li key={slot.id}>
+                    <button
+                      type="button"
+                      className={`mol-composer-suggest__btn${
+                        slot.streaming ? " mol-composer-suggest__btn--typing" : ""
+                      }${slot.done ? " mol-composer-suggest__btn--done" : ""}`}
+                      disabled={!pickable}
+                      onClick={() => {
+                        onPick(slot.fullText);
+                        onClose();
+                      }}
+                    >
+                      <span className="mol-composer-suggest__text">
+                        {slot.displayText}
+                        {slot.streaming ? (
+                          <span className="mol-composer-suggest__cursor" aria-hidden>
+                            ▍
+                          </span>
+                        ) : null}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
         </ul>
       ) : null}
 
@@ -227,7 +327,7 @@ export function MolSuggestPanel({
           <button
             type="button"
             className="mol-composer-foot__refresh"
-            disabled={loading}
+            disabled={loading || streamBusy}
             aria-label="刷新"
             onClick={() => void loadRef.current()}
           >

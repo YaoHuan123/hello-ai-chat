@@ -4471,6 +4471,91 @@ button.msg-chat-c1-placeholder:active {
   cursor: wait;
 }
 
+/* 推荐回复 · 流式成稿 · D 紫粉渐变 */
+.mol-composer-panel--stream-d {
+  background: linear-gradient(
+    165deg,
+    rgba(123, 92, 255, 0.07) 0%,
+    rgba(196, 77, 114, 0.04) 55%,
+    transparent 100%
+  );
+  border-radius: 14px 14px 0 0;
+}
+
+.mol-composer-panel--stream-d .mol-composer-draft {
+  background: linear-gradient(135deg, rgba(123, 92, 255, 0.08), rgba(196, 77, 114, 0.06));
+  border-color: rgba(123, 92, 255, 0.18);
+}
+
+.mol-composer-panel--stream-d .mol-composer-context__text {
+  font-weight: 600;
+  color: #3a2a40;
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__btn,
+.mol-composer-panel--stream-d .mol-composer-suggest button {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid rgba(123, 92, 255, 0.14);
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(123, 92, 255, 0.07) 0%,
+    rgba(196, 77, 114, 0.05) 100%
+  );
+  box-shadow: 0 3px 12px rgba(123, 92, 255, 0.08);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+  font-family: inherit;
+  color: var(--aichat-text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__btn--typing {
+  border-color: rgba(196, 77, 114, 0.35);
+  box-shadow: 0 0 0 3px rgba(123, 92, 255, 0.1), 0 3px 12px rgba(123, 92, 255, 0.1);
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__btn--done {
+  border-color: rgba(123, 92, 255, 0.18);
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__btn:active:not(:disabled),
+.mol-composer-panel--stream-d .mol-composer-suggest button:active:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    rgba(123, 92, 255, 0.12) 0%,
+    rgba(196, 77, 114, 0.08) 100%
+  );
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__btn:disabled,
+.mol-composer-panel--stream-d .mol-composer-suggest button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__cursor {
+  color: #9b4dca;
+  animation: mol-suggest-caret-blink 0.8s step-end infinite;
+}
+
+@keyframes mol-suggest-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.mol-composer-panel--stream-d .mol-composer-suggest__placeholder {
+  min-height: 44px;
+  border-radius: 12px;
+  background: rgba(123, 92, 255, 0.04);
+  border: 1px dashed rgba(196, 77, 114, 0.2);
+}
+
 .mol-composer-foot {
   display: flex;
   justify-content: flex-end;
@@ -7069,6 +7154,116 @@ button.msg-chat-c1-placeholder:active {
 
 .msg-chat-c1-row--me .guardian-group-msg-name {
   text-align: right;
+}
+
+.guardian-group-msg-name--guardian {
+  color: var(--aichat-guardian);
+}
+
+.guardian-group-avatar-glow {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  border-radius: var(--aichat-avatar-radius);
+}
+
+.guardian-group-avatar-glow.is-speaking::before,
+.guardian-group-avatar-glow.is-speaking::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--aichat-avatar-radius) + 4px);
+  background: conic-gradient(
+    from 0deg,
+    var(--aichat-ai-violet, #7b5cff),
+    var(--aichat-guardian),
+    var(--aichat-ai-violet, #7b5cff)
+  );
+  animation: guardianAvatarGlowSpin 2s linear infinite;
+  z-index: 0;
+}
+
+.guardian-group-avatar-glow.is-speaking::after {
+  filter: blur(6px);
+  opacity: 0.5;
+}
+
+.guardian-group-avatar-glow.is-speaking .msg-chat-c1-avatar--guardian {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes guardianAvatarGlowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.guardian-group-typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(79, 109, 245, 0.06);
+  border: 1px solid rgba(79, 109, 245, 0.15);
+  border-radius: 18px;
+  border-bottom-left-radius: 8px;
+}
+
+.guardian-group-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--aichat-ai-violet, #7b5cff);
+  animation: guardianTypingDotBounce 1.2s ease-in-out infinite;
+}
+
+.guardian-group-typing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.guardian-group-typing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes guardianTypingDotBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.guardian-group-room--simple .msg-chat-c1-bubble--guardian-reveal {
+  animation: guardianBubbleReveal 0.4s ease-out;
+}
+
+@keyframes guardianBubbleReveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guardian-group-room--simple .msg-chat-c1-bubble--guardian {
+  background: rgba(79, 109, 245, 0.04);
+  border: 1px solid rgba(79, 109, 245, 0.2);
+  border-radius: 18px;
+  border-bottom-left-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 10px rgba(79, 109, 245, 0.08);
 }
 
 .guardian-group-room--simple .guardian-group-room__topbar {

@@ -281,6 +281,17 @@ const SEED_MOL_DEFS: {
     recommended: true,
   },
   {
+    id: "mw-seed-buhaore",
+    name: "不好惹",
+    primaryCategory: "朋友社交",
+    taskTags: ["延续聊天", "维护边界", "拒绝", "玩笑"],
+    toneTags: ["幽默", "直接"],
+    relationshipTags: ["朋友", "同学"],
+    abilityTags: ["会接话", "会润色"],
+    popularityScore: 680,
+    recommended: true,
+  },
+  {
     id: "mw-seed-poxi",
     name: "婆媳和谐",
     primaryCategory: "家庭亲友",
