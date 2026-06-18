@@ -11,6 +11,7 @@ import type { RouteName } from "../../types/routes";
 type Props = {
   onOpenFriend: (c: ContactItem) => void;
   onNavigateFeature: (route: RouteName) => void;
+  onBack?: () => void;
 };
 
 function isSameDay(a: Date, b: Date): boolean {
@@ -64,7 +65,7 @@ function groupExploreRecordsByDay(records: MomentsExploreRecord[]): ExploreDayGr
   return groups;
 }
 
-export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
+export function MomentsTab({ onOpenFriend, onNavigateFeature, onBack }: Props) {
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -121,8 +122,14 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature }: Props) {
 
   return (
     <div className="moments-tab-inner">
-      <header className="aichat-topbar aichat-topbar--plain">
+      <header className={`aichat-topbar ${onBack ? "aichat-topbar-flex" : "aichat-topbar--plain"}`}>
+        {onBack ? (
+          <button type="button" className="aichat-back" onClick={onBack}>
+            返回
+          </button>
+        ) : null}
         <h1>朋友圈</h1>
+        {onBack ? <span className="aichat-topbar-spacer" aria-hidden /> : null}
       </header>
 
       <div className="aichat-main msg-tab-main moments-tab-scroll">

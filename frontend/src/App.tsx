@@ -31,6 +31,7 @@ import { YiyiMessagesPage } from "./pages/yiyi/YiyiMessagesPage";
 import { YiyiProfilePage } from "./pages/yiyi/YiyiProfilePage";
 import { YiyiSettingsPage } from "./pages/yiyi/YiyiSettingsPage";
 import { YiyiTab } from "./pages/yiyi/YiyiTab";
+import { MomentsTab } from "./pages/main/MomentsTab";
 import { DailyTab } from "./pages/main/DailyTab";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
@@ -143,7 +144,7 @@ function App() {
       }
       if (route === "guardian-group-chat") {
         setGuardianGroupId(null);
-        setMainTab("groups");
+        setMainTab("messages");
         setRoute("main");
         return true;
       }
@@ -153,7 +154,7 @@ function App() {
       }
       if (route === "guardian-create-feature") {
         setGuardianCreateFeature(null);
-        setMainTab("groups");
+        setMainTab("messages");
         setRoute("main");
         return true;
       }
@@ -179,17 +180,19 @@ function App() {
       }
       if (route === "moments-friend") {
         setMomentsFriendContact(null);
-        setMainTab("moments");
-        setRoute("main");
+        setRoute("moments-hub");
         return true;
       }
       if (route === "moments-my") {
-        setMainTab("moments");
-        setRoute("main");
+        setRoute("moments-hub");
         return true;
       }
       if (route === "moments-hot") {
-        setMainTab("moments");
+        setRoute("moments-hub");
+        return true;
+      }
+      if (route === "moments-hub") {
+        setMainTab("explore");
         setRoute("main");
         return true;
       }
@@ -201,7 +204,12 @@ function App() {
         setRoute("yiyi-home");
         return true;
       }
-      if (route === "yiyi-home" || route === "daily-home") {
+      if (route === "yiyi-home") {
+        setMainTab("explore");
+        setRoute("main");
+        return true;
+      }
+      if (route === "daily-home") {
         setMainTab("me");
         setRoute("main");
         return true;
@@ -307,7 +315,7 @@ function App() {
       <CreateGuardianGroupFeaturePage
         onBack={() => {
           setGuardianCreateFeature(null);
-          setMainTab("groups");
+          setMainTab("messages");
           setRoute("main");
         }}
         onContinue={(feature) => {
@@ -326,7 +334,7 @@ function App() {
         onCreated={(id) => {
           setGuardianCreateFeature(null);
           setGuardianGroupId(id);
-          setMainTab("groups");
+          setMainTab("messages");
           setRoute("guardian-group-chat");
         }}
       />
@@ -340,7 +348,7 @@ function App() {
         groupId={guardianGroupId}
         onBack={() => {
           setGuardianGroupId(null);
-          setMainTab("groups");
+          setMainTab("messages");
           setRoute("main");
         }}
       />
@@ -376,10 +384,6 @@ function App() {
         }}
         onFriendRequestSent={refreshFriendPending}
         onOpenChatRoom={openChatWith}
-        onOpenMomentsFriend={(c) => {
-          setMomentsFriendContact(c);
-          setRoute("moments-friend");
-        }}
         onOpenGuardianGroup={(groupId) => {
           setGuardianGroupId(groupId);
           setRoute("guardian-group-chat");
@@ -396,6 +400,16 @@ function App() {
           setFeatureReturnRoute("main");
           if (r === "home") {
             setRoute("home");
+            return;
+          }
+          if (r === "moments-hub") {
+            setMainTab("explore");
+            setRoute(r);
+            return;
+          }
+          if (r === "yiyi-home") {
+            setMainTab("explore");
+            setRoute(r);
             return;
           }
           if (r === "mol-world") setMolWorldBackRoute("main");
@@ -485,12 +499,31 @@ function App() {
     );
   }
 
+  if (route === "moments-hub") {
+    return (
+      <MomentsTab
+        onOpenFriend={(c) => {
+          setMomentsFriendContact(c);
+          setRoute("moments-friend");
+        }}
+        onNavigateFeature={(r) => {
+          setMainTab("explore");
+          setRoute(r);
+        }}
+        onBack={() => {
+          setMainTab("explore");
+          setRoute("main");
+        }}
+      />
+    );
+  }
+
   if (route === "moments-my") {
     return (
       <MyMomentsPage
         onBack={() => {
-          setMainTab("moments");
-          setRoute("main");
+          setMainTab("explore");
+          setRoute("moments-hub");
         }}
       />
     );
@@ -500,8 +533,8 @@ function App() {
     return (
       <MomentsHotTopicsPage
         onBack={() => {
-          setMainTab("moments");
-          setRoute("main");
+          setMainTab("explore");
+          setRoute("moments-hub");
         }}
       />
     );
@@ -514,8 +547,8 @@ function App() {
         contact={momentsFriendContact}
         onBack={() => {
           setMomentsFriendContact(null);
-          setMainTab("moments");
-          setRoute("main");
+          setMainTab("explore");
+          setRoute("moments-hub");
         }}
       />
     );
@@ -526,7 +559,7 @@ function App() {
       <div className="aichat-shell">
         <YiyiTab
           onBack={() => {
-            setMainTab("me");
+            setMainTab("explore");
             setRoute("main");
           }}
           onNavigateFeature={(r) => {

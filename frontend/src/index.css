@@ -3198,6 +3198,55 @@ html:has(#root > .msg-chat-room) body {
   color: var(--aichat-muted);
 }
 
+.msg-tab-topbar.aichat-topbar-flex h1 {
+  flex: 1;
+}
+
+.msg-tab__create {
+  border: none;
+  background: transparent;
+  padding: 6px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aichat-accent);
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.inbox-empty {
+  margin-top: 48px;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.inbox-empty__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--aichat-text);
+}
+
+.inbox-empty__sub {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--aichat-muted);
+}
+
+.inbox-empty__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.inbox-empty__actions .aichat-btn-primary,
+.inbox-empty__actions .aichat-btn-ghost {
+  min-width: 10em;
+}
+
 .msg-tab-main {
   flex: 1;
   min-height: 0;
@@ -9267,6 +9316,11 @@ span:has(> .contact-avatar__img) {
 .me-tab__row-icon--daily {
   background: rgba(13, 148, 136, 0.12);
   color: #0d9488;
+}
+
+.me-tab__row-icon--moments {
+  background: rgba(234, 88, 12, 0.12);
+  color: #ea580c;
 }
 
 .me-tab__row-icon-svg {

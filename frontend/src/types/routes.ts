@@ -11,6 +11,7 @@ export type RouteName =
   | "chat-assist"
   | "assist-mol-list"
   | "assist-mol-data"
+  | "moments-hub"
   | "moments-my"
   | "moments-hot"
   | "moments-friend"
@@ -40,10 +41,11 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   "chat-assist": { title: "辅助聊天 + 素颜", phase: "阶段 2" },
   "assist-mol-list": { title: "我的素颜", phase: "AI" },
   "assist-mol-data": { title: "素颜资料", phase: "AI" },
+  "moments-hub": { title: "朋友圈", phase: "探索" },
   "moments-my": { title: "我的动态", phase: "朋友圈" },
   "moments-hot": { title: "热点", phase: "朋友圈" },
   "moments-friend": { title: "朋友圈探索", phase: "朋友圈" },
-  "yiyi-home": { title: "YiYi", phase: "YiYi" },
+  "yiyi-home": { title: "YiYi", phase: "探索" },
   "yiyi-trash": { title: "网络垃圾桶", phase: "YiYi" },
   "daily-home": { title: "日常", phase: "日常" },
   "yiyi-chat": { title: "YiYi", phase: "YiYi" },

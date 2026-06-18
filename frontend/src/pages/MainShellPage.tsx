@@ -3,18 +3,16 @@ import type { ContactItem } from "../types/contact";
 import type { RouteName } from "../types/routes";
 import { isNativeAppShell } from "../platform/appShell";
 import { MessagesTab } from "./main/MessagesTab";
-import { GroupsTab } from "./main/GroupsTab";
-import { MomentsTab } from "./main/MomentsTab";
+import { ExploreTab } from "./main/ExploreTab";
 import { PersonaTab } from "./main/PersonaTab";
 import { MeTab } from "./main/MeTab";
 
-export type MainTabId = "messages" | "groups" | "moments" | "people" | "me";
+export type MainTabId = "messages" | "explore" | "people" | "me";
 
 type Props = {
   activeTab?: MainTabId;
   onTabChange?: (tab: MainTabId) => void;
   onOpenChatRoom: (c: ContactItem) => void;
-  onOpenMomentsFriend: (c: ContactItem) => void;
   onNavigateFeature: (route: RouteName) => void;
   onLogout: () => void;
   friendRequestPendingCount: number;
@@ -22,18 +20,17 @@ type Props = {
   onFriendRequestSent: () => void;
   onOpenGuardianGroup: (groupId: string) => void;
   onCreateGuardianGroup: () => void;
-  onOpenGuardianHall: (fromTab: "people" | "groups") => void;
+  onOpenGuardianHall: (fromTab: "people" | "messages") => void;
 };
 
 const TAB_LABEL: Record<MainTabId, string> = {
   messages: "消息",
-  groups: "群聊",
-  moments: "朋友圈",
+  explore: "探索",
   people: "关系",
   me: "我的",
 };
 
-const TAB_ORDER: MainTabId[] = ["messages", "groups", "moments", "people", "me"];
+const TAB_ORDER: MainTabId[] = ["messages", "explore", "people", "me"];
 
 function TabIcon({ id }: { id: MainTabId }) {
   switch (id) {
@@ -43,23 +40,11 @@ function TabIcon({ id }: { id: MainTabId }) {
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
         </svg>
       );
-    case "groups":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-        </svg>
-      );
-    case "moments":
+    case "explore":
       return (
         <svg viewBox="0 0 24 24" aria-hidden>
           <circle cx="12" cy="12" r="10" />
-          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-          <line x1="9" y1="9" x2="9.01" y2="9" />
-          <line x1="15" y1="9" x2="15.01" y2="9" />
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
         </svg>
       );
     case "people":
@@ -85,7 +70,6 @@ export function MainShellPage({
   activeTab,
   onTabChange,
   onOpenChatRoom,
-  onOpenMomentsFriend,
   onNavigateFeature,
   onLogout,
   friendRequestPendingCount,
@@ -128,17 +112,15 @@ export function MainShellPage({
         <div className="aichat-main-shell__body">
           {tab === "messages" && (
             <div className="msg-tab-root msg-mode-normal">
-              <MessagesTab onOpenChatRoom={onOpenChatRoom} />
+              <MessagesTab
+                onOpenChatRoom={onOpenChatRoom}
+                onOpenGuardianGroup={onOpenGuardianGroup}
+                onCreateGuardianGroup={onCreateGuardianGroup}
+                onOpenGuardianHall={() => onOpenGuardianHall("messages")}
+              />
             </div>
           )}
-          {tab === "groups" && (
-            <GroupsTab
-              onOpenGuardianGroup={onOpenGuardianGroup}
-              onCreateGroup={onCreateGuardianGroup}
-              onOpenGuardianHall={() => onOpenGuardianHall("groups")}
-            />
-          )}
-          {tab === "moments" && <MomentsTab onOpenFriend={onOpenMomentsFriend} onNavigateFeature={onNavigateFeature} />}
+          {tab === "explore" && <ExploreTab onNavigateFeature={onNavigateFeature} />}
           {tab === "people" && (
             <PersonaTab
               onOpenChat={onOpenChatRoom}
