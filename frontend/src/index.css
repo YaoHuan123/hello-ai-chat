@@ -3484,7 +3484,6 @@ html:has(#root > .msg-chat-room) body {
   width: 100%;
   margin: 0;
   padding: 0;
-  margin-top: auto;
 }
 
 .msg-mol-placeholder-wrap {
@@ -4210,7 +4209,6 @@ button.msg-mol-placeholder-bubble--switchable::after {
 
 .msg-chat-c1-list {
   gap: 14px;
-  margin-top: auto;
   width: 100%;
 }
 
@@ -4823,8 +4821,11 @@ button.msg-chat-c1-placeholder:active {
 }
 
 .msg-chat-list.msg-chat-c1-list {
-  margin-top: auto;
   gap: 14px;
+}
+
+.msg-chat-c1-scroll--empty {
+  justify-content: center;
 }
 
 .msg-chat-bubble-wrap {

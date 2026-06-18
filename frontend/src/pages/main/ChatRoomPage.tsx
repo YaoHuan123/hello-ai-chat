@@ -174,8 +174,10 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
   }, [myUserId, peerId, reload]);
 
   useEffect(() => {
-    const el = scRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    requestAnimationFrame(() => {
+      const el = scRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
   }, [messages, myUserId, molPanelOpen]);
 
   useChatViewportScroll(scRef);
@@ -293,7 +295,10 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
         <p className="aichat-form-msg err msg-chat-c1-banner-err">{loadErr}</p>
       ) : null}
 
-      <div ref={scRef} className="msg-chat-scroll msg-chat-c1-scroll">
+      <div
+        ref={scRef}
+        className={`msg-chat-scroll msg-chat-c1-scroll${messages.length === 0 && myUserId ? " msg-chat-c1-scroll--empty" : ""}`}
+      >
         {myUserId ? (
           <ul className="msg-chat-list msg-chat-c1-list" aria-label="消息记录">
             {messages.length === 0 ? (

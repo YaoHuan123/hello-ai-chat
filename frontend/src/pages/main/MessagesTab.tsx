@@ -73,6 +73,16 @@ export function MessagesTab({ onOpenChatRoom }: Props) {
     return load();
   }, [load]);
 
+  useEffect(() => {
+    const refresh = () => load();
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [load]);
+
   const convRows = useMemo(() => {
     return localConvPeers
       .map((c) => {

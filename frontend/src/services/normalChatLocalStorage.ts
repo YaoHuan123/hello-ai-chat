@@ -87,8 +87,21 @@ export type NormalConversationPreview = {
 
 /** 从本地所有 normal 会话键汇总会话列表（需传入已知 peerId 列表）。 */
 export function listNormalConversationPreviews(peerUserIds: string[]): NormalConversationPreview[] {
+  const idSet = new Set(peerUserIds.map((id) => id.trim()).filter(Boolean));
+  try {
+    const prefix = "aichat.chat.normal.";
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith(prefix)) continue;
+      const peer = key.slice(prefix.length).trim();
+      if (peer) idSet.add(peer);
+    }
+  } catch {
+    /* ignore */
+  }
+
   const out: NormalConversationPreview[] = [];
-  for (const peerUserId of peerUserIds) {
+  for (const peerUserId of idSet) {
     const p = getNormalChatLastPreview(peerUserId);
     if (!p) continue;
     out.push({ peerUserId, lastText: p.text, lastTs: p.ts });
