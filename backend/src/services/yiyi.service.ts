@@ -31,7 +31,6 @@ const DEFAULT_PROFILE: YiyiProfile = {
 };
 
 const DEFAULT_PERMISSIONS: YiyiPermissions = {
-  allowViewProcess: false,
   allowAddFriend: true,
   yiyiActive: true,
 };
@@ -75,6 +74,16 @@ function peerAccent(userId: string): string {
   for (let i = 0; i < userId.length; i += 1) hash = (hash * 31 + userId.charCodeAt(i)) >>> 0;
   const hues = ["#6366f1", "#8b5cf6", "#10b981", "#f472b6", "#0ea5e9", "#f59e0b"];
   return hues[hash % hues.length];
+}
+
+/** 桥接 transcript 仅返回当前用户所属 YiYi 侧的发言。 */
+export function filterBridgeTranscriptForViewer(
+  viewerUserId: string,
+  userAId: string,
+  transcript: YiyiBridgeTranscriptLine[],
+): YiyiBridgeTranscriptLine[] {
+  const mySide: "a" | "b" = userAId === viewerUserId ? "a" : "b";
+  return transcript.filter((line) => line.from === mySide);
 }
 
 export class YiyiService {
@@ -305,9 +314,8 @@ export class YiyiService {
     const peerUserId = row.user_a_id === viewerUserId ? row.user_b_id : row.user_a_id;
     const peerLabel = `${this.getUserDisplayName(peerUserId)}的 YiYi`;
     const tags = parseJson<string[]>(row.tags_json, []);
-    const transcript = parseJson<YiyiBridgeTranscriptLine[]>(row.transcript_json, []);
-    const state = this.ensureUserState(viewerUserId);
-    const showTranscript = state.permissions.allowViewProcess;
+    const fullTranscript = parseJson<YiyiBridgeTranscriptLine[]>(row.transcript_json, []);
+    const ownTranscript = filterBridgeTranscriptForViewer(viewerUserId, row.user_a_id, fullTranscript);
 
     return {
       id: row.id,
@@ -318,7 +326,7 @@ export class YiyiService {
       preview: row.status === "blocked" && row.blocked_reason ? row.blocked_reason : row.summary,
       tags,
       blockedReason: row.blocked_reason ?? undefined,
-      transcript: showTranscript ? transcript : [],
+      transcript: ownTranscript,
       ts: row.updated_at,
     };
   }

@@ -127,10 +127,7 @@ export function getLastChatPreviewFromState(chat: YiyiChatMessage[]): string {
 }
 
 export function permissionsSummaryFrom(perms: YiyiPermissions): string {
-  const parts = [
-    perms.allowViewProcess ? "沟通过程可见" : "沟通过程不可见",
-    perms.allowAddFriend ? "允许加好友" : "不允许加好友",
-  ];
+  const parts = [perms.allowAddFriend ? "允许加好友" : "不允许加好友"];
   return parts.join(" · ");
 }
 

@@ -66,8 +66,8 @@ export function YiyiMessagesPage({ onBack }: Props) {
       <div className="aichat-main yiyi-subpage__main">
         {err ? <p className="aichat-form-msg err">{err}</p> : null}
         <p className="yiyi-intro">
-          展示双方 YiYi 的沟通结果摘要。{effectiveCount > 0 ? `当前有 ${effectiveCount} 条有效沟通。` : ""}
-          完整过程是否可见，取决于权限设置。
+          展示 YiYi 匹配后的沟通摘要。{effectiveCount > 0 ? `当前有 ${effectiveCount} 条有效沟通。` : ""}
+          仅能看到你的 YiYi 的发言记录，对方 YiYi 的具体内容不可见。
         </p>
 
         {loading ? <p className="yiyi-empty">加载中…</p> : null}

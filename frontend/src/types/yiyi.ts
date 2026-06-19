@@ -27,7 +27,6 @@ export type YiyiProfile = {
 };
 
 export type YiyiPermissions = {
-  allowViewProcess: boolean;
   allowAddFriend: boolean;
   yiyiActive: boolean;
 };

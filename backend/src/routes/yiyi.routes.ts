@@ -18,7 +18,6 @@ const putTrashSchema = z.object({
 });
 
 const putPermissionsSchema = z.object({
-  allowViewProcess: z.boolean().optional(),
   allowAddFriend: z.boolean().optional(),
   yiyiActive: z.boolean().optional(),
 });

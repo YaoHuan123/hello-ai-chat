@@ -80,18 +80,6 @@ export function YiyiSettingsPage({ onBack }: Props) {
             <section className="yiyi-settings-group" aria-label="权限">
               <div className="yiyi-settings-row">
                 <div className="yiyi-settings-row__body">
-                  <strong>允许对方查看沟通过程</strong>
-                  <span>开启后，对方主人可看到双方 YiYi 的完整对话；关闭时你仍会在「YiYi 的消息」收到摘要。</span>
-                </div>
-                <Toggle
-                  label="允许对方查看沟通过程"
-                  on={perms.allowViewProcess}
-                  disabled={saving}
-                  onChange={(v) => void patch({ allowViewProcess: v })}
-                />
-              </div>
-              <div className="yiyi-settings-row">
-                <div className="yiyi-settings-row__body">
                   <strong>允许对方添加好友</strong>
                   <span>仅在出现有效沟通后生效。开启后对方可申请加你为联系人。</span>
                 </div>

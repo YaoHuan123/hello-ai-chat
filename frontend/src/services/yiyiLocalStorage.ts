@@ -43,7 +43,6 @@ const DEFAULT_PROFILE: YiyiProfile = {
 };
 
 const DEFAULT_PERMISSIONS: YiyiPermissions = {
-  allowViewProcess: false,
   allowAddFriend: true,
   yiyiActive: true,
 };
@@ -358,9 +357,6 @@ export function pickTopicFromChip(topic: string, sourceMessageId?: string): Yiyi
 
 export function permissionsSummary(): string {
   const p = getPermissions();
-  const parts = [
-    p.allowViewProcess ? "沟通过程可见" : "沟通过程不可见",
-    p.allowAddFriend ? "允许加好友" : "不允许加好友",
-  ];
+  const parts = [p.allowAddFriend ? "允许加好友" : "不允许加好友"];
   return parts.join(" · ");
 }
