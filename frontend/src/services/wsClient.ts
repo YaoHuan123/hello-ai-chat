@@ -11,7 +11,22 @@ export type WsServerMessage =
   | { type: "friend_request_accepted"; payload: { requestId: number; contactUserId: string; contactPhone: string } }
   | {
       type: "guardian_group_message";
-      payload: { groupId: string; message: { id: number; groupId: string; senderKind: string; text: string; ts: number } };
+      payload: {
+        groupId: string;
+        message: {
+          id: number;
+          groupId?: string;
+          senderKind: "owner" | "peer" | "guardian";
+          fromUserId?: string | null;
+          guardianRoleId?: string | null;
+          text: string;
+          ts: number;
+        };
+      };
+    }
+  | {
+      type: "guardian_speaking";
+      payload: { groupId: string; roleId: string };
     }
   | {
       type: "guardian_owner_hint";

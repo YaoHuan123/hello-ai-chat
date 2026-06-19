@@ -91,6 +91,19 @@ function pushGroupMessage(groupId: string, message: unknown, userIds: string[]):
   }
 }
 
+const GUARDIAN_SPEAKING_MS = 450;
+
+function pushGroupSpeaking(groupId: string, roleId: string, userIds: string[]): void {
+  const payload = { type: "guardian_speaking", payload: { groupId, roleId } };
+  for (const uid of userIds) {
+    pushToUser(uid, payload);
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function pushGroupUpdated(groupId: string, group: unknown, userIds: string[]): void {
   const payload = { type: "guardian_group_updated", payload: { groupId, group } };
   for (const uid of userIds) {
@@ -201,6 +214,11 @@ export const createGuardianRouter = (svc: GuardianGroupsService): Router => {
             }
           }
           for (const gm of guardianMessages) {
+            const roleId = gm.guardianRoleId?.trim();
+            if (roleId) {
+              pushGroupSpeaking(groupId, roleId, members);
+              await sleep(GUARDIAN_SPEAKING_MS);
+            }
             pushGroupMessage(groupId, gm, members);
           }
         } catch {

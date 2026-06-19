@@ -45,7 +45,7 @@ export class GuardianAiService {
     latestPeerText: string;
     groupId?: string;
   }): Promise<string | null> {
-    if (!this.shouldTryProactive(args.latestPeerText)) {
+    if (!this.shouldTryProactiveInternal(args.latestPeerText)) {
       return null;
     }
 
@@ -222,7 +222,12 @@ export class GuardianAiService {
   }
 
   /** 轻量规则：明显寒暄可跳过，节省调用。 */
-  private shouldTryProactive(peerText: string): boolean {
+  shouldTryProactive(peerText: string): boolean {
+    return this.shouldTryProactiveInternal(peerText);
+  }
+
+  /** 轻量规则：明显寒暄可跳过，节省调用。 */
+  private shouldTryProactiveInternal(peerText: string): boolean {
     const t = peerText.trim();
     if (!t) return false;
     if (t.length <= 2 && /^[好嗯哦啊哈嘻]+$/.test(t)) return false;

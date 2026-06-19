@@ -4,6 +4,7 @@ import type { RouteName } from "./types/routes";
 import { HomeShellPage } from "./pages/HomeShellPage";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { AssistedChatPage } from "./pages/AssistedChatPage";
+import { ingestIncomingGuardianGroupMessage } from "./services/guardianGroupLocalStorage";
 import { ingestIncomingRemoteMessage } from "./services/normalChatLocalStorage";
 import { clearAuth, getAuthToken, getUserId } from "./services/storage";
 import { MolWorldPage } from "./pages/MolWorldPage";
@@ -120,6 +121,10 @@ function App() {
       if (msg.type === "message") {
         const myUserId = getUserId();
         if (myUserId) ingestIncomingRemoteMessage(myUserId, msg.payload);
+        return;
+      }
+      if (msg.type === "guardian_group_message") {
+        ingestIncomingGuardianGroupMessage(msg.payload);
         return;
       }
       if (msg.type === "friend_request_received" || msg.type === "friend_request_accepted") {

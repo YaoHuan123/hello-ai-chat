@@ -46,6 +46,36 @@ export function appendGuardianGroupMessages(groupId: string, ...items: GuardianG
   setGuardianGroupMessages(groupId, [...prev, ...items]);
 }
 
+function isGuardianGroupMessage(value: unknown): value is GuardianGroupMessage {
+  if (typeof value !== "object" || value === null) return false;
+  const m = value as GuardianGroupMessage;
+  return (
+    typeof m.id === "number" &&
+    (m.senderKind === "owner" || m.senderKind === "peer" || m.senderKind === "guardian") &&
+    typeof m.text === "string" &&
+    typeof m.ts === "number"
+  );
+}
+
+/** 将 WebSocket 推送的群消息写入本地（去重）；返回是否新写入。 */
+export function ingestIncomingGuardianGroupMessage(payload: {
+  groupId: string;
+  message: unknown;
+}): boolean {
+  const groupId = payload.groupId.trim();
+  if (!groupId || !isGuardianGroupMessage(payload.message)) return false;
+  const message = payload.message;
+  const prev = getGuardianGroupMessages(groupId);
+  if (prev.some((x) => x.id === message.id)) return false;
+  appendGuardianGroupMessages(groupId, {
+    ...message,
+    groupId,
+    fromUserId: message.fromUserId ?? null,
+    guardianRoleId: message.guardianRoleId ?? null,
+  });
+  return true;
+}
+
 function formatGuardianPreviewLine(last: GuardianGroupMessage): string {
   const prefix = last.senderKind === "guardian" ? "搭子：" : last.senderKind === "owner" ? "我：" : "";
   const t = last.text.trim();

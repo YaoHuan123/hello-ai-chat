@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMeApi, listContactsApi } from "../../services/api";
 import {
   getGuardianGroupApi,
@@ -9,6 +9,7 @@ import {
 import { GuardianGroupMembersPanel } from "./GuardianGroupMembersPanel";
 import {
   getGuardianGroupMessages,
+  ingestIncomingGuardianGroupMessage,
   setGuardianGroupMessages,
 } from "../../services/guardianGroupLocalStorage";
 import { wsClient, type WsServerMessage } from "../../services/wsClient";
@@ -44,15 +45,6 @@ function formatMessageTime(ts: number): string {
   if (!ts) return "";
   const d = new Date(ts);
   return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
-}
-
-function pickNextGuardianRoleId(
-  guardianRoleIds: string[],
-  messages: GuardianGroupMessage[],
-): string | null {
-  if (guardianRoleIds.length === 0) return null;
-  const guardianCount = messages.filter((m) => m.senderKind === "guardian").length;
-  return guardianRoleIds[guardianCount % guardianRoleIds.length] ?? null;
 }
 
 function contactForMember(
@@ -103,15 +95,10 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   const scRef = useRef<HTMLDivElement>(null);
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesRef = useRef<GuardianGroupMessage[]>(messages);
-  const groupRef = useRef<GuardianGroup | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
-
-  useEffect(() => {
-    groupRef.current = group;
-  }, [group]);
 
   const contactById = useMemo(() => new Map(contacts.map((c) => [c.contactUserId, c])), [contacts]);
 
@@ -125,19 +112,18 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
     setMessages(next);
   };
 
+  const reloadMessages = useCallback(() => {
+    const local = getGuardianGroupMessages(groupId);
+    seenIdsRef.current = new Set(local.map((x) => x.id));
+    setMessages(local);
+  }, [groupId]);
+
   const appendMessages = (...items: GuardianGroupMessage[]) => {
     const next = [...messagesRef.current, ...items];
     persistMessages(next);
     for (const it of items) {
       seenIdsRef.current.add(it.id);
     }
-  };
-
-  const startGuardianSpeakingAfterPeerMessage = () => {
-    const g = groupRef.current;
-    if (!g?.guardianRoleIds?.length) return;
-    const roleId = pickNextGuardianRoleId(g.guardianRoleIds, messagesRef.current);
-    if (roleId) setGuardianSpeaking({ roleId });
   };
 
   const finishGuardianSpeaking = (messageId: number) => {
@@ -187,20 +173,23 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
   }, [groupId]);
 
   useEffect(() => {
+    queueMicrotask(() => reloadMessages());
+  }, [groupId, reloadMessages]);
+
+  useEffect(() => {
     const unsub = wsClient.subscribe((msg: WsServerMessage) => {
       if (msg.type === "guardian_group_message") {
         if (msg.payload.groupId !== groupId) return;
-        const m = msg.payload.message as GuardianGroupMessage;
-        if (seenIdsRef.current.has(m.id)) return;
-        if (m.senderKind === "guardian") {
-          finishGuardianSpeaking(m.id);
-          appendMessages({ ...m, groupId });
-          return;
+        ingestIncomingGuardianGroupMessage(msg.payload);
+        reloadMessages();
+        if (msg.payload.message.senderKind === "guardian") {
+          finishGuardianSpeaking(msg.payload.message.id);
         }
-        appendMessages({ ...m, groupId });
-        if (m.senderKind === "peer") {
-          startGuardianSpeakingAfterPeerMessage();
-        }
+        return;
+      }
+      if (msg.type === "guardian_speaking") {
+        if (msg.payload.groupId !== groupId) return;
+        setGuardianSpeaking({ roleId: msg.payload.roleId });
         return;
       }
       if (msg.type === "guardian_owner_hint") {
@@ -214,7 +203,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       }
     });
     return unsub;
-  }, [groupId]);
+  }, [groupId, reloadMessages]);
 
   useEffect(() => {
     const el = scRef.current;
@@ -239,9 +228,6 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
       const { message: m } = await sendGuardianGroupMessageApi(groupId, text, messagesRef.current);
       if (!seenIdsRef.current.has(m.id)) {
         appendMessages(m);
-        if (m.senderKind === "peer") {
-          startGuardianSpeakingAfterPeerMessage();
-        }
       }
     } catch (e: unknown) {
       setLoadErr(e instanceof Error ? e.message : String(e));
