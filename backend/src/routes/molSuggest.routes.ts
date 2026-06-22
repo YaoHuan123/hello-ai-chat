@@ -142,6 +142,8 @@ export const createMolSuggestRouter = (
     }
 
     const lm: SuggestLastMessage[] = pickSuggestChatContext(lastMessages ?? []);
+    const meGender = contacts.getUserGender(user.userId);
+    const peerGender = contacts.getUserGender(peerUserId);
 
     try {
       const suggestions = await aiReply.suggestReplies({
@@ -150,6 +152,8 @@ export const createMolSuggestRouter = (
         relationType,
         userDraft,
         molId,
+        meGender,
+        peerGender,
       });
       res.status(200).json({ suggestions, relationType });
     } catch (error) {

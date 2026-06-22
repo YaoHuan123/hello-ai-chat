@@ -91,12 +91,16 @@ export const createRelationSuggestRouter = (aiReply: AiReplyService, contacts: C
     }
 
     const lm: SuggestLastMessage[] = pickSuggestChatContext(lastMessages ?? []);
+    const meGender = contacts.getUserGender(user.userId);
+    const peerGender = contacts.getUserGender(peerUserId);
 
     try {
       const suggestions = await aiReply.suggestRepliesByRelation({
         relationType,
         lastMessages: lm,
         userDraft,
+        meGender,
+        peerGender,
       });
       res.status(200).json({ suggestions, relationType });
     } catch (error) {

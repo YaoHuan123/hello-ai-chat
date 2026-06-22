@@ -9,6 +9,11 @@ import {
   entertainmentSuggestTemperature,
 } from "../constants/molEntertainmentSuggest";
 import { pickSuggestChatContext } from "../constants/suggestChatContext";
+import {
+  applySuggestParticipantsBlock,
+  buildSuggestParticipantsBlock,
+} from "../constants/suggestParticipants";
+import type { UserGender } from "../constants/userGender";
 import { logWarn } from "../logger";
 import { loadMolSuggestSystemTemplate, loadMolSuggestUserTemplate } from "./molSuggestPromptFiles";
 import { loadRelationSuggestSystemTemplate, loadRelationSuggestUserTemplate } from "./relationSuggestPromptFiles";
@@ -51,10 +56,13 @@ export class AiReplyService {
     relationType?: RelationType | null;
     userDraft?: string;
     molId?: string;
+    meGender?: UserGender | null;
+    peerGender?: UserGender | null;
   }): Promise<string[]> {
     const persona = truncate(args.personaBlock.trim(), MAX_PERSONA_CHARS);
     const history = formatChatHistory(args.lastMessages);
     const entertainmentBoost = shouldBoostEntertainment(args.molId, args.relationType);
+    const participantsBlock = buildSuggestParticipantsBlock(args.meGender ?? null, args.peerGender ?? null);
 
     const systemTpl = loadMolSuggestSystemTemplate();
     const userTpl = loadMolSuggestUserTemplate();
@@ -66,9 +74,12 @@ export class AiReplyService {
         : "";
     const entertainmentBlock =
       entertainmentBoost && args.relationType ? `${buildEntertainmentSuggestBlock(args.relationType)}\n` : "";
-    const system = (relationLine + systemTpl.replaceAll("{{PERSONA_BLOCK}}", persona || "（无额外资料）"))
-      .replaceAll("{{GROUNDING_RULES}}", buildSuyanGroundingRules(args.molId, entertainmentBlock))
-      .trimEnd();
+    const system = applySuggestParticipantsBlock(
+      (relationLine + systemTpl.replaceAll("{{PERSONA_BLOCK}}", persona || "（无额外资料）"))
+        .replaceAll("{{GROUNDING_RULES}}", buildSuyanGroundingRules(args.molId, entertainmentBlock))
+        .trimEnd(),
+      participantsBlock,
+    );
     const user = userTpl
       .replaceAll("{{USER_DRAFT_SECTION}}", formatUserDraftSection(args.userDraft))
       .replaceAll("{{CHAT_HISTORY}}", history)
@@ -88,19 +99,25 @@ export class AiReplyService {
     relationType: RelationType;
     lastMessages: SuggestLastMessage[];
     userDraft?: string;
+    meGender?: UserGender | null;
+    peerGender?: UserGender | null;
   }): Promise<string[]> {
     const history = formatChatHistory(args.lastMessages);
     const label = RELATION_LABELS[args.relationType];
     const guidance = relationSuggestGuidance(args.relationType);
     const groundingRules = loadPromptFile("relation-suggest-grounding-rules.txt");
+    const participantsBlock = buildSuggestParticipantsBlock(args.meGender ?? null, args.peerGender ?? null);
 
     const systemTpl = loadRelationSuggestSystemTemplate();
     const userTpl = loadRelationSuggestUserTemplate();
-    const system = systemTpl
-      .replaceAll("{{RELATION_LABEL}}", label)
-      .replaceAll("{{RELATION_GUIDANCE}}", guidance)
-      .replaceAll("{{GROUNDING_RULES}}", groundingRules)
-      .trimEnd();
+    const system = applySuggestParticipantsBlock(
+      systemTpl
+        .replaceAll("{{RELATION_LABEL}}", label)
+        .replaceAll("{{RELATION_GUIDANCE}}", guidance)
+        .replaceAll("{{GROUNDING_RULES}}", groundingRules)
+        .trimEnd(),
+      participantsBlock,
+    );
     const user = userTpl
       .replaceAll("{{USER_DRAFT_SECTION}}", formatUserDraftSection(args.userDraft))
       .replaceAll("{{CHAT_HISTORY}}", history)

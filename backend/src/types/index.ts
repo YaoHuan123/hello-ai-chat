@@ -4,6 +4,7 @@ export interface UserRecord {
   nickname: string | null;
   avatar_url: string | null;
   avatar_updated_at: number | null;
+  gender: string | null;
   created_at: string;
   token_version: number;
 }

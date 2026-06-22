@@ -1,4 +1,5 @@
 import type { RelationType } from "../constants/relationTypes";
+import type { UserGender } from "../constants/userGender";
 
 export interface ContactItem {
   contactUserId: string;
@@ -6,6 +7,7 @@ export interface ContactItem {
   nickname: string | null;
   avatarUrl: string | null;
   avatarUpdatedAt: number | null;
+  gender: UserGender | null;
   remark: string | null;
   relationType: RelationType | null;
   defaultMolId: string | null;

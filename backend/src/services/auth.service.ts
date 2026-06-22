@@ -3,6 +3,7 @@ import { customAlphabet } from "nanoid";
 import type { DatabaseSync } from "node:sqlite";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config";
 import type { AuthSuccessResponse, JwtPayload, UserRecord } from "../types";
+import { normalizeUserGender, type UserGender } from "../constants/userGender";
 import { normalizePhoneDigits } from "../utils/phone";
 import type { AliyunSmsService } from "./aliyunSms.service";
 import type { AuthAuditLogService } from "./authAuditLog.service";
@@ -79,22 +80,47 @@ export class AuthService {
   getById = (userId: string): UserRecord | undefined => {
     return this.db
       .prepare(
-        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, created_at, token_version FROM users WHERE id = ?",
+        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, gender, created_at, token_version FROM users WHERE id = ?",
       )
       .get(userId) as UserRecord | undefined;
   };
 
-  updateNickname = (userId: string, nicknameRaw: string | null): UserRecord => {
-    const nickname = normalizeNickname(nicknameRaw);
-    const info = this.db.prepare("UPDATE users SET nickname = ? WHERE id = ?").run(nickname, userId);
-    if (info.changes === 0) {
-      throw new Error("USER_NOT_FOUND");
-    }
+  updateProfile = (
+    userId: string,
+    input: { nickname?: string | null; gender?: UserGender | null },
+  ): UserRecord => {
     const row = this.getById(userId);
     if (!row) {
       throw new Error("USER_NOT_FOUND");
     }
-    return row;
+
+    const nickname = input.nickname !== undefined ? normalizeNickname(input.nickname) : row.nickname;
+    let gender: string | null = row.gender;
+    if (input.gender !== undefined) {
+      if (input.gender === null) {
+        gender = null;
+      } else {
+        const normalized = normalizeUserGender(input.gender);
+        if (!normalized) {
+          throw new Error("INVALID_GENDER");
+        }
+        gender = normalized;
+      }
+    }
+
+    const info = this.db.prepare("UPDATE users SET nickname = ?, gender = ? WHERE id = ?").run(nickname, gender, userId);
+    if (info.changes === 0) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    const next = this.getById(userId);
+    if (!next) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    return next;
+  };
+
+  updateNickname = (userId: string, nicknameRaw: string | null): UserRecord => {
+    return this.updateProfile(userId, { nickname: nicknameRaw });
   };
 
   updateAvatar = (userId: string, imageBase64: string): UserRecord => {
@@ -171,7 +197,7 @@ export class AuthService {
   private findByPhone(phone: string): UserRecord | undefined {
     return this.db
       .prepare(
-        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, created_at, token_version FROM users WHERE phone = ?",
+        "SELECT id, phone, nickname, avatar_url, avatar_updated_at, gender, created_at, token_version FROM users WHERE phone = ?",
       )
       .get(phone) as UserRecord | undefined;
   }

@@ -136,6 +136,7 @@ const SEED_MOL_DEFS: {
   abilityTags: string[];
   popularityScore: number;
   recommended: boolean;
+  entertainmentEnabled?: boolean;
 }[] = [
   {
     id: "mw-seed-age18",
@@ -270,6 +271,18 @@ const SEED_MOL_DEFS: {
     recommended: true,
   },
   {
+    id: "mw-seed-lianaijunshi",
+    name: "恋爱军师",
+    primaryCategory: "亲密关系",
+    taskTags: ["延续聊天", "推进关系", "邀约", "安慰", "维护边界"],
+    toneTags: ["清楚", "克制"],
+    relationshipTags: ["暧昧中", "恋人", "朋友"],
+    abilityTags: ["会接话", "会润色", "会多步引导"],
+    popularityScore: 714,
+    recommended: true,
+    entertainmentEnabled: true,
+  },
+  {
     id: "mw-seed-dusheguimi",
     name: "毒舌闺蜜",
     primaryCategory: "朋友社交",
@@ -303,6 +316,19 @@ const SEED_MOL_DEFS: {
     recommended: true,
   },
 ];
+
+export function listSeedMolIds(): string[] {
+  return SEED_MOL_DEFS.map((d) => d.id);
+}
+
+export function seedSuyanEntertainmentDefaults(): Record<string, boolean> {
+  const out: Record<string, boolean> = {};
+  for (const def of SEED_MOL_DEFS) {
+    if (!def.entertainmentEnabled) continue;
+    out[def.id.replace(/^mw-seed-/, "")] = true;
+  }
+  return out;
+}
 
 function buildSeedMol(
   def: (typeof SEED_MOL_DEFS)[number],

@@ -103,6 +103,11 @@ export const initDb = (): DatabaseSync => {
   } catch {
     /* column may already exist */
   }
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN gender TEXT");
+  } catch {
+    /* column may already exist */
+  }
 
   ensureDir(path.join(DATA_ROOT, "uploads", "avatars"));
 

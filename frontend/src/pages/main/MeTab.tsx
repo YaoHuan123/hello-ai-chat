@@ -6,8 +6,10 @@ import {
   generateMeAvatarApi,
   getMeApi,
   updateMeNicknameApi,
+  updateMeProfileApi,
   uploadMeAvatarApi,
 } from "../../services/api";
+import { USER_GENDERS, USER_GENDER_LABEL, genderDisplayLabel, type UserGender } from "../../constants/userGender";
 import { readFileAsDataUrl, validateAvatarFile } from "../../lib/avatarUrl";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import {
@@ -16,6 +18,7 @@ import {
   getMyDisplayName,
   getNickname,
   setAvatarCache,
+  setGenderCache,
   setNicknameCache,
 } from "../../services/storage";
 import { formatAppVersion, getAppVersion } from "../../platform/appVersion";
@@ -47,12 +50,17 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [gender, setGender] = useState<UserGender | null>(null);
+  const [genderSheetOpen, setGenderSheetOpen] = useState(false);
+  const [genderSaving, setGenderSaving] = useState(false);
 
   function applyMeProfile(me: Awaited<ReturnType<typeof getMeApi>>) {
     setNicknameCache(me.nickname);
     setAvatarCache(me.avatarUrl, me.avatarUpdatedAt);
+    setGenderCache(me.gender);
     setDisplayName(me.nickname?.trim() || getMaskedPhone());
     setDraft(me.nickname ?? "");
+    setGender(me.gender);
     setAvatarContact(getMyAvatarContact());
   }
 
@@ -103,6 +111,20 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
     setDraft(getNickname());
     setErr("");
     setSheetOpen(true);
+  }
+
+  async function onSaveGender(next: UserGender) {
+    setGenderSaving(true);
+    setErr("");
+    try {
+      const me = await updateMeProfileApi({ gender: next });
+      applyMeProfile(me);
+      setGenderSheetOpen(false);
+    } catch (error) {
+      setErr(error instanceof Error ? error.message : "保存失败");
+    } finally {
+      setGenderSaving(false);
+    }
   }
 
   async function onSaveNickname(e: FormEvent) {
@@ -206,6 +228,19 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
         </div>
 
         {err && !sheetOpen && !generateOpen ? <p className="aichat-form-msg err me-tab__err">{err}</p> : null}
+
+        <section className="me-tab__group" aria-label="基本资料">
+          <button type="button" className="me-tab__row" onClick={() => setGenderSheetOpen(true)}>
+            <span className="me-tab__row-body">
+              <b>性别</b>
+              <span>用于聊天建议等场景</span>
+            </span>
+            <span className="me-tab__row-value">{genderDisplayLabel(gender)}</span>
+            <span className="me-tab__row-chev" aria-hidden>
+              ›
+            </span>
+          </button>
+        </section>
 
         <section className="me-tab__group" aria-label="素颜">
           <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("assist-mol-list")}>
@@ -386,6 +421,37 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
               </button>
               <button className="aichat-btn-primary contacts-sheet__btn me-tab__clear-confirm" type="button" disabled={clearing} onClick={() => void onConfirmClearChat()}>
                 {clearing ? "处理中…" : "清空"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {genderSheetOpen ? (
+        <div className="contacts-sheet-overlay" role="presentation" onClick={() => !genderSaving && setGenderSheetOpen(false)}>
+          <div className="contacts-sheet me-tab__gender-sheet" role="dialog" aria-modal="true" aria-labelledby="me-gender-title" onClick={(ev) => ev.stopPropagation()}>
+            <div className="contacts-sheet__handle" aria-hidden />
+            <h2 id="me-gender-title" className="contacts-sheet__title">
+              选择性别
+            </h2>
+            <ul className="me-tab__gender-options">
+              {USER_GENDERS.map((value) => (
+                <li key={value}>
+                  <button
+                    type="button"
+                    className={`me-tab__gender-option${gender === value ? " me-tab__gender-option--on" : ""}`}
+                    disabled={genderSaving}
+                    onClick={() => void onSaveGender(value)}
+                  >
+                    {USER_GENDER_LABEL[value]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {err && genderSheetOpen ? <p className="aichat-form-msg err">{err}</p> : null}
+            <div className="contacts-sheet__actions">
+              <button className="aichat-btn-ghost contacts-sheet__btn" type="button" disabled={genderSaving} onClick={() => setGenderSheetOpen(false)}>
+                取消
               </button>
             </div>
           </div>

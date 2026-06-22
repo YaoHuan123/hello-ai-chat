@@ -30,16 +30,18 @@ import { MomentsService } from "./services/moments.service";
 import { ContactsService } from "./services/contacts.service";
 import { FriendRequestsService } from "./services/friendRequests.service";
 import { MessagesService } from "./services/messages.service";
-import { MolWorldService } from "./services/molWorld.service";
+import { MolWorldService, listSeedMolIds, seedSuyanEntertainmentDefaults } from "./services/molWorld.service";
 import { UserMolsService } from "./services/userMols.service";
-import { AiReplyService } from "./services/aiReply.service";
 import { YiyiAiService } from "./services/yiyiAi.service";
 import { YiyiService } from "./services/yiyi.service";
 import { errorToMeta, logError, logInfo, logWarn } from "./logger";
 import { attachWs } from "./ws/wsServer";
 import { ensureSettingsFilesSeeded } from "./services/settingsRuntime.service";
+import { ensureSeedSuyanSettingsFromDemo } from "./services/suyanDemoSync.service";
+import { AiReplyService } from "./services/aiReply.service";
 
 ensureSettingsFilesSeeded();
+ensureSeedSuyanSettingsFromDemo(listSeedMolIds(), seedSuyanEntertainmentDefaults());
 
 if ((process.env.JWT_SECRET ?? "").trim() === "" || process.env.JWT_SECRET === "replace-this-in-production") {
   logWarn("config.jwt_secret", {

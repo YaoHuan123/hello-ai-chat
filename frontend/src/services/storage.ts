@@ -1,15 +1,24 @@
 import type { AuthResult } from "../types/auth";
+import type { UserGender } from "../constants/userGender";
+import { isUserGender } from "../constants/userGender";
 
 const KEY_TOKEN = "authToken";
 const KEY_USER = "userId";
 const KEY_PHONE = "phone";
 const KEY_NICKNAME = "nickname";
+const KEY_GENDER = "gender";
 const KEY_AVATAR_URL = "avatarUrl";
 const KEY_AVATAR_UPDATED = "avatarUpdatedAt";
 const KEY_LAST_PHONE = "lastPhone";
 const KEY_LOGIN_PHONE_HISTORY = "loginPhoneHistory";
 
 const LOGIN_PHONE_HISTORY_MAX = 10;
+
+export const ME_PROFILE_UPDATED_EVENT = "aichat-me-profile-updated";
+
+function notifyMeProfileUpdated(): void {
+  window.dispatchEvent(new Event(ME_PROFILE_UPDATED_EVENT));
+}
 
 function isValidCnMobileDigits(phone: string): boolean {
   return /^1\d{10}$/.test(phone.replace(/\D/g, ""));
@@ -62,6 +71,10 @@ export function saveAuth(data: AuthResult): void {
   localStorage.setItem(KEY_USER, data.userId);
   localStorage.setItem(KEY_PHONE, data.phone);
   localStorage.setItem(KEY_LAST_PHONE, data.phone);
+  localStorage.removeItem(KEY_NICKNAME);
+  localStorage.removeItem(KEY_GENDER);
+  localStorage.removeItem(KEY_AVATAR_URL);
+  localStorage.removeItem(KEY_AVATAR_UPDATED);
   rememberLoginPhone(data.phone);
 }
 
@@ -70,6 +83,7 @@ export function clearAuth(): void {
   localStorage.removeItem(KEY_USER);
   localStorage.removeItem(KEY_PHONE);
   localStorage.removeItem(KEY_NICKNAME);
+  localStorage.removeItem(KEY_GENDER);
   localStorage.removeItem(KEY_AVATAR_URL);
   localStorage.removeItem(KEY_AVATAR_UPDATED);
 }
@@ -78,6 +92,7 @@ export function setNicknameCache(nickname: string | null | undefined): void {
   const t = nickname?.trim();
   if (t) localStorage.setItem(KEY_NICKNAME, t);
   else localStorage.removeItem(KEY_NICKNAME);
+  notifyMeProfileUpdated();
 }
 
 export function getNickname(): string {
@@ -89,6 +104,21 @@ export function getMyDisplayName(): string {
   const n = getNickname().trim();
   if (n) return n;
   return getMaskedPhone();
+}
+
+export function setGenderCache(gender: UserGender | null | undefined): void {
+  if (gender && isUserGender(gender)) {
+    localStorage.setItem(KEY_GENDER, gender);
+  } else {
+    localStorage.removeItem(KEY_GENDER);
+  }
+  notifyMeProfileUpdated();
+}
+
+export function getGender(): UserGender | null {
+  const raw = localStorage.getItem(KEY_GENDER)?.trim();
+  if (!raw || !isUserGender(raw)) return null;
+  return raw;
 }
 
 export function setAvatarCache(avatarUrl: string | null | undefined, avatarUpdatedAt: number | null | undefined): void {
@@ -104,6 +134,7 @@ export function setAvatarCache(avatarUrl: string | null | undefined, avatarUpdat
     localStorage.removeItem(KEY_AVATAR_URL);
     localStorage.removeItem(KEY_AVATAR_UPDATED);
   }
+  notifyMeProfileUpdated();
 }
 
 export function getAvatarUrl(): string | null {

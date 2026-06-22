@@ -8910,6 +8910,46 @@ button.msg-chat-c1-placeholder:active {
 }
 
 /* —— 我的 Tab —— */
+.me-tab__row-value {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--aichat-muted);
+  margin-right: 4px;
+}
+
+.me-tab__gender-options {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.me-tab__gender-option {
+  width: 100%;
+  border: 1px solid rgba(20, 23, 26, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--aichat-surface);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.me-tab__gender-option--on {
+  border-color: rgba(79, 109, 245, 0.45);
+  background: rgba(79, 109, 245, 0.08);
+  color: #3d52c7;
+}
+
+.me-tab__gender-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .me-tab__hero {
   display: flex;
   align-items: center;

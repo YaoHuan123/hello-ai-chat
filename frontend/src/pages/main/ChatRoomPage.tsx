@@ -21,8 +21,8 @@ import { ContactAvatar } from "../../components/ContactAvatar";
 import { ContactRelationSheet } from "../../components/ContactRelationSheet";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { pickRecommendedMolId } from "../../lib/contactRelations";
-import { getMyAvatarContact } from "../../services/storage";
 import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
+import { useMyAvatarContact } from "../../hooks/useMyAvatarContact";
 
 type Props = {
   contact: ContactItem;
@@ -54,7 +54,7 @@ function resolveActiveMol(mols: MolInMyCollection[], contact: ContactItem): MolI
 }
 
 function MeAvatarMolBadge() {
-  const me = getMyAvatarContact();
+  const me = useMyAvatarContact();
   const hasPhoto = Boolean(me.avatarUrl?.trim());
   return (
     <div className="msg-chat-c1-me-avatar-wrap">

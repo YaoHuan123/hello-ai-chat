@@ -108,6 +108,7 @@ export function MessagesTab({
           nickname: null,
           avatarUrl: null,
           avatarUpdatedAt: null,
+          gender: null,
           relationType: null,
           defaultMolId: null,
           createdAt: c.lastTs,

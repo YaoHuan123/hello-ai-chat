@@ -36,6 +36,7 @@ function contactForMember(contacts: ContactItem[], userId: string, phone: string
       nickname: null,
       avatarUrl: null,
       avatarUpdatedAt: null,
+      gender: null,
       relationType: null,
       defaultMolId: null,
       createdAt: 0,

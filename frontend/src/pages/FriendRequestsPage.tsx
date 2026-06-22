@@ -75,6 +75,7 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
         nickname: null,
         avatarUrl: null,
         avatarUpdatedAt: null,
+        gender: null,
         remark: null,
         relationType,
         defaultMolId: null,

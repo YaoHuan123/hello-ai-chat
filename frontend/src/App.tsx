@@ -14,7 +14,7 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { ContactsPage } from "./pages/ContactsPage";
 import { FriendRequestsPage } from "./pages/FriendRequestsPage";
 import { getMeApi } from "./services/api";
-import { setAvatarCache, setNicknameCache } from "./services/storage";
+import { setAvatarCache, setGenderCache, setNicknameCache } from "./services/storage";
 import { getFriendRequestPendingCountApi } from "./services/friendRequestsApi";
 import { wsClient } from "./services/wsClient";
 import { setAndroidBackHandler } from "./platform/androidShell";
@@ -91,6 +91,7 @@ function App() {
         if (!cancelled) {
           setNicknameCache(me.nickname);
           setAvatarCache(me.avatarUrl, me.avatarUpdatedAt);
+          setGenderCache(me.gender);
           setAuthed(true);
         }
       })
@@ -267,9 +268,17 @@ function App() {
     return (
       <LoginPage
         onSuccess={() => {
-          setAuthed(true);
-          setFeatureReturnRoute("main");
-          setRoute("main");
+          void getMeApi()
+            .then((me) => {
+              setNicknameCache(me.nickname);
+              setAvatarCache(me.avatarUrl, me.avatarUpdatedAt);
+              setGenderCache(me.gender);
+            })
+            .finally(() => {
+              setAuthed(true);
+              setFeatureReturnRoute("main");
+              setRoute("main");
+            });
         }}
       />
     );

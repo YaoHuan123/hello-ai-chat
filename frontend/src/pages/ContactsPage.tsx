@@ -4,7 +4,7 @@ import { createFriendRequestApi } from "../services/friendRequestsApi";
 import { wsClient } from "../services/wsClient";
 import { AppIcon } from "../components/AppIcons";
 import { ContactAvatar } from "../components/ContactAvatar";
-import { contactDisplayName, maskPhoneDisplay } from "../lib/contactDisplay";
+import { contactDisplayName, contactMetaLine, maskPhoneDisplay } from "../lib/contactDisplay";
 import type { ContactItem } from "../types/contact";
 
 type Props = {
@@ -20,21 +20,7 @@ type Props = {
 function subtitleLine(c: ContactItem): string {
   const r = c.remark?.trim();
   if (r) return maskPhoneDisplay(c.phone);
-  return `添加于 ${formatAddedAt(c.createdAt)}`;
-}
-
-function formatAddedAt(ts: number): string {
-  const d = new Date(ts);
-  const now = new Date();
-  const sameDay =
-    d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-  if (sameDay) {
-    return `今天 ${d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
-  }
-  if (d.getFullYear() === now.getFullYear()) {
-    return d.toLocaleDateString("zh-CN", { month: "long", day: "numeric" });
-  }
-  return d.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" });
+  return contactMetaLine(c);
 }
 
 export function ContactsPage({

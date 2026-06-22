@@ -1,5 +1,6 @@
 import type { AuthResult } from "../types/auth";
 import type { ContactItem } from "../types/contact";
+import type { UserGender } from "../constants/userGender";
 import { getAuthToken } from "./storage";
 import { isApiMock } from "./mock";
 import { suyanApiErrorLabel } from "../constants/suyanCopy";
@@ -170,6 +171,7 @@ export type MeResponse = {
   nickname: string | null;
   avatarUrl: string | null;
   avatarUpdatedAt: number | null;
+  gender: UserGender | null;
   createdAt: string;
 };
 
@@ -187,6 +189,17 @@ export async function updateMeNicknameApi(nickname: string | null, token?: strin
     throw new Error("未登录");
   }
   return patchJson<MeResponse>("/api/auth/me", { nickname }, t);
+}
+
+export async function updateMeProfileApi(
+  patch: { nickname?: string | null; gender?: UserGender | null },
+  token?: string,
+): Promise<MeResponse> {
+  const t = token ?? getAuthToken().trim();
+  if (!t) {
+    throw new Error("未登录");
+  }
+  return patchJson<MeResponse>("/api/auth/me", patch, t);
 }
 
 export async function uploadMeAvatarApi(image: string, token?: string): Promise<MeResponse> {

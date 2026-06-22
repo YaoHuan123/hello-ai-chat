@@ -4,6 +4,7 @@ import type { AuthService } from "../services/auth.service";
 import type { AvatarText2ImgService } from "../services/avatarText2Img.service";
 import { authMiddleware } from "../middleware/auth";
 import { logWarn } from "../logger";
+import { USER_GENDERS, normalizeUserGender } from "../constants/userGender";
 import { AliyunSmsError } from "../services/aliyunSms.service";
 import type { SmsScene } from "../services/smsRateLimit.service";
 
@@ -23,9 +24,14 @@ const deleteAccountSchema = z.object({
   code: z.string().min(4).max(8),
 });
 
-const patchMeSchema = z.object({
-  nickname: z.union([z.string().max(32), z.null()]),
-});
+const patchMeSchema = z
+  .object({
+    nickname: z.union([z.string().max(32), z.null()]).optional(),
+    gender: z.union([z.enum(USER_GENDERS), z.null()]).optional(),
+  })
+  .refine((v) => v.nickname !== undefined || v.gender !== undefined, {
+    message: "至少提供一项更新字段",
+  });
 
 const avatarUploadSchema = z.object({
   image: z.string().min(1).max(700_000),
@@ -41,6 +47,7 @@ function mePayload(detail: {
   nickname: string | null;
   avatar_url: string | null;
   avatar_updated_at: number | null;
+  gender: string | null;
   created_at: string;
 }) {
   return {
@@ -49,6 +56,7 @@ function mePayload(detail: {
     nickname: detail.nickname ?? null,
     avatarUrl: detail.avatar_url ?? null,
     avatarUpdatedAt: detail.avatar_updated_at ?? null,
+    gender: normalizeUserGender(detail.gender),
     createdAt: detail.created_at,
   };
 }
@@ -115,6 +123,10 @@ function mapAuthError(res: Response, error: unknown): boolean {
   }
   if (code === "INVALID_PHRASE") {
     res.status(400).json({ code, message: "请输入一句有效的话" });
+    return true;
+  }
+  if (code === "INVALID_GENDER") {
+    res.status(400).json({ code, message: "性别选项无效" });
     return true;
   }
   if (code === "TEXT2IMG_TIMEOUT") {
@@ -208,11 +220,11 @@ export const createAuthRouter = (authService: AuthService, avatarText2Img: Avata
       return;
     }
     try {
-      const detail = authService.updateNickname(user.userId, parsed.data.nickname);
+      const detail = authService.updateProfile(user.userId, parsed.data);
       res.status(200).json(mePayload(detail));
     } catch (error) {
       if (mapAuthError(res, error)) return;
-      res.status(500).json({ code: "INTERNAL_ERROR", message: "更新昵称失败" });
+      res.status(500).json({ code: "INTERNAL_ERROR", message: "更新资料失败" });
     }
   });
 

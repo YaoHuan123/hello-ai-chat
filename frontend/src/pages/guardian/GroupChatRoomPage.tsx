@@ -20,8 +20,8 @@ import { ChatComposeBar } from "../../components/ChatComposeBar";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { contactDisplayName, maskPhoneDisplay } from "../../lib/contactDisplay";
-import { getMyAvatarContact } from "../../services/storage";
 import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
+import { useMyAvatarContact } from "../../hooks/useMyAvatarContact";
 
 type Props = {
   groupId: string;
@@ -61,6 +61,7 @@ function contactForMember(
     nickname: null,
     avatarUrl: null,
     avatarUpdatedAt: null,
+    gender: null,
     relationType: null,
     defaultMolId: null,
     createdAt: 0,
@@ -68,7 +69,7 @@ function contactForMember(
 }
 
 function MeMessageAvatar() {
-  const me = getMyAvatarContact();
+  const me = useMyAvatarContact();
   const hasPhoto = Boolean(me.avatarUrl?.trim());
   return (
     <ContactAvatar

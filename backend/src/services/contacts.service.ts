@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import { isValidRelationType, type RelationType } from "../constants/relationTypes";
+import { normalizeUserGender, type UserGender } from "../constants/userGender";
 import { normalizePhoneDigits } from "../utils/phone";
 
 export type ContactRow = {
@@ -8,6 +9,7 @@ export type ContactRow = {
   nickname: string | null;
   avatarUrl: string | null;
   avatarUpdatedAt: number | null;
+  gender: UserGender | null;
   remark: string | null;
   relationType: RelationType | null;
   defaultMolId: string | null;
@@ -21,7 +23,7 @@ export type ContactPatchInput = {
 };
 
 const CONTACT_SELECT = `SELECT c.contact_user_id AS contactUserId, u.phone AS phone, u.nickname AS nickname,
-                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt,
+                u.avatar_url AS avatarUrl, u.avatar_updated_at AS avatarUpdatedAt, u.gender AS gender,
                 c.remark AS remark, c.relation_type AS relationType, c.default_mol_id AS defaultMolId,
                 c.created_at AS createdAt`;
 
@@ -44,6 +46,7 @@ function mapContactRow(raw: Record<string, unknown>): ContactRow {
     nickname: raw.nickname == null ? null : String(raw.nickname),
     avatarUrl: raw.avatarUrl == null ? null : String(raw.avatarUrl),
     avatarUpdatedAt: raw.avatarUpdatedAt == null ? null : Number(raw.avatarUpdatedAt),
+    gender: normalizeUserGender(raw.gender == null ? null : String(raw.gender)),
     remark: raw.remark == null ? null : String(raw.remark),
     relationType: typeof rel === "string" && isValidRelationType(rel) ? rel : null,
     defaultMolId: raw.defaultMolId == null || raw.defaultMolId === "" ? null : String(raw.defaultMolId),
@@ -120,6 +123,12 @@ export class ContactsService {
       .prepare("SELECT 1 AS x FROM contacts WHERE owner_user_id = ? AND contact_user_id = ? LIMIT 1")
       .get(ownerUserId, contactUserId) as { x?: number } | undefined;
     return Boolean(row);
+  }
+
+  getUserGender(userId: string): UserGender | null {
+    const row = this.db.prepare("SELECT gender FROM users WHERE id = ?").get(userId) as { gender?: string | null } | undefined;
+    if (!row) return null;
+    return normalizeUserGender(row.gender);
   }
 
   getRelation(ownerUserId: string, contactUserId: string): RelationType | null {

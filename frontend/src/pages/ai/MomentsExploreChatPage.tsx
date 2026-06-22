@@ -11,8 +11,8 @@ import { contactDisplayName } from "../../lib/contactDisplay";
 import { ChatComposeBar } from "../../components/ChatComposeBar";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { AppIcon } from "../../components/AppIcons";
-import { getMyAvatarContact } from "../../services/storage";
 import { useChatViewportScroll } from "../../hooks/useChatViewportScroll";
+import { useMyAvatarContact } from "../../hooks/useMyAvatarContact";
 
 type Props = {
   contact: ContactItem;
@@ -37,7 +37,7 @@ function toExploreHistory(messages: ChatLocalMessage[]): ExploreChatLine[] {
 }
 
 function MeAvatar() {
-  const me = getMyAvatarContact();
+  const me = useMyAvatarContact();
   const hasPhoto = Boolean(me.avatarUrl?.trim());
   if (hasPhoto) {
     return <ContactAvatar contact={me} className="msg-chat-c1-avatar msg-chat-c1-avatar--me msg-chat-c1-avatar--photo" alt="" />;
