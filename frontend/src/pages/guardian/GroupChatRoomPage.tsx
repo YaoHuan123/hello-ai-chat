@@ -1,3 +1,4 @@
+import { GUARDIAN } from "../../constants/productCopy";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMeApi, listContactsApi } from "../../services/api";
 import {
@@ -311,7 +312,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
               const role = m.guardianRoleId ? roles.get(m.guardianRoleId) : undefined;
               const member = humanMembers.find((x) => x.userId === m.fromUserId);
               const isMe = kind === "me";
-              const guardianName = role?.name ?? "搭子";
+              const guardianName = role?.name ?? GUARDIAN.name;
               const senderLabel =
                 kind === "guardian"
                   ? guardianName
@@ -370,7 +371,7 @@ export function GroupChatRoomPage({ groupId, onBack }: Props) {
                   <span className="guardian-group-msg-name guardian-group-msg-name--guardian">
                     {speakingRole.name}
                   </span>
-                  <div className="guardian-group-typing-dots" aria-label="搭子正在回复">
+                  <div className="guardian-group-typing-dots" aria-label={GUARDIAN.typing}>
                     <span />
                     <span />
                     <span />

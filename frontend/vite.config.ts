@@ -8,8 +8,11 @@ const pkg = JSON.parse(
   readFileSync(join(dirname(fileURLToPath(import.meta.url)), "package.json"), "utf-8"),
 ) as { version: string };
 
+const basePath = (process.env.VITE_BASE_PATH ?? "/").replace(/\/?$/, "/");
+
 // https://vite.dev/config/
 export default defineConfig({
+  base: basePath,
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

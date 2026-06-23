@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { RouteName } from "../../types/routes";
 import { SUYAN } from "../../constants/suyanCopy";
+import { YIYI } from "../../constants/productCopy";
 import { AppIcon } from "../../components/AppIcons";
 import {
   generateMeAvatarApi,
@@ -233,7 +234,7 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           <button type="button" className="me-tab__row" onClick={() => setGenderSheetOpen(true)}>
             <span className="me-tab__row-body">
               <b>性别</b>
-              <span>用于聊天建议等场景</span>
+              <span>用于回复建议与匹配</span>
             </span>
             <span className="me-tab__row-value">{genderDisplayLabel(gender)}</span>
             <span className="me-tab__row-chev" aria-hidden>
@@ -242,7 +243,7 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           </button>
         </section>
 
-        <section className="me-tab__group" aria-label="素颜">
+        <section className="me-tab__group" aria-label={SUYAN.name}>
           <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("assist-mol-list")}>
             <span className="me-tab__row-icon me-tab__row-icon--mol" aria-hidden>
               <AppIcon name="mol" className="app-icon app-icon--mol" />
@@ -257,29 +258,11 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
           </button>
         </section>
 
-        <section className="me-tab__group" aria-label="功能">
-          <button type="button" className="me-tab__row" onClick={() => onNavigateFeature("daily-home")}>
-            <span className="me-tab__row-icon me-tab__row-icon--daily" aria-hidden>
-              <svg viewBox="0 0 24 24" className="me-tab__row-icon-svg" aria-hidden>
-                <rect x="4" y="3" width="16" height="18" rx="2.5" />
-                <path d="M8 7h8M8 11h8M8 15h5" />
-              </svg>
-            </span>
-            <span className="me-tab__row-body">
-              <b>日常</b>
-              <span>本机生活记录，不对他人展示</span>
-            </span>
-            <span className="me-tab__row-chev" aria-hidden>
-              ›
-            </span>
-          </button>
-        </section>
-
         <section className="me-tab__group" aria-label="账号">
           <button type="button" className="me-tab__row" onClick={() => setClearConfirmOpen(true)}>
             <span className="me-tab__row-body">
               <b>清空聊天记录</b>
-              <span>仅删除本机私聊、群聊与 YiYi 对话</span>
+              <span>仅删除本机私聊、群聊与{YIYI.name}对话</span>
             </span>
             <span className="me-tab__row-chev" aria-hidden>
               ›
@@ -414,7 +397,7 @@ export function MeTab({ onNavigateFeature, onLogout }: Props) {
             <h2 id="me-clear-chat-title" className="contacts-sheet__title">
               清空本机聊天记录
             </h2>
-            <p className="me-tab__clear-desc">将删除本机全部私聊、群聊与 YiYi 对话记录，不可恢复。</p>
+            <p className="me-tab__clear-desc">将删除本机全部私聊、群聊与{YIYI.name}对话记录，不可恢复。</p>
             <div className="contacts-sheet__actions">
               <button className="aichat-btn-ghost contacts-sheet__btn" type="button" disabled={clearing} onClick={() => setClearConfirmOpen(false)}>
                 取消

@@ -132,7 +132,7 @@ export function ContactsPage({
           </button>
         )}
         <div className="aichat-stage-head">
-          <h1>联系人</h1>
+          <h1>好友</h1>
           <p>{items.length > 0 ? `${items.length} 位好友` : "已注册用户"}</p>
         </div>
         <button
@@ -184,14 +184,14 @@ export function ContactsPage({
             <span className="contacts-empty__icon" aria-hidden>
               <AppIcon name="usersEmpty" className="app-icon app-icon--lg app-icon--muted" />
             </span>
-            <p className="contacts-empty__title">还没有联系人</p>
+            <p className="contacts-empty__title">还没有好友</p>
             <p className="contacts-empty__hint">发送好友申请，对方同意后双方将出现在列表中</p>
             <button className="aichat-btn-primary contacts-empty__btn" type="button" onClick={() => setSheetOpen(true)}>
               发送好友申请
             </button>
           </div>
         ) : (
-          <ul className="contacts-list" aria-label="联系人列表">
+          <ul className="contacts-list" aria-label="好友列表">
             {items.map((c) => (
               <li key={c.contactUserId} className="contacts-list__item">
                 <div className="contacts-row">
@@ -223,7 +223,7 @@ export function ContactsPage({
                     {menuOpenId === c.contactUserId ? (
                       <div className="contacts-menu" role="menu">
                         <button type="button" className="contacts-menu__item contacts-menu__item--danger" role="menuitem" onClick={() => onDelete(c)}>
-                          删除联系人
+                          删除好友
                         </button>
                       </div>
                     ) : null}

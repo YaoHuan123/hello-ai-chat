@@ -6,9 +6,10 @@ import type { ContactItem } from "../../types/contact";
 import type { GuardianRole } from "../../types/guardian";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { ContactAvatar } from "../../components/ContactAvatar";
+import { GUARDIAN } from "../../constants/productCopy";
 import {
-  guardianSceneForFeature,
   type GuardianCreateFeature,
+  guardianSceneForFeature,
 } from "../../constants/guardianCreateFeatures";
 
 type Props = {
@@ -76,7 +77,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
       if (prev.length > 0) {
         const anchor = roles.find((r) => r.id === prev[0]);
         if (anchor && role.scene !== anchor.scene) {
-          setErr("搭子类型不一致");
+          setErr(`${GUARDIAN.name}类型不一致`);
           return prev;
         }
       }
@@ -91,7 +92,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
       return;
     }
     if (picked.length < 1) {
-      setErr("请至少选择 1 位搭子");
+      setErr(`请至少选择 1 位${GUARDIAN.name}`);
       return;
     }
     const pickedRoles = picked
@@ -99,7 +100,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
       .filter((r): r is GuardianRole => Boolean(r));
     const scene = pickedRoles[0]?.scene;
     if (!scene || pickedRoles.some((r) => r.scene !== scene)) {
-      setErr("搭子选择无效");
+      setErr(`${GUARDIAN.name}选择无效`);
       return;
     }
     setSubmitting(true);
@@ -128,7 +129,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
         <button className="aichat-btn-ghost" type="button" onClick={onBack} disabled={submitting}>
           取消
         </button>
-        <h1 className="guardian-create__title">发起群聊</h1>
+        <h1 className="guardian-create__title">创建群聊</h1>
         <button
           type="button"
           className="guardian-create__done"
@@ -196,7 +197,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
         <section className="guardian-create-section" aria-labelledby="guardian-create-guardians">
           <div className="guardian-create-section__head">
             <h2 id="guardian-create-guardians" className="guardian-create-section__title">
-              选择搭子
+              {GUARDIAN.createSelect}
             </h2>
             <span className="guardian-create-section__meta">
               已选 {picked.length}/{MAX_PICK}
@@ -205,7 +206,7 @@ export function CreateGuardianGroupPage({ feature, onBack, onCreated }: Props) {
           {loading ? (
             <p className="aichat-muted-line guardian-create-section__empty">加载中…</p>
           ) : visibleRoles.length === 0 ? (
-            <p className="aichat-muted-line guardian-create-section__empty">暂无搭子</p>
+            <p className="aichat-muted-line guardian-create-section__empty">{GUARDIAN.createEmpty}</p>
           ) : (
             <ul className="guardian-create-role-list">
               {visibleRoles.map((r) => {

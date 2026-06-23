@@ -9,6 +9,7 @@ import { ContactAvatar } from "../../components/ContactAvatar";
 import { RelationTag } from "../../components/RelationTag";
 import { contactDisplayName } from "../../lib/contactDisplay";
 import { formatConvTime } from "../../lib/formatConvTime";
+import { GUARDIAN } from "../../constants/productCopy";
 import type { ContactItem } from "../../types/contact";
 import type { GuardianGroupListItem } from "../../types/guardian";
 
@@ -27,7 +28,7 @@ function guardianGroupTitle(g: GuardianGroupListItem): string {
   const name = g.name?.trim();
   if (name) return name;
   const count = g.memberCount ?? g.members?.length ?? 2;
-  return `搭子群 · ${count}人`;
+  return `${GUARDIAN.groupPrefix} · ${count}人`;
 }
 
 export function MessagesTab({
@@ -172,10 +173,10 @@ export function MessagesTab({
             <p className="inbox-empty__sub">发起私聊或创建搭子群，开始对话</p>
             <div className="inbox-empty__actions">
               <button type="button" className="aichat-btn-primary" onClick={onCreateGuardianGroup}>
-                发起群聊
+                创建群聊
               </button>
               <button type="button" className="aichat-btn-ghost" onClick={onOpenGuardianHall}>
-                看看搭子
+                浏览{GUARDIAN.name}
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ContactItem } from "../types/contact";
 import type { RouteName } from "../types/routes";
+import { PRODUCT } from "../constants/productCopy";
 import { isNativeAppShell } from "../platform/appShell";
 import { MessagesTab } from "./main/MessagesTab";
 import { ExploreTab } from "./main/ExploreTab";
@@ -25,8 +26,8 @@ type Props = {
 
 const TAB_LABEL: Record<MainTabId, string> = {
   messages: "消息",
-  explore: "探索",
-  people: "关系",
+  explore: "发现",
+  people: "好友",
   me: "我的",
 };
 
@@ -89,7 +90,7 @@ export function MainShellPage({
       {showSidebar && (
         <aside className="aichat-sidebar" aria-label="侧边导航">
           <div className="aichat-sidebar__brand">
-            <span className="aichat-sidebar__logo">AIChat</span>
+            <span className="aichat-sidebar__logo">{PRODUCT.name}</span>
           </div>
           <nav className="aichat-sidebar__nav">
             {TAB_ORDER.map((id) => (

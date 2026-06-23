@@ -128,7 +128,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature, onBack }: Props) {
             返回
           </button>
         ) : null}
-        <h1>朋友圈</h1>
+        <h1>动态</h1>
         {onBack ? <span className="aichat-topbar-spacer" aria-hidden /> : null}
       </header>
 
@@ -136,13 +136,13 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature, onBack }: Props) {
         {err && <p className="aichat-form-msg err">{err}</p>}
         {loading ? null : (
           <>
-            <div className="moments-tab-entry-list" role="group" aria-label="朋友圈入口">
+            <div className="moments-tab-entry-list" role="group" aria-label="动态入口">
               <button type="button" className="moments-tab-entry" onClick={() => setPickerOpen(true)}>
                 <span className="moments-tab-entry__label">
                   <span className="moments-tab-entry__ico" aria-hidden>
                     <AppIcon name="explore" className="app-icon app-icon--sm app-icon--brand" />
                   </span>
-                  <span className="moments-tab-entry__title">探索好友</span>
+                  <span className="moments-tab-entry__title">了解 TA</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -164,7 +164,7 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature, onBack }: Props) {
                   <span className="moments-tab-entry__ico" aria-hidden>
                     <AppIcon name="hot" className="app-icon app-icon--sm app-icon--hot" />
                   </span>
-                  <span className="moments-tab-entry__title">热点</span>
+                  <span className="moments-tab-entry__title">话题</span>
                 </span>
                 <span className="moments-tab-entry__arr" aria-hidden>
                   ›
@@ -172,16 +172,16 @@ export function MomentsTab({ onOpenFriend, onNavigateFeature, onBack }: Props) {
               </button>
             </div>
 
-            <section className="moments-tab-section" aria-label="好友日常">
+            <section className="moments-tab-section" aria-label="好友动态">
               <div className="moments-tab-section-head">
-                <h2>好友日常</h2>
+                <h2>好友动态</h2>
               </div>
               {exploreRecords.length === 0 ? (
                 <div className="moments-tab-empty-card">
                   <p>暂无记录</p>
                 </div>
               ) : (
-                <ul className="moments-tab-history" aria-label="好友日常列表">
+                <ul className="moments-tab-history" aria-label="好友动态列表">
                   {exploreDayGroups.map((group) => (
                     <li key={group.dayKey} className="moments-tab-history-day">
                       <time className="moments-tab-day-row" dateTime={group.dayIso}>

@@ -131,9 +131,9 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
 
       <div ref={scRef} className="msg-chat-scroll msg-chat-c1-scroll">
         {messages.length === 0 && !sending ? (
-          <p className="msg-chat-c1-empty">发一条消息，和 TA 的分身聊聊 TA 的日常</p>
+          <p className="msg-chat-c1-empty">发一条消息，了解 TA 最近的生活</p>
         ) : (
-          <ul className="msg-chat-list msg-chat-c1-list" aria-label="探索对话">
+          <ul className="msg-chat-list msg-chat-c1-list" aria-label="了解对话">
             {messages.map((m) => (
               <li key={m.id} className={`msg-chat-c1-row msg-chat-c1-row--${m.from === "me" ? "me" : "other"}`}>
                 {m.from === "other" ? (
@@ -154,7 +154,7 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
                 <ContactAvatar contact={contact} className="msg-chat-c1-avatar msg-chat-c1-avatar--peer" alt="" />
                 <div className="msg-chat-c1-col">
                   <div className="msg-chat-c1-bubble msg-chat-c1-bubble--other">
-                    <span className="aichat-muted-line">分身正在想…</span>
+                    <span className="aichat-muted-line">正在回复…</span>
                   </div>
                 </div>
               </li>
@@ -168,7 +168,7 @@ export function MomentsExploreChatPage({ contact, onBack }: Props) {
           value={input}
           onChange={setInput}
           onSend={() => void onSend()}
-          placeholder="探索 TA 的日常…"
+          placeholder="想了解什么？"
           disabled={sending}
           sendDisabled={sending}
         />

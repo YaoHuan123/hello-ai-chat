@@ -109,7 +109,7 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>好友请求</h1>
+          <h1>新的好友</h1>
         </div>
         <span className="aichat-topbar-spacer" aria-hidden />
       </header>
@@ -139,7 +139,7 @@ export function FriendRequestsPage({ onBack, onChanged, onOpenChatAfterAccept }:
                       </div>
                     </div>
                     <p className="fr-req-card__msg">{text}</p>
-                    <p className="fr-req-card__label">接受后，TA 是你的</p>
+                    <p className="fr-req-card__label">接受后，标记为</p>
                     <div className="rel-grid rel-grid--compact" role="listbox" aria-label="关系类型">
                       {RELATION_ACCEPT_QUICK_TYPES.map((t) => (
                         <button

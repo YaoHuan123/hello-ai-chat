@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { PRODUCT } from "../constants/productCopy";
 import { sendSmsCodeApi, smsLoginApi } from "../services/api";
 import { getLastPhoneForForm, getLoginPhoneHistory, saveAuth } from "../services/storage";
 
@@ -108,7 +109,7 @@ export function LoginPage({ onSuccess }: Props) {
   return (
     <div className="aichat-shell">
       <header className="aichat-topbar aichat-topbar--plain">
-        <h1>AIChat</h1>
+        <h1>{PRODUCT.name}</h1>
       </header>
       <div className="aichat-main aichat-login-main">
         <form onSubmit={onSubmit} className="aichat-form">

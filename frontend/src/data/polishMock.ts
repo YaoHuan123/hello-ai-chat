@@ -23,34 +23,19 @@ const TONE_TAGS: Record<PolishTone, string[]> = {
   direct: ["直球版", "去客套"],
 };
 
-const PERSONA_HEAD: Record<string, string> = {
-  refuse: "好的，",
-};
-
-const PERSONA_TAIL: Record<string, string> = {
-  refuse: "你看方便吗？",
-};
-
 const KEEP_SUFFIX = ["", "，你看方便吗？", "，我这边都行", "，等你回话", "，怎么方便怎么来"];
 
 function applyTone(
   draft: string,
   tone: PolishTone,
-  molId: string,
+  _molId: string,
   variantIndex: number,
   seed: number,
 ): string {
-  const head = PERSONA_HEAD[molId] ?? "";
-  const tail = PERSONA_TAIL[molId] ?? "";
   const t = draft.trim();
   if (!t) return "";
   switch (tone) {
     case "recommended": {
-      // 推荐按当前 Mol 风格给一个稳妥版本：职场偏礼貌，社交/亲友偏亲近。
-      if (molId === "refuse") {
-        const base = `${head}${t}`;
-        return variantIndex === 0 ? `${base}。` : `${base}。${tail}`;
-      }
       const base = t.replace(/  +/g, " ");
       return variantIndex === 0 ? base : `${base}，你看可以吗？`;
     }
@@ -60,12 +45,12 @@ function applyTone(
       return variantIndex === 0 ? base : base.replace(/[。.]$/, "") + "，先这样？";
     }
     case "polite": {
-      const base = `${head}${t}`;
-      return variantIndex === 0 ? `${base}，谢谢～` : `${base}。${tail}`;
+      const base = t;
+      return variantIndex === 0 ? `${base}，谢谢～` : `${base}，你看方便吗？`;
     }
     case "warm":
       return variantIndex === 0
-        ? `${head}${t}，咱们慢慢说～`
+        ? `${t}，咱们慢慢说～`
         : `${t}，没事，咱不急。`;
     case "direct": {
       const stripped = t

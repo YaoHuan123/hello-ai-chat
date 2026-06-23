@@ -138,7 +138,7 @@ export function AssistMolDataPage({ molId, onBack, onRemoved }: Props) {
   async function handleRemoveMol() {
     if (removeBusy || renameBusy) return;
     const displayName = molName || SUYAN.name;
-    if (!window.confirm(`确定从「我的素颜」移除「${displayName}」？`)) return;
+    if (!window.confirm(`确定从「${SUYAN.my}」移除「${displayName}」？`)) return;
 
     const isUploader = uploaderIsMe === true || (uploaderIsMe !== false && molSource === "created");
     let deleteFromWorld: boolean | undefined;

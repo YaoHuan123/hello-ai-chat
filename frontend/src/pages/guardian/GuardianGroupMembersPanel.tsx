@@ -1,3 +1,4 @@
+import { GUARDIAN } from "../../constants/productCopy";
 import { useMemo, useState } from "react";
 import { ContactAvatar } from "../../components/ContactAvatar";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
@@ -251,7 +252,7 @@ export function GuardianGroupMembersPanel({
         {group.guardianRoleIds.length > 0 ? (
           <section className="guardian-group-members__section" aria-labelledby="guardian-members-ai">
             <h2 id="guardian-members-ai" className="guardian-group-members__section-title">
-              搭子
+              {GUARDIAN.name}
             </h2>
             <ul className="guardian-group-sheet__list">
               {group.guardianRoleIds.map((id) => {
@@ -261,7 +262,7 @@ export function GuardianGroupMembersPanel({
                   <li key={id} className="guardian-group-sheet__row guardian-group-sheet__row--ai">
                     <GuardianAvatar role={r} className="guardian-group-sheet__av guardian-group-sheet__av--ai" alt="" />
                     <span className="guardian-group-sheet__name">{r.name}</span>
-                    <span className="guardian-group-sheet__tag">搭子</span>
+                    <span className="guardian-group-sheet__tag">{GUARDIAN.roleTag}</span>
                   </li>
                 );
               })}

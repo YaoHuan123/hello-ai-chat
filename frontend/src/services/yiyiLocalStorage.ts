@@ -1,3 +1,4 @@
+import { YIYI } from "../constants/productCopy";
 import type {
   YiyiBridgeMessage,
   YiyiChatMessage,
@@ -53,8 +54,8 @@ const SEED_BRIDGE: YiyiBridgeMessage[] = [
     peerLabel: "小林的 YiYi",
     peerAccent: "#fb7185",
     status: "effective",
-    preview: "双方都在准备 2027 考研，目标专业相近；作息偏夜猫子，倾向线上互相打卡。未触发垃圾桶规则。",
-    tags: ["考研搭子", "同专业方向", "夜猫子"],
+    preview: "都喜欢慢热了解，周末偏好 city walk；聊天节奏合拍，未触发黑名单规则。",
+    tags: ["慢热", "同城", "同频"],
     ts: Date.now() - 2 * 60 * 60 * 1000,
   },
   {
@@ -62,8 +63,8 @@ const SEED_BRIDGE: YiyiBridgeMessage[] = [
     peerLabel: "阿哲的 YiYi",
     peerAccent: "#10b981",
     status: "effective",
-    preview: "都喜欢独立音乐与 city walk，聊天节奏偏慢热。对方 YiYi 未越界，双方愿意继续了解。",
-    tags: ["同频聊友", "慢热"],
+    preview: "都喜欢独立音乐与散步，聊天节奏偏慢热。对方未越界，双方愿意继续了解。",
+    tags: ["同频", "慢热"],
     ts: Date.now() - 24 * 60 * 60 * 1000,
   },
   {
@@ -71,7 +72,7 @@ const SEED_BRIDGE: YiyiBridgeMessage[] = [
     peerLabel: "匿名 YiYi",
     peerAccent: "#9ca3af",
     status: "blocked",
-    preview: "触发「没有边界」规则，YiYi 已终止对话，未向对方透露你的信息。",
+    preview: `触发「没有边界」规则，${YIYI.name}已终止对话，未向对方透露你的信息。`,
     tags: [],
     ts: Date.now() - 3 * 24 * 60 * 60 * 1000,
   },
@@ -121,7 +122,7 @@ export function ensureYiyiInitialized(): void {
     {
       id: nextId("yiyi"),
       from: "yiyi",
-      text: "你好，我是 YiYi。我会先了解你的想法和边界，再代表你参与对外沟通。",
+      text: `你好，我是${YIYI.name}。我会先了解你的想法和边界，再代表你参与对外沟通。`,
       ts: Date.now() - 60_000,
     },
     {
@@ -176,7 +177,7 @@ export function getLastChatPreview(): string {
   for (let i = msgs.length - 1; i >= 0; i -= 1) {
     if (msgs[i].from === "yiyi") return msgs[i].text;
   }
-  return "和 YiYi 聊聊偏好与边界";
+  return `和${YIYI.name}聊聊偏好与边界`;
 }
 
 export function getCurrentTopics(): string[] {
@@ -235,10 +236,10 @@ function updateProfileFromText(text: string): void {
   let { socialDirection, personality, other } = profile;
   const tags = { ...profile.tags };
 
-  if (/考研|搭子|监督/.test(text)) {
-    socialDirection = "考研 · 互相督促";
-    tags.social = mergeTags(tags.social, ["考研", "线上打卡"]);
-  } else if (/男朋友|女朋友|恋爱|对象|脱单/.test(text)) {
+  if (/约会|见面|同城|线下/.test(text)) {
+    socialDirection = "约会意向";
+    tags.social = mergeTags(tags.social, ["约会"]);
+  } else if (/男朋友|女朋友|恋爱|对象|脱单|暧昧/.test(text)) {
     socialDirection = "恋爱意向";
     tags.social = mergeTags(tags.social, ["恋爱"]);
   } else if (/感悟|同频|聊聊|扩列|独处/.test(text)) {
@@ -269,19 +270,19 @@ function updateProfileFromText(text: string): void {
 function pickYiyiReply(userText: string, turnIndex: number): { text: string; topics?: string[] } {
   updateProfileFromText(userText);
 
-  if (/考研|搭子|监督/.test(userText)) {
+  if (/约会|见面|同城/.test(userText)) {
     return {
-      text: "收到。你平时自习喜欢早起还是夜猫子？这会影响我对外沟通时的节奏。",
+      text: "收到。你更希望先线上慢慢了解，还是接受同城线下见面？",
     };
   }
-  if (/男朋友|恋爱|对象/.test(userText)) {
+  if (/男朋友|恋爱|对象|暧昧/.test(userText)) {
     return {
       text: "明白了。你更希望先线上慢慢了解，还是接受同城线下见面？",
     };
   }
   if (/夜猫|熬夜/.test(userText)) {
     return {
-      text: "好的，我会记住这个节奏偏好。还有什么是你特别不能接受的沟通方式吗？可以在「网络垃圾桶」里设置。",
+      text: `好的，我会记住这个节奏偏好。还有什么是你特别不能接受的沟通方式吗？可以在「${YIYI.trash}」里设置。`,
       topics: refreshTopicBatch(),
     };
   }

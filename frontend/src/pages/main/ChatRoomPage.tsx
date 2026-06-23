@@ -284,7 +284,7 @@ export function ChatRoomPage({ contact: contactProp, onBack, onManageMols }: Pro
                   setRelationSheetOpen(true);
                 }}
               >
-                设置关系
+                编辑关系
               </button>
             </div>
           ) : null}

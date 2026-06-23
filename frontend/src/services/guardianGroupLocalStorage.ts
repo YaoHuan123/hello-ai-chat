@@ -1,4 +1,5 @@
 import type { GuardianGroupMessage } from "../types/guardian";
+import { GUARDIAN } from "../constants/productCopy";
 
 function logKey(groupId: string): string {
   return `aichat.guardian.group.${groupId.trim() || "unknown"}`;
@@ -77,7 +78,7 @@ export function ingestIncomingGuardianGroupMessage(payload: {
 }
 
 function formatGuardianPreviewLine(last: GuardianGroupMessage): string {
-  const prefix = last.senderKind === "guardian" ? "搭子：" : last.senderKind === "owner" ? "我：" : "";
+  const prefix = last.senderKind === "guardian" ? `${GUARDIAN.name}：` : last.senderKind === "owner" ? "我：" : "";
   const t = last.text.trim();
   const line = `${prefix}${t}`;
   return line.length > 36 ? `${line.slice(0, 34)}…` : line;

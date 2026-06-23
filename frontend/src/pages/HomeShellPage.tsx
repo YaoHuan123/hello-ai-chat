@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PRODUCT } from "../constants/productCopy";
 import { getApiHealth } from "../services/api";
 import { isApiMock } from "../services/mock";
 import { getMaskedPhone } from "../services/storage";
@@ -39,7 +40,7 @@ export function HomeShellPage({ onNavigate, onLogout }: Props) {
     <div className="aichat-shell">
       <header className="aichat-topbar aichat-topbar-flex">
         <div>
-          <h1>AIChat</h1>
+          <h1>{PRODUCT.name}</h1>
           <p>
             {displayName} · 主导航
           </p>

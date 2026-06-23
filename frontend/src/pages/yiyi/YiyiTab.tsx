@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AppIcon } from "../../components/AppIcons";
+import { YIYI } from "../../constants/productCopy";
 import { loadYiyiState, permissionsSummaryFrom, profileSummaryFrom, type YiyiUserState } from "../../services/yiyiClient";
 import type { RouteName } from "../../types/routes";
 
@@ -48,7 +49,7 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
           <span className="yiyi-tab__topbar-spacer" aria-hidden />
         )}
         <div className="aichat-stage-head">
-          <h1>YiYi</h1>
+          <h1>{YIYI.name}</h1>
         </div>
         <button type="button" className="yiyi-tab__topbar-link" onClick={() => onNavigateFeature("yiyi-settings")}>
           设置
@@ -59,9 +60,9 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
         {err ? <p className="aichat-form-msg err">{err}</p> : null}
         {loading && !state ? <p className="yiyi-empty">加载中…</p> : null}
 
-        <section className="yiyi-hero" aria-label="YiYi 介绍">
-          <h2 className="yiyi-hero__title">你的中间人 YiYi</h2>
-          <p className="yiyi-hero__desc">先和你聊清楚偏好与边界，再代表你参与对外沟通。</p>
+        <section className="yiyi-hero" aria-label={`${YIYI.name}介绍`}>
+          <h2 className="yiyi-hero__title">{YIYI.heroTitle}</h2>
+          <p className="yiyi-hero__desc">{YIYI.heroDesc}</p>
         </section>
 
         <p className="yiyi-section-label">管理</p>
@@ -70,7 +71,7 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
             ×
           </span>
           <span className="yiyi-row__body">
-            <strong className="yiyi-row__title">网络垃圾桶</strong>
+            <strong className="yiyi-row__title">{YIYI.trash}</strong>
             <span className="yiyi-row__sub">已屏蔽 {trashCount} 类沟通方式</span>
           </span>
           <span className="yiyi-row__chev" aria-hidden>
@@ -84,8 +85,8 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
             <AppIcon name="user" className="app-icon app-icon--sm app-icon--purple" />
           </span>
           <span className="yiyi-row__body">
-            <strong className="yiyi-row__title">YiYi</strong>
-            <span className="yiyi-row__sub">{profileSummary || "暂未形成画像，多和 YiYi 聊聊"}</span>
+            <strong className="yiyi-row__title">{YIYI.profileEntry}</strong>
+            <span className="yiyi-row__sub">{profileSummary || YIYI.emptyProfile}</span>
           </span>
           <span className="yiyi-row__chev" aria-hidden>
             ›
@@ -97,8 +98,8 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
             <AppIcon name="mail" className="app-icon app-icon--sm" />
           </span>
           <span className="yiyi-row__body">
-            <strong className="yiyi-row__title">YiYi 的消息</strong>
-            <span className="yiyi-row__sub">查看 YiYi 之间的沟通结果</span>
+            <strong className="yiyi-row__title">{YIYI.messages}</strong>
+            <span className="yiyi-row__sub">{YIYI.messagesTabDesc}</span>
           </span>
           <span className="yiyi-row__chev" aria-hidden>
             ›
@@ -111,7 +112,7 @@ export function YiyiTab({ onNavigateFeature, onBack }: Props) {
             <AppIcon name="user" className="app-icon app-icon--sm" />
           </span>
           <span className="yiyi-row__body">
-            <strong className="yiyi-row__title">权限与可见范围</strong>
+            <strong className="yiyi-row__title">{YIYI.settings}</strong>
             <span className="yiyi-row__sub">{permSummary || "—"}</span>
           </span>
           <span className="yiyi-row__chev" aria-hidden>

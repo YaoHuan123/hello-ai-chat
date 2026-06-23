@@ -1,3 +1,4 @@
+import { YIYI } from "../../constants/productCopy";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppIcon } from "../../components/AppIcons";
 import { YiyiAvatar } from "../../components/YiyiAvatar";
@@ -9,7 +10,7 @@ type Props = {
   onBack: () => void;
 };
 
-const INPUT_PLACEHOLDER = "回答 YiYi 的问题，或直接说说你的想法。";
+const INPUT_PLACEHOLDER = YIYI.chatPlaceholder;
 const INPUT_MAX_HEIGHT = 120;
 
 export function YiyiChatPage({ onBack }: Props) {
@@ -107,13 +108,13 @@ export function YiyiChatPage({ onBack }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>YiYi</h1>
+          <h1>{YIYI.name}</h1>
         </div>
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
 
       <div className="yiyi-chat-msgs" ref={scRef}>
-        <p className="yiyi-chat-banner">YiYi 是你的中间人。多聊几句，我会更了解如何代表你。</p>
+        <p className="yiyi-chat-banner">{YIYI.chatBanner}</p>
         {err ? <p className="aichat-form-msg err yiyi-chat-error">{err}</p> : null}
         {loading && messages.length === 0 ? <p className="yiyi-empty yiyi-chat-empty">加载中…</p> : null}
 

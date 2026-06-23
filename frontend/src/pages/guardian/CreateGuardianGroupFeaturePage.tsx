@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GUARDIAN } from "../../constants/productCopy";
 import {
   GUARDIAN_CREATE_FEATURES,
   type GuardianCreateFeature,
@@ -22,12 +23,12 @@ export function CreateGuardianGroupFeaturePage({ onBack, onContinue }: Props) {
         <button className="aichat-btn-ghost" type="button" onClick={onBack}>
           取消
         </button>
-        <h1 className="guardian-create-feature__title">选择用途</h1>
+        <h1 className="guardian-create-feature__title">选择场景</h1>
         <span className="guardian-create-feature__topbar-spacer" aria-hidden />
       </header>
 
       <div className="aichat-main guardian-create-feature__main">
-        <p className="guardian-create-feature__lead">选择群聊主要用途，便于推荐搭子。可不选，直接继续。</p>
+        <p className="guardian-create-feature__lead">{GUARDIAN.featureLead}</p>
         <ul className="guardian-create-feature__list" aria-label="群聊用途">
           {GUARDIAN_CREATE_FEATURES.map((f) => {
             const on = picked === f.id;

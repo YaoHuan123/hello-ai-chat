@@ -1,3 +1,4 @@
+import { GUARDIAN } from "../../constants/productCopy";
 import type { RouteName } from "../../types/routes";
 import { SUYAN } from "../../constants/suyanCopy";
 
@@ -19,7 +20,7 @@ export function AiTab({ onNavigateFeature }: Props) {
         </button>
 
         <button type="button" className="aichat-ai-big-card aichat-ai-big-card--guardian" onClick={() => onNavigateFeature("guardian-hall")}>
-          <span className="aichat-ai-big-card__title">搭子</span>
+          <span className="aichat-ai-big-card__title">{GUARDIAN.name}</span>
           <span className="aichat-ai-big-card__body">性格各异，进群主动接话</span>
         </button>
       </div>

@@ -232,12 +232,12 @@ export function MolSuggestPanel({
           {onSetRelation ? (
             <>
               <button type="button" className="mol-composer-hint-link" onClick={onSetRelation}>
-                设置关系
+                设置你们的关系
               </button>
               或
             </>
           ) : (
-            "设置关系或"
+            "设置你们的关系或"
           )}
           {onManageMols ? (
             <button type="button" className="mol-composer-hint-link" onClick={onManageMols}>

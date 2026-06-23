@@ -33,7 +33,6 @@ import { YiyiProfilePage } from "./pages/yiyi/YiyiProfilePage";
 import { YiyiSettingsPage } from "./pages/yiyi/YiyiSettingsPage";
 import { YiyiTab } from "./pages/yiyi/YiyiTab";
 import { MomentsTab } from "./pages/main/MomentsTab";
-import { DailyTab } from "./pages/main/DailyTab";
 import { GuardianHallPage } from "./pages/guardian/GuardianHallPage";
 import { GuardianRoleDetailPage } from "./pages/guardian/GuardianRoleDetailPage";
 import { CreateGuardianGroupFeaturePage } from "./pages/guardian/CreateGuardianGroupFeaturePage";
@@ -212,11 +211,6 @@ function App() {
       }
       if (route === "yiyi-home") {
         setMainTab("explore");
-        setRoute("main");
-        return true;
-      }
-      if (route === "daily-home") {
-        setMainTab("me");
         setRoute("main");
         return true;
       }
@@ -579,19 +573,6 @@ function App() {
           onNavigateFeature={(r) => {
             setFeatureReturnRoute("yiyi-home");
             setRoute(r);
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (route === "daily-home") {
-    return (
-      <div className="aichat-shell">
-        <DailyTab
-          onBack={() => {
-            setMainTab("me");
-            setRoute("main");
           }}
         />
       </div>

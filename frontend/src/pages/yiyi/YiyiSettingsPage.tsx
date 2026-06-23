@@ -1,3 +1,4 @@
+import { YIYI } from "../../constants/productCopy";
 import { useCallback, useEffect, useState } from "react";
 import { loadYiyiState, saveYiyiPermissions } from "../../services/yiyiClient";
 import type { YiyiPermissions } from "../../types/yiyi";
@@ -64,7 +65,7 @@ export function YiyiSettingsPage({ onBack }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>权限与可见范围</h1>
+          <h1>{YIYI.settings}</h1>
         </div>
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
@@ -73,7 +74,7 @@ export function YiyiSettingsPage({ onBack }: Props) {
         {err ? <p className="aichat-form-msg err">{err}</p> : null}
         {loading ? <p className="yiyi-empty">加载中…</p> : null}
 
-        <p className="yiyi-intro">以下设置作用于你的 YiYi 与对方的 YiYi 沟通阶段，可随时修改。</p>
+        <p className="yiyi-intro">{YIYI.settingsIntro}</p>
 
         {perms ? (
           <>
@@ -95,10 +96,10 @@ export function YiyiSettingsPage({ onBack }: Props) {
             <section className="yiyi-settings-group" aria-label="活跃状态">
               <div className="yiyi-settings-row">
                 <div className="yiyi-settings-row__body">
-                  <strong>YiYi 对外活跃</strong>
-                  <span>关闭后 YiYi 暂停与其他 YiYi 建立新沟通，已有会话不受影响。</span>
+                  <strong>{YIYI.activeToggle}</strong>
+                  <span>{YIYI.activeToggleDesc}</span>
                 </div>
-                <Toggle label="YiYi 对外活跃" on={perms.yiyiActive} disabled={saving} onChange={(v) => void patch({ yiyiActive: v })} />
+                <Toggle label={YIYI.activeToggle} on={perms.yiyiActive} disabled={saving} onChange={(v) => void patch({ yiyiActive: v })} />
               </div>
             </section>
           </>

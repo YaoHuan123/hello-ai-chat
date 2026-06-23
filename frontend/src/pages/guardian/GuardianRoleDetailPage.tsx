@@ -1,3 +1,4 @@
+import { GUARDIAN } from "../../constants/productCopy";
 import { useEffect, useState, type CSSProperties } from "react";
 import { GuardianAvatar } from "../../components/GuardianAvatar";
 import { getGuardianRoleApi } from "../../services/guardianApi";
@@ -37,7 +38,7 @@ export function GuardianRoleDetailPage({ roleId, onBack }: Props) {
       try {
         const found = await getGuardianRoleApi(roleId);
         if (!cancelled) {
-          if (!found) setLoadErr("未找到该搭子。");
+          if (!found) setLoadErr(GUARDIAN.notFound);
           else setRole(found);
         }
       } catch (e: unknown) {

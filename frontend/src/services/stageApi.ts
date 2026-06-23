@@ -5,7 +5,7 @@ import { isApiMock } from "./mock";
 import { clearAssistMolItems } from "./molDataLocalStorage";
 import { getAuthToken } from "./storage";
 
-const DEFAULT_MOL_CATEGORY = "职场沟通";
+const DEFAULT_MOL_CATEGORY = "朋友社交";
 
 export type ChatRole = "visitor" | "agent";
 export type OneWayMessage = {
@@ -110,17 +110,17 @@ const dataBoardMock: DataBoardSnapshot = {
 
 let molCatalogMock: MolCatalogItem[] = [
   {
-    id: "refuse",
-    name: "婉拒边界",
-    summary: "礼貌说「不」并给替代方案。",
+    id: "lianaijunshi",
+    name: "恋爱军师",
+    summary: "冷静懂进退，成稿可直接发给对方。",
     price: 0,
     owned: false,
-    primaryCategory: "职场沟通",
-    taskTags: ["婉拒", "维护边界", "催进度"],
-    toneTags: ["有边界感", "专业", "温和"],
-    relationshipTags: ["领导", "同事", "客户"],
-    abilityTags: ["擅长拒绝", "会多步引导"],
-    recommended: false,
+    primaryCategory: "亲密关系",
+    taskTags: ["延续聊天", "推进关系", "邀约", "安慰", "维护边界"],
+    toneTags: ["清楚", "克制"],
+    relationshipTags: ["暧昧中", "恋人", "朋友"],
+    abilityTags: ["会接话", "会润色", "会多步引导"],
+    recommended: true,
     popularityScore: 850,
   },
   {
@@ -158,9 +158,9 @@ let molCatalogMock: MolCatalogItem[] = [
     price: 0,
     owned: false,
     primaryCategory: "朋友社交",
-    taskTags: ["延续聊天", "表达感谢", "谈合作", "催进度"],
+    taskTags: ["延续聊天", "表达感谢", "邀约", "安慰"],
     toneTags: ["清楚", "温和"],
-    relationshipTags: ["朋友", "同事"],
+    relationshipTags: ["朋友", "暧昧中"],
     abilityTags: ["会接话", "会润色", "会多步引导"],
     recommended: true,
     popularityScore: 785,
@@ -178,20 +178,6 @@ let molCatalogMock: MolCatalogItem[] = [
     abilityTags: ["会接话", "擅长安慰"],
     recommended: true,
     popularityScore: 738,
-  },
-  {
-    id: "keyan",
-    name: "科研圣体",
-    summary: "结构清楚、有据可依：像做科研一样聊事，但不堆术语。",
-    price: 0,
-    owned: false,
-    primaryCategory: "职场沟通",
-    taskTags: ["谈合作", "催进度", "维护边界", "表达感谢"],
-    toneTags: ["专业", "严谨"],
-    relationshipTags: ["同事", "同学", "客户"],
-    abilityTags: ["会润色", "会多步引导"],
-    recommended: true,
-    popularityScore: 732,
   },
 ];
 

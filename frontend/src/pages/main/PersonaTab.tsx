@@ -7,6 +7,7 @@ import { ContactAvatar } from "../../components/ContactAvatar";
 import { ContactRelationSheet } from "../../components/ContactRelationSheet";
 import { contactDisplayName as displayContactName } from "../../lib/contactDisplay";
 import { filterContacts, groupContactsByRelation } from "../../lib/contactRelations";
+import { GUARDIAN } from "../../constants/productCopy";
 import type { ContactItem } from "../../types/contact";
 
 type Props = {
@@ -112,14 +113,14 @@ export function PersonaTab({
   return (
     <div className="aichat-main-shell-tab persona-tab">
       <header className="aichat-topbar persona-tab__topbar aichat-topbar--plain">
-        <h1>关系</h1>
+        <h1>好友</h1>
       </header>
 
       <div className="persona-tab__search-wrap">
         <input
           className="persona-tab__search"
           type="search"
-          placeholder="搜联系人、关系"
+          placeholder="搜索昵称或备注"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -134,7 +135,7 @@ export function PersonaTab({
               <AppIcon name="mail" className="app-icon app-icon--warm" />
             </span>
             <span className="contacts-entry-card__body">
-              <span className="contacts-entry-card__title">好友请求</span>
+              <span className="contacts-entry-card__title">新的好友</span>
             </span>
             {pending > 0 ? <span className="contacts-entry-card__badge">{pending > 99 ? "99+" : pending}</span> : null}
             <span className="contacts-entry-card__arrow" aria-hidden>
@@ -145,7 +146,7 @@ export function PersonaTab({
 
         {loading ? null : showEmpty ? (
           <div className="persona-tab__empty">
-            <p>没有匹配的联系人</p>
+            <p>没有匹配的好友</p>
             {q ? (
               <button
                 type="button"
@@ -159,24 +160,24 @@ export function PersonaTab({
         ) : showContactsBlock ? (
           <>
             <div className="persona-tab__section-head persona-tab__section-head--global">
-              <h2>联系人</h2>
+              <h2>好友</h2>
               <span>{contactCount}</span>
               <button type="button" className="persona-tab__section-act" onClick={() => setSheetOpen(true)}>
                 添加
               </button>
             </div>
             {showGuardianSection ? (
-              <section className="persona-tab__section persona-tab__section--guardian" aria-label="搭子">
+              <section className="persona-tab__section persona-tab__section--guardian" aria-label={GUARDIAN.name}>
                 <div className="persona-tab__section-head">
-                  <h2>搭子</h2>
+                  <h2>{GUARDIAN.name}</h2>
                 </div>
                 <button type="button" className="persona-tab__row persona-tab__row--guardian" onClick={onOpenGuardianHall}>
                   <span className="persona-tab__av persona-tab__av--ai" aria-hidden>
                     <AppIcon name="aiContact" className="app-icon app-icon--guardian" />
                   </span>
                   <span className="persona-tab__mid">
-                    <strong>搭子大厅</strong>
-                    <span className="persona-tab__mid-hint">群聊场景角色</span>
+                    <strong>{GUARDIAN.hall}</strong>
+                    <span className="persona-tab__mid-hint">{GUARDIAN.sectionHint}</span>
                   </span>
                   <span className="persona-tab__row-arrow" aria-hidden>
                     ›
@@ -204,7 +205,7 @@ export function PersonaTab({
                     <ContactAvatar contact={c} className="persona-tab__av persona-tab__av--human" alt="" />
                     <span className="persona-tab__mid">
                       <strong>{displayContactName(c)}</strong>
-                      {!c.relationType ? <span className="persona-tab__mid-hint">点击设置关系</span> : null}
+                      {!c.relationType ? <span className="persona-tab__mid-hint">点击设置你们的关系</span> : null}
                     </span>
                     <span className="persona-tab__row-arrow" aria-hidden>
                       ›

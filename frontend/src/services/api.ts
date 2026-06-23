@@ -23,7 +23,7 @@ function readApiErrorMessage(data: ApiErrorShape, status: number): string {
   const detail = data.detail;
   if (typeof detail === "string" && detail.trim()) {
     if (status === 404) {
-      return "接口不存在，请确认 backend 已启动（npm run dev）且包含朋友圈模块";
+      return "接口不存在，请确认 backend 已启动（npm run dev）且包含动态模块";
     }
     return detail.trim();
   }
@@ -34,7 +34,7 @@ function readApiErrorMessage(data: ApiErrorShape, status: number): string {
 
   const code = typeof data.code === "string" ? data.code.trim() : "";
   if (code === "NOT_FOUND" || status === 404) {
-    return "接口不存在，请确认 backend 已启动（npm run dev）且包含朋友圈模块";
+    return "接口不存在，请确认 backend 已启动（npm run dev）且包含动态模块";
   }
   const suyanLabel = code ? suyanApiErrorLabel(code) : undefined;
   if (suyanLabel) return suyanLabel;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { YIYI } from "../../constants/productCopy";
 import { YiyiProfileBlock } from "../../components/YiyiProfileBlock";
 import { loadYiyiState } from "../../services/yiyiClient";
 import type { YiyiProfile } from "../../types/yiyi";
@@ -33,7 +34,7 @@ export function YiyiProfilePage({ onBack, onContinueChat }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>我的画像</h1>
+          <h1>{YIYI.profile}</h1>
         </div>
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
@@ -45,7 +46,7 @@ export function YiyiProfilePage({ onBack, onContinueChat }: Props) {
           <>
             <YiyiProfileBlock profile={profile} />
             <button type="button" className="yiyi-cta" onClick={onContinueChat}>
-              继续和 YiYi 聊
+              {YIYI.continueChat}
             </button>
           </>
         ) : null}

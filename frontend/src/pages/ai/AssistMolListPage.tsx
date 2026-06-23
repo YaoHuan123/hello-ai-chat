@@ -89,7 +89,7 @@ export function AssistMolListPage({ onBack, onOpenWorld, onOpenData }: Props) {
   async function handleDelete(m: MolInMyCollection) {
     if (removing) return;
     const displayName = formatSuyanDisplayName(m.name);
-    if (!window.confirm(`确定从「我的素颜」移除「${displayName}」？`)) return;
+    if (!window.confirm(`确定从「${SUYAN.my}」移除「${displayName}」？`)) return;
 
     const isUploader = m.uploaderIsMe === true || (m.uploaderIsMe !== false && m.source === "created");
     let deleteFromWorld: boolean | undefined;

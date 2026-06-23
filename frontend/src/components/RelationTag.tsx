@@ -9,7 +9,7 @@ export function RelationTag({ type, className = "" }: Props) {
   const label = relationLabel(type);
   if (!label) {
     return (
-      <span className={`${relationTagClass(null)} ${className}`.trim()} aria-label="未设置关系">
+      <span className={`${relationTagClass(null)} ${className}`.trim()} aria-label="未设置">
         未设置
       </span>
     );

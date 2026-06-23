@@ -81,7 +81,7 @@ export function MolDetailPage({ molId, onBack }: Props) {
 
   const [name, setName] = useState("");
   const [summary, setSummary] = useState("");
-  const [category, setCategory] = useState<string>(SCENE_OPTIONS[0] ?? "职场沟通");
+  const [category, setCategory] = useState<string>(SCENE_OPTIONS[0] ?? "朋友社交");
   const [source, setSource] = useState<MolInMyCollection["source"] | null>(null);
 
   const [infoItems, setInfoItems] = useState<MolInfoItem[]>([]);

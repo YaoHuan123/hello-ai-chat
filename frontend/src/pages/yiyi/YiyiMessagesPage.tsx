@@ -1,3 +1,4 @@
+import { YIYI } from "../../constants/productCopy";
 import { useCallback, useEffect, useState } from "react";
 import { YiyiAvatar } from "../../components/YiyiAvatar";
 import { loadYiyiBridges, runYiyiMatch } from "../../services/yiyiClient";
@@ -56,7 +57,7 @@ export function YiyiMessagesPage({ onBack }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>YiYi 的消息</h1>
+          <h1>{YIYI.messages}</h1>
         </div>
         <button type="button" className="yiyi-tab__topbar-link" onClick={() => void onMatch()} disabled={matching}>
           {matching ? "匹配中" : "匹配"}
@@ -66,13 +67,13 @@ export function YiyiMessagesPage({ onBack }: Props) {
       <div className="aichat-main yiyi-subpage__main">
         {err ? <p className="aichat-form-msg err">{err}</p> : null}
         <p className="yiyi-intro">
-          展示 YiYi 匹配后的沟通摘要。{effectiveCount > 0 ? `当前有 ${effectiveCount} 条有效沟通。` : ""}
-          仅能看到你的 YiYi 的发言记录，对方 YiYi 的具体内容不可见。
+          {YIYI.messagesDesc}
+          {effectiveCount > 0 ? ` 当前有 ${effectiveCount} 条有效沟通。` : ""}
         </p>
 
         {loading ? <p className="yiyi-empty">加载中…</p> : null}
 
-        {!loading && items.length === 0 ? <p className="yiyi-empty">暂无 YiYi 之间的沟通记录。可先与 YiYi 完善画像，再点右上角「匹配」。</p> : null}
+        {!loading && items.length === 0 ? <p className="yiyi-empty">{YIYI.emptyMessages}</p> : null}
 
         {items.map((item) => (
           <article key={item.id} className={`yiyi-bridge-card${item.status === "blocked" ? " yiyi-bridge-card--muted" : ""}`}>
@@ -84,7 +85,7 @@ export function YiyiMessagesPage({ onBack }: Props) {
                 </span>
               </div>
               <div>
-                <div className="yiyi-bridge-card__title">你的 YiYi ↔ {item.peerLabel}</div>
+                <div className="yiyi-bridge-card__title">{YIYI.bridgeTitle(item.peerLabel)}</div>
                 <div className={`yiyi-bridge-card__status${item.status === "effective" ? " yiyi-bridge-card__status--ok" : ""}`}>
                   {item.status === "effective" ? `有效沟通 · ${formatBridgeTime(item.ts)}` : "未通过 · 已拦截"}
                 </div>

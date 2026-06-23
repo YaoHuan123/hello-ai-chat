@@ -1,3 +1,4 @@
+import { YIYI } from "../constants/productCopy";
 import type {
   YiyiBridgeMessage,
   YiyiChatMessage,
@@ -123,7 +124,7 @@ export function getLastChatPreviewFromState(chat: YiyiChatMessage[]): string {
   for (let i = chat.length - 1; i >= 0; i -= 1) {
     if (chat[i].from === "yiyi") return chat[i].text;
   }
-  return "和 YiYi 聊聊偏好与边界";
+  return `和${YIYI.name}聊聊偏好与边界`;
 }
 
 export function permissionsSummaryFrom(perms: YiyiPermissions): string {
@@ -137,7 +138,7 @@ export function profileSummaryFrom(profile: YiyiProfile): string {
   if (profile.personality !== "待了解") parts.push(profile.personality);
   const tagCount = profile.tags.social.length + profile.tags.personality.length + profile.tags.other.length;
   if (tagCount > 0) parts.push(`${tagCount} 个标签`);
-  if (parts.length === 0) return "暂未形成画像，多和 YiYi 聊聊";
+  if (parts.length === 0) return YIYI.emptyProfile;
   return parts.slice(0, 3).join(" · ");
 }
 

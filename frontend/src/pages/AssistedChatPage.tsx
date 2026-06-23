@@ -14,9 +14,9 @@ import { useInferredOutputFlow } from "./assisted/useInferredOutputFlow";
 type Msg = { id: string; from: "other" | "me"; text: string; time: string };
 
 const seed: Msg[] = [
-  { id: "1", from: "other", time: "10:00", text: "下午有空吗？想聊聊项目合作的事。" },
-  { id: "2", from: "me", time: "10:01", text: "我先看下日程，晚点回复你。" },
-  { id: "3", from: "other", time: "10:05", text: "好的，尽量快一点，这个项目比较急。" },
+  { id: "1", from: "other", time: "10:00", text: "这周末有空吗？想约你出来喝杯咖啡。" },
+  { id: "2", from: "me", time: "10:01", text: "我先看下安排，晚点回你。" },
+  { id: "3", from: "other", time: "10:05", text: "好呀，不急，你定时间就行。" },
 ];
 
 function nextId() {

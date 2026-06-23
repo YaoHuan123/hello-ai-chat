@@ -1,3 +1,4 @@
+import { YIYI } from "../../constants/productCopy";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { loadYiyiState, saveYiyiTrash } from "../../services/yiyiClient";
 import type { YiyiTrashItem } from "../../types/yiyi";
@@ -70,7 +71,7 @@ export function YiyiTrashPage({ onBack }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>网络垃圾桶</h1>
+          <h1>{YIYI.trash}</h1>
         </div>
         <span className="yiyi-tab__topbar-spacer" aria-hidden />
       </header>
@@ -80,7 +81,7 @@ export function YiyiTrashPage({ onBack }: Props) {
         {loading ? <p className="yiyi-empty">加载中…</p> : null}
 
         <p className="yiyi-intro">
-          勾选你排斥的沟通方式与内容。YiYi 在对外交流时会主动避开这些表达，并在遇到时终止或请你确认。
+          {YIYI.trashDesc}
         </p>
 
         <section className="yiyi-check-group" aria-label="系统推荐">

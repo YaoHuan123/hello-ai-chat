@@ -1,3 +1,4 @@
+import { YIYI } from "../constants/productCopy";
 import { profileCompletenessFrom, profileDimStatus } from "../services/yiyiClient";
 import type { YiyiProfile } from "../types/yiyi";
 
@@ -53,7 +54,7 @@ export function YiyiProfileBlock({ profile }: Props) {
             </svg>
           </div>
           <div className="yiyi-profile-hero__meta">
-            <h2 className="yiyi-profile-hero__title">YiYi 对你的理解</h2>
+            <h2 className="yiyi-profile-hero__title">{YIYI.profileHero}</h2>
             <p className="yiyi-profile-hero__sub">
               完整度 {completeness}% · 仅用于对外表达
             </p>
