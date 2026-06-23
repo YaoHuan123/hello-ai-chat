@@ -10,8 +10,10 @@
 # 3. ios_signing（iOS release / ad hoc）
 #    - 证书 Reference name：app-common（Team → Code signing identities → iOS certificates）
 #    - 描述文件：App Store / Ad Hoc .mobileprovision（Reference 如 aichat-appstore、aichat-adhoc）
-#    - Team ID: TCPBS85F56
-#    - Bundle ID: io.github.YaoHuan123.hello-ai-chat
+# 4. App Store Connect 自动上传（ios-release）
+#    - Team settings → Team integrations → Developer Portal：上传 .p8 API Key
+#    - 记下 Integration 名称，与下方 integrations.app_store_connect 一致
+#    - App Store Connect 中需已创建对应 Bundle ID 的 App 记录
 
 workflows:
   android-debug:
@@ -159,6 +161,8 @@ workflows:
     name: AIChat iOS Release
     max_build_duration: 120
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: app-store-connect
     environment:
       node: 22
       xcode: latest
@@ -206,6 +210,10 @@ workflows:
             --scheme App
     artifacts:
       - frontend/ios/App/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
 
   ios-ad-hoc:
     name: AIChat iOS Ad Hoc
