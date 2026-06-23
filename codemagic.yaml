@@ -8,8 +8,8 @@
 # 2. android_signing（Android release）
 #    - 上传 keystore，Reference name 填 aichat_keystore
 # 3. ios_signing（iOS release / ad hoc）
-#    - 上传 Distribution .p12 + App Store .mobileprovision（TestFlight / ios-release）
-#    - Ad Hoc：另建 Ad Hoc .mobileprovision，设备 UDID 须先登记（ios-ad-hoc）
+#    - 证书 Reference name：app-common（Team → Code signing identities → iOS certificates）
+#    - 描述文件：App Store / Ad Hoc .mobileprovision（Reference 如 aichat-appstore、aichat-adhoc）
 #    - Team ID: TCPBS85F56
 #    - Bundle ID: io.github.YaoHuan123.hello-ai-chat
 
@@ -163,8 +163,10 @@ workflows:
       node: 22
       xcode: latest
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: io.github.YaoHuan123.hello-ai-chat
+        certificates:
+          - app-common
+        provisioning_profiles:
+          - aichat-appstore
       vars:
         VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
@@ -213,8 +215,10 @@ workflows:
       node: 22
       xcode: latest
       ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: io.github.YaoHuan123.hello-ai-chat
+        certificates:
+          - app-common
+        provisioning_profiles:
+          - aichat-adhoc
       vars:
         VITE_API_BASE: http://192.168.137.1:4000
         VITE_USE_MOCK: "0"
