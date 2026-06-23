@@ -20,7 +20,7 @@ const ENTRIES = [
 
     route: "moments-hub" as const,
 
-    title: "动态",
+    title: "朋友圈",
 
     sub: "好友近况与话题",
 
@@ -58,7 +58,7 @@ export function ExploreTab({ onNavigateFeature }: Props) {
 
         <h1>发现</h1>
 
-        <p className="explore-tab__lead">从这里认识好友、记录动态，或与 YiYi 对外沟通。</p>
+        <p className="explore-tab__lead">从这里认识好友、维护朋友圈，或与 YiYi 对外沟通。</p>
 
       </header>
 

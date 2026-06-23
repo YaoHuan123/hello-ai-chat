@@ -42,7 +42,7 @@ export const ROUTE_LABEL: Record<RouteName, { title: string; phase: string }> = 
   "assist-mol-list": { title: "我的素颜", phase: "AI" },
   "assist-mol-data": { title: "素颜资料", phase: "AI" },
   "moments-hub": { title: "朋友圈", phase: "探索" },
-  "moments-my": { title: "我的动态", phase: "朋友圈" },
+  "moments-my": { title: "我的朋友圈", phase: "朋友圈" },
   "moments-hot": { title: "热点", phase: "朋友圈" },
   "moments-friend": { title: "朋友圈探索", phase: "朋友圈" },
   "yiyi-home": { title: "YiYi", phase: "探索" },

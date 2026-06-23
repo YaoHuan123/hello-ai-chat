@@ -35,7 +35,7 @@ function ItemEditorModal({
       }}
     >
       <div className="aichat-moldt-info-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-        <h4 className="aichat-moldt-info-form__h">{isQa ? "编辑问答" : "编辑动态"}</h4>
+        <h4 className="aichat-moldt-info-form__h">{isQa ? "编辑问答" : "编辑朋友圈"}</h4>
         {isQa && (
           <>
             <label className="aichat-moldt-info-form__lab" htmlFor="pcf-title">
@@ -143,7 +143,7 @@ export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
   if (items.length === 0) {
     return (
       <div className="moments-my-empty">
-        <p>还没有动态。点右上角「添加」写一条。</p>
+        <p>还没有朋友圈内容。点右上角「添加」写一条。</p>
       </div>
     );
   }
@@ -152,7 +152,7 @@ export function MyMomentsFeed({ refreshKey, onChanged }: Props) {
 
   return (
     <>
-      <div className="moments-my-day-groups" aria-label="我的动态">
+      <div className="moments-my-day-groups" aria-label="我的朋友圈">
         {dayGroups.map((group) => (
           <section key={group.dayKey} className="moments-my-day-group">
             <h2 className="moments-my-day-group__title">

@@ -39,7 +39,7 @@ export function MyMomentsPage({ onBack }: Props) {
           返回
         </button>
         <div className="aichat-stage-head">
-          <h1>我的动态</h1>
+          <h1>我的朋友圈</h1>
         </div>
         <button className="moments-layered-topbar__btn" type="button" onClick={() => setShowAdd(true)}>
           添加
