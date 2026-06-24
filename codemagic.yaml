@@ -202,6 +202,13 @@ workflows:
           npm run sync:ios
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
+      - name: Set iOS build number
+        script: |
+          cd frontend/ios/App
+          BUILD_NUM="${BUILD_NUMBER}"
+          if [ "$BUILD_NUM" -lt 2 ]; then BUILD_NUM=2; fi
+          sed -i.bak "s/CURRENT_PROJECT_VERSION = [0-9][0-9]*;/CURRENT_PROJECT_VERSION = ${BUILD_NUM};/g" App.xcodeproj/project.pbxproj
+          echo "CURRENT_PROJECT_VERSION=${BUILD_NUM}"
       - name: Build ipa for distribution
         script: |
           cd frontend/ios/App
