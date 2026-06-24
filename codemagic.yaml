@@ -3,7 +3,7 @@
 #
 # Codemagic UI 需配置：
 # 1. Environment variables
-#    - VITE_API_BASE  生产 HTTPS 后端地址（如 https://api.example.com）
+#    - VITE_API_BASE  iOS/Android 正式包：https://hellotita.top/hello-chat（勿用局域网 IP）
 #    - VITE_USE_MOCK  0
 # 2. android_signing（Android release）
 #    - 上传 keystore，Reference name 填 aichat_keystore
@@ -172,7 +172,7 @@ workflows:
         provisioning_profiles:
           - aichat-appstore
       vars:
-        VITE_API_BASE: http://192.168.137.1:4000
+        VITE_API_BASE: https://hellotita.top/hello-chat
         VITE_USE_MOCK: "0"
         XCODE_PROJECT: frontend/ios/App/App.xcodeproj
         XCODE_SCHEME: App
@@ -235,7 +235,7 @@ workflows:
         provisioning_profiles:
           - aichat-adhoc
       vars:
-        VITE_API_BASE: http://192.168.137.1:4000
+        VITE_API_BASE: https://hellotita.top/hello-chat
         VITE_USE_MOCK: "0"
         XCODE_PROJECT: frontend/ios/App/App.xcodeproj
         XCODE_SCHEME: App

@@ -104,7 +104,7 @@ export function LoginPage({ onSuccess }: Props) {
   }
 
   const digits = normalizePhoneInput(phone);
-  const canSend = isValidCnMobile(digits) && cooldown === 0 && !sending;
+  const canSend = cooldown === 0 && !sending;
 
   return (
     <div className="aichat-shell">
@@ -149,8 +149,13 @@ export function LoginPage({ onSuccess }: Props) {
               value={code}
               onChange={(e) => setCode(e.target.value)}
             />
-            <button className="aichat-btn-ghost aichat-login-code-btn" type="button" disabled={!canSend} onClick={onSendCode}>
-              {cooldown > 0 ? `${cooldown}s` : sending ? "…" : "获取验证码"}
+            <button
+              className="aichat-btn-ghost aichat-login-code-btn"
+              type="button"
+              disabled={!canSend}
+              onClick={onSendCode}
+            >
+              {cooldown > 0 ? `${cooldown}s` : sending ? "发送中…" : "获取验证码"}
             </button>
           </div>
           {msg ? <p className={error ? "aichat-form-msg err" : "aichat-form-msg ok"}>{msg}</p> : null}
